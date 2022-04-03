@@ -19,10 +19,10 @@ func AttackSystem() {
 					tarObj, ok1 := resultH.Components[myecs.Object].(*object.Object)
 					hp, ok2 := resultH.Components[myecs.Health].(*data.Health)
 					hitbox := resultH.Components[myecs.Hitbox]
-					if ok1 && ok2 && (atk.Team == 0 || (atk.Team != hp.Team && hp.Team != 0)) {
+					if ok1 && ok2 && !hp.Dead && (atk.Team == 0 || (atk.Team != hp.Team && hp.Team != 0)) {
 						c, okC := hitbox.(*pixel.Circle)
 						r, okR := hitbox.(*pixel.Rect)
-						rng := pixel.C(obj.Pos, atk.Range)
+						rng := pixel.C(obj.Pos, atk.Range * 0.5)
 						if (okC && rng.Intersect(c.Moved(tarObj.Pos)).Radius > 0.) ||
 							(okR && rng.IntersectRect(r.Moved(tarObj.Pos)) != pixel.ZV) {
 							atk.Attacking = true

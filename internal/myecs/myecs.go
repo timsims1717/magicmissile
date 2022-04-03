@@ -27,7 +27,7 @@ var (
 	HasParent  = ecs.BuildTag(Object, Parent)
 	IsDrawable = ecs.BuildTag(Object, Drawable)
 	HasAnim    = ecs.BuildTag(Animated)
-	HasUpdate  = ecs.BuildTag(Update, Object)
+	HasUpdate  = ecs.BuildTag(Update)
 
 	HasHealth  = ecs.BuildTag(Object, Health, Hitbox)
 	PlayerChar = ecs.BuildTag(Object, Movable, Health)

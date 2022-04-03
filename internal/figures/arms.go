@@ -11,9 +11,9 @@ import (
 
 func ArmObj() *object.Object {
 	armObj := object.New()
-	armObj.Pos.X += 14.
-	armObj.Pos.Y += 28.
-	armObj.RotArnd = pixel.V(-14., -28.)
+	armObj.Pos.X += 12.
+	armObj.Pos.Y += 12.
+	armObj.RotArnd = pixel.V(-12., -12.)
 	return armObj
 }
 

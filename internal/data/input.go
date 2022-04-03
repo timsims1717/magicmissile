@@ -12,6 +12,14 @@ var TheInput = &input.Input{
 		"1":         input.NewJoyless(pixelgl.Key1),
 		"2":         input.NewJoyless(pixelgl.Key2),
 		"click":     input.NewJoyless(pixelgl.MouseButtonLeft),
+		"switchR":   {
+			Keys:     []pixelgl.Button{pixelgl.KeyE},
+			Scroll:   1,
+		},
+		"switchL":   {
+			Keys:     []pixelgl.Button{pixelgl.KeyQ},
+			Scroll:   -1,
+		},
 	},
 	Mode: input.KeyboardMouse,
 }

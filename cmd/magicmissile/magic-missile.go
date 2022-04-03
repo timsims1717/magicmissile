@@ -31,6 +31,11 @@ func run() {
 	camera.Cam.SetZoom(1.)
 	camera.Cam.SetSize(1600., 900.)
 
+	stuffSheet, err := img.LoadSpriteSheet("assets/stuff.json")
+	if err != nil {
+		panic(err)
+	}
+	img.AddBatcher("stuff", stuffSheet, true, true)
 	testSheet, err := img.LoadSpriteSheet("assets/test.json")
 	if err != nil {
 		panic(err)

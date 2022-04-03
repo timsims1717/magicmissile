@@ -1,6 +1,7 @@
 package payloads
 
 import (
+	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"image/color"
@@ -22,13 +23,13 @@ func BasicMissile(start, target pixel.Vec, speed float64, rgba color.RGBA) {
 	spr := &img.Sprite{
 		Key:    "missile",
 		Color:  rgba,
-		Batch:  "test",
+		Batch:  "figures",
 	}
 	hp := &data.Health{
 		HP:   1,
 		Team: data.NoTeam,
 	}
-	hitbox := pixel.R(-7.5, -2.5, 7.5, 2.5)
+	hitbox := pixel.R(-16., -3.5, 16, 3.5)
 	myecs.Manager.NewEntity().
 		AddComponent(myecs.Object, obj).
 		AddComponent(myecs.Drawable, spr).
@@ -41,6 +42,184 @@ func BasicMissile(start, target pixel.Vec, speed float64, rgba color.RGBA) {
 				BasicExplosion(obj.Pos, 30., 2., rgba)
 			},
 		})
+}
+
+func MagicMissile(start, target pixel.Vec, speed float64, rgba color.RGBA) {
+	for i := 0; i < 3; i++ {
+		pos := target
+		s := start
+		spd := speed
+		col := rgba
+		e := myecs.Manager.NewEntity()
+		e.AddComponent(myecs.Update, data.NewTimerFunc(func() bool {
+			pos.X += rand.Float64() * 40. - 20.
+			pos.Y += rand.Float64() * 40. - 20.
+			BasicMissile(s, pos, spd, col)
+			myecs.Manager.DisposeEntity(e)
+			return false
+		}, float64(i) * 0.15))
+	}
+}
+
+func Fireball(start, target pixel.Vec, speed float64) {
+	obj := object.New()
+	obj.Pos = start
+	obj.Rot = target.Sub(start).Angle()
+	col := color.RGBA{
+		R: 223,
+		G: 62,
+		B: 35,
+		A: 255,
+	}
+	spr := &img.Sprite{
+		Key:    "missile",
+		Color:  col,
+		Batch:  "figures",
+	}
+	hp := &data.Health{
+		HP:   1,
+		Team: data.NoTeam,
+	}
+	hitbox := pixel.R(-16., -3.5, 16, 3.5)
+	myecs.Manager.NewEntity().
+		AddComponent(myecs.Object, obj).
+		AddComponent(myecs.Drawable, spr).
+		AddComponent(myecs.Health, hp).
+		AddComponent(myecs.Hitbox, &hitbox).
+		AddComponent(myecs.Payload, &data.Missile{
+			Target: target,
+			Speed:  speed,
+			Finish: func(pos pixel.Vec) {
+				BasicExplosion(obj.Pos, 75., 2., col)
+			},
+		})
+}
+
+func ChaosBolt(start, target pixel.Vec, speed float64, count int) {
+	obj := object.New()
+	obj.Pos = start
+	obj.Rot = target.Sub(start).Angle()
+	r := false
+	g := false
+	b := false
+	c := rand.Intn(3)
+	var R1, G1, B1 uint8
+	if c == 0 {
+		r = true
+		B1 = 255
+	} else if c == 1 {
+		g = true
+		R1 = 255
+	} else {
+		b = true
+		G1 = 255
+	}
+	col := color.RGBA{
+		R: R1,
+		G: G1,
+		B: B1,
+		A: 255,
+	}
+	spr := &img.Sprite{
+		Key:    "missile",
+		Color:  col,
+		Batch:  "figures",
+	}
+	hitbox := pixel.R(-16., -3.5, 16, 3.5)
+	e := myecs.Manager.NewEntity().
+		AddComponent(myecs.Object, obj).
+		AddComponent(myecs.Drawable, spr).
+		AddComponent(myecs.Hitbox, &hitbox).
+		AddComponent(myecs.Update, data.NewFrameFunc(func() bool {
+			add := int(timing.DT * 450.)
+			R, G, B := int(spr.Color.R), int(spr.Color.G), int(spr.Color.B)
+			if r {
+				if R + add > 255 {
+					R = 255
+					r = false
+					g = true
+				} else {
+					R += add
+				}
+				if G - add < 0 {
+					G = 0
+				} else {
+					G -= add
+				}
+				if B - add < 0 {
+					B = 0
+				} else {
+					B -= add
+				}
+			}
+			if g {
+				if G + add > 255 {
+					G = 255
+					g = false
+					b = true
+				} else {
+					G += add
+				}
+				if R - add < 0 {
+					R = 0
+				} else {
+					R -= add
+				}
+				if B - add < 0 {
+					B = 0
+				} else {
+					B -= add
+				}
+			}
+			if b {
+				if B + add > 255 {
+					B = 255
+					b = false
+					r = true
+				} else {
+					B += add
+				}
+				if R - add < 0 {
+					R = 0
+				} else {
+					R -= add
+				}
+				if G - add < 0 {
+					G = 0
+				} else {
+					G -= add
+				}
+			}
+			spr.Color.R = uint8(R)
+			spr.Color.G = uint8(G)
+			spr.Color.B = uint8(B)
+			return false
+		})).
+		AddComponent(myecs.Payload, &data.Missile{
+			Target: target,
+			Speed:  speed,
+			Finish: func(pos pixel.Vec) {
+				if count < rand.Intn(6) + 1 {
+					tar := pos
+					tar.X += rand.Float64()*150. - 75.
+					tar.Y += rand.Float64()*150. - 75.
+					if tar.Y < game.Frame.Min.Y {
+						tar.Y = game.Frame.Min.Y
+					}
+					ChaosBolt(pos, tar, speed, count+1)
+					BasicExplosion(obj.Pos, 20. + (2. * float64(count+1)), 2., spr.Color)
+				} else {
+					BasicExplosion(obj.Pos, 40., 2., spr.Color)
+				}
+			},
+		})
+	if count == 0 {
+		hp := &data.Health{
+			HP:   1,
+			Team: data.NoTeam,
+		}
+		e.AddComponent(myecs.Health, hp)
+	}
 }
 
 func BasicExplosion(pos pixel.Vec, radius, expansion float64, rgba color.RGBA) {
@@ -56,24 +235,38 @@ func BasicExplosion(pos pixel.Vec, radius, expansion float64, rgba color.RGBA) {
 			imd.Color = rgba
 			imd.Push(pos)
 			imd.Circle(exp.CurrRadius, 0.)
+			imd.Color = color.RGBA{
+				R: 0,
+				G: 0,
+				B: 0,
+				A: 255,
+			}
+			imd.Push(pos)
+			imd.Circle(exp.CurrRadius, 1.)
 		})).
 		AddComponent(myecs.Payload, exp)
 }
 
-func BasicMeteor() {
+func BasicMeteor(spd float64, pos pixel.Vec) {
 	obj := object.New()
-	obj.Pos.X = float64(rand.Intn(1520) - 760)
-	obj.Pos.Y = 460.
+	if pos == pixel.ZV {
+		obj.Pos.X = float64(rand.Intn(1520) - 760)
+		obj.Pos.Y = 460.
+	} else {
+		obj.Pos = pos
+		obj.Pos.X += rand.Float64() * 48. - 24.
+		obj.Pos.Y += rand.Float64() * 48. - 24.
+	}
 	obj.Rot = math.Pi * rand.Float64() * 2. - 1.
 	spr := &img.Sprite{
-		Key:    "meteor",
+		Key:    fmt.Sprintf("meteor_sm_%d", rand.Intn(2)),
 		Color:  color.RGBA{
 			R: 255,
 			G: 255,
 			B: 255,
 			A: 255,
 		},
-		Batch:  "test",
+		Batch:  "stuff",
 	}
 	var target pixel.Vec
 	try := 0
@@ -85,28 +278,120 @@ func BasicMeteor() {
 		}
 		try++
 		if try > 12 {
-			target = pixel.V(float64(rand.Intn(1520)-760), -325.)
+			target = pixel.V(float64(rand.Intn(1520)-760), game.TownYLvl)
 			break
 		}
 	}
-	speed := 50.
+	speed := spd
 	hp := &data.Health{
 		HP: 1,
 	}
-	hitbox := pixel.C(pixel.ZV, 8.5)
+	hitbox := pixel.C(pixel.ZV, 16.)
+	obj.Rot = math.Pi * rand.Float64() * 2. - 1.
+	rSpd := rand.Float64() * 2. - 1.
 	myecs.Manager.NewEntity().
 		AddComponent(myecs.Object, obj).
 		AddComponent(myecs.Drawable, spr).
 		AddComponent(myecs.Health, hp).
 		AddComponent(myecs.Hitbox, &hitbox).
+		AddComponent(myecs.Update, data.NewFrameFunc(func() bool {
+			obj.Rot += rSpd * timing.DT
+			if obj.Rot > math.Pi {
+				obj.Rot -= math.Pi * 2.
+			} else if obj.Rot < -math.Pi {
+				obj.Rot += math.Pi * 2.
+			}
+			return false
+		})).
 		AddComponent(myecs.Payload, &data.Missile{
 			Target: target,
 			Speed:  speed,
 			Finish: func(pos pixel.Vec) {
-				BasicExplosion(obj.Pos, 50., 2., color.RGBA{
-					R: 200,
-					G: 100,
-					B: 0,
+				BasicExplosion(obj.Pos, 60., 1., color.RGBA{
+					R: 223,
+					G: 62,
+					B: 35,
+					A: 255,
+				})
+			},
+		})
+}
+
+func BigMeteor(spd float64) {
+	obj := object.New()
+	obj.Pos.X = float64(rand.Intn(1520) - 760)
+	obj.Pos.Y = 460.
+	obj.Rot = math.Pi * rand.Float64() * 2. - 1.
+	spr := &img.Sprite{
+		Key:    "meteor_lrg",
+		Color:  color.RGBA{
+			R: 255,
+			G: 255,
+			B: 255,
+			A: 255,
+		},
+		Batch:  "stuff",
+	}
+	var target pixel.Vec
+	try := 0
+	for {
+		town := game.Towns[rand.Intn(len(game.Towns))]
+		if !town.Health.Dead {
+			target = town.Obj.Pos
+			break
+		}
+		try++
+		if try > 12 {
+			target = pixel.V(float64(rand.Intn(1520)-760), game.TownYLvl)
+			break
+		}
+	}
+	speed := spd
+	hp := &data.Health{
+		HP: 1,
+	}
+	hitbox := pixel.C(pixel.ZV, 32.)
+	obj.Rot = math.Pi * rand.Float64() * 2. - 1.
+	rSpd := rand.Float64() * 2. - 1.
+	var breakUp *timing.Timer
+	if rand.Intn(2) == 0 {
+		breakUp = timing.New(rand.Float64()*3. + 2.)
+	}
+	e := myecs.Manager.NewEntity()
+	e.AddComponent(myecs.Object, obj).
+		AddComponent(myecs.Drawable, spr).
+		AddComponent(myecs.Health, hp).
+		AddComponent(myecs.Hitbox, &hitbox).
+		AddComponent(myecs.Update, data.NewFrameFunc(func() bool {
+			obj.Rot += rSpd * timing.DT
+			if obj.Rot > math.Pi {
+				obj.Rot -= math.Pi * 2.
+			} else if obj.Rot < -math.Pi {
+				obj.Rot += math.Pi * 2.
+			}
+			twnCnt := 0
+			for _, twn := range game.Towns {
+				if !twn.Health.Dead {
+					twnCnt++
+				}
+			}
+			if breakUp != nil && breakUp.UpdateDone() && twnCnt > 2 {
+				cnt := rand.Intn(2) + 3
+				for i := 0; i < cnt; i++ {
+					BasicMeteor(spd, obj.Pos)
+				}
+				myecs.Manager.DisposeEntity(e)
+			}
+			return false
+		})).
+		AddComponent(myecs.Payload, &data.Missile{
+			Target: target,
+			Speed:  speed,
+			Finish: func(pos pixel.Vec) {
+				BasicExplosion(obj.Pos, 90., 1., color.RGBA{
+					R: 223,
+					G: 62,
+					B: 35,
 					A: 255,
 				})
 			},
@@ -115,9 +400,9 @@ func BasicMeteor() {
 
 func BasicZombie() {
 	col := color.RGBA{
-		R: 60,
-		G: 200,
-		B: 40,
+		R: 91,
+		G: 149,
+		B: 56,
 		A: 255,
 	}
 	mob := &data.Mob{

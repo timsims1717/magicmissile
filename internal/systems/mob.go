@@ -32,15 +32,15 @@ func MobSystem() {
 									obj.Pos.Y = mob.Target.Obj.Pos.Y
 								}
 							} else {
-								if obj.Pos.Y > -375. {
+								if obj.Pos.Y > game.CharYLvl {
 									obj.Pos.Y -= mob.Speed * timing.DT
-									if obj.Pos.Y < -375. {
-										obj.Pos.Y = -375.
+									if obj.Pos.Y < game.CharYLvl {
+										obj.Pos.Y = game.CharYLvl
 									}
-								} else if obj.Pos.Y < -375. {
+								} else if obj.Pos.Y < game.CharYLvl {
 									obj.Pos.Y += mob.Speed * timing.DT
-									if obj.Pos.Y > -375. {
-										obj.Pos.Y = -375.
+									if obj.Pos.Y > game.CharYLvl {
+										obj.Pos.Y = game.CharYLvl
 									}
 								}
 							}

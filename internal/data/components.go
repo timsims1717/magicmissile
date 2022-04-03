@@ -61,10 +61,12 @@ type Health struct {
 }
 
 type Moving struct {
-	Selected bool
-	Moving   bool
-	Speed    float64
-	Key      string
+	Selected  bool
+	Moving    bool
+	Speed     float64
+	Key       string
+	Up        bool
+	Wait      bool
 }
 
 type Town struct {

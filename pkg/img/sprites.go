@@ -56,7 +56,7 @@ func Draw(target pixel.Target) {
 
 type Sprite struct {
 	Key    string
-	Color  color.Color
+	Color  color.RGBA
 	Batch  string
 }
 
