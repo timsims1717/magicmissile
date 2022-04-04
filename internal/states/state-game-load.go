@@ -351,41 +351,56 @@ func loadScenery() {
 	grass := &img.Sprite{
 		Key:    "grass",
 		Color:  white,
-		Batch:  "scenery",
+		Batch:  "sceneryfg",
 	}
-	//path := &img.Sprite{
-	//	Key:    "grass",
-	//	Color:  white,
-	//	Batch:  "scenery",
-	//}
-	layer1Y := -450.
-	layer2Y := layer1Y + 32.
-	layer3Y := layer1Y + 64.
-	layer4Y := layer1Y + 96.
+	path := &img.Sprite{
+		Key:    "path",
+		Color:  white,
+		Batch:  "sceneryfg",
+	}
+	layer1Y := -460.
+	layer2Y := layer1Y + 24.
+	layer3Y := layer1Y + 48.
+	layer4Y := layer1Y + 72.
+	layer5Y := layer1Y + 96.
+	layer6Y := layer1Y + 120.
+	layer7Y := layer1Y + 144.
 	layer1X := -800.
-	layer2X := layer1X + 10.
-	layer3X := layer1X + 17.
-	layer4X := layer1X + 22.
 	for i := 0; i < 16; i++ {
+		obj7 := object.New()
+		obj7.Pos = pixel.V(layer1X + float64(i) * 128., layer7Y)
+		myecs.Manager.NewEntity().
+			AddComponent(myecs.Object, obj7).
+			AddComponent(myecs.Drawable, path)
+		obj6 := object.New()
+		obj6.Pos = pixel.V(layer1X + float64(i) * 128., layer6Y)
+		myecs.Manager.NewEntity().
+			AddComponent(myecs.Object, obj6).
+			AddComponent(myecs.Drawable, grass)
+		obj5 := object.New()
+		obj5.Pos = pixel.V(layer1X + float64(i) * 128., layer5Y)
+		myecs.Manager.NewEntity().
+			AddComponent(myecs.Object, obj5).
+			AddComponent(myecs.Drawable, grass)
+		obj4 := object.New()
+		obj4.Pos = pixel.V(layer1X + float64(i) * 128., layer4Y)
+		myecs.Manager.NewEntity().
+			AddComponent(myecs.Object, obj4).
+			AddComponent(myecs.Drawable, grass)
+		obj3 := object.New()
+		obj3.Pos = pixel.V(layer1X + float64(i) * 128., layer3Y)
+		myecs.Manager.NewEntity().
+			AddComponent(myecs.Object, obj3).
+			AddComponent(myecs.Drawable, grass)
+		obj2 := object.New()
+		obj2.Pos = pixel.V(layer1X + float64(i) * 128., layer2Y)
+		myecs.Manager.NewEntity().
+			AddComponent(myecs.Object, obj2).
+			AddComponent(myecs.Drawable, grass)
 		obj1 := object.New()
 		obj1.Pos = pixel.V(layer1X + float64(i) * 128., layer1Y)
 		myecs.Manager.NewEntity().
 			AddComponent(myecs.Object, obj1).
-			AddComponent(myecs.Drawable, grass)
-		obj2 := object.New()
-		obj2.Pos = pixel.V(layer2X + float64(i) * 128., layer2Y)
-		myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, obj2).
-			AddComponent(myecs.Drawable, grass)
-		obj3 := object.New()
-		obj3.Pos = pixel.V(layer3X + float64(i) * 128., layer3Y)
-		myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, obj3).
-			AddComponent(myecs.Drawable, grass)
-		obj4 := object.New()
-		obj4.Pos = pixel.V(layer4X + float64(i) * 128., layer4Y)
-		myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, obj4).
 			AddComponent(myecs.Drawable, grass)
 	}
 }

@@ -37,9 +37,9 @@ func (s *menuState) Load() {
 	game.Title.SetPos(pixel.V(0., 250.))
 	game.Title.SetText("MagicMissile")
 	myecs.Manager.NewEntity().AddComponent(myecs.Object, game.Title.Obj)
-	loadScenery()
 	loadTowns()
-	sfx.MusicPlayer.PlayTrack("ambience", "wind")
+	loadScenery()
+	sfx.MusicPlayer.PlayMusic("ambience")
 }
 
 func (s *menuState) Update(win *pixelgl.Window) {

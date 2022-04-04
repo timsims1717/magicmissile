@@ -45,8 +45,9 @@ func run() {
 	sfx.SoundPlayer.RegisterSound("assets/zombie-hit.wav", "zombie-hit")
 
 	// music
-	sfx.MusicPlayer.RegisterMusicTrack("assets/wind.wav", "wind")
-	sfx.MusicPlayer.NewSet("ambience", []string{"wind"}, sfx.Repeat, 0., 4.)
+	sfx.MusicPlayer.RegisterMusicTrack("assets/wind1.wav", "wind1")
+	sfx.MusicPlayer.RegisterMusicTrack("assets/wind2.wav", "wind2")
+	sfx.MusicPlayer.NewSet("ambience", []string{"wind1", "wind2"}, sfx.Random, 0., 4.)
 
 	mainFont, err := typeface.LoadTTF("assets/FR73PixD.ttf", 200.)
 	typeface.Atlases["main"] = text.NewAtlas(mainFont, text.ASCII)
@@ -61,6 +62,11 @@ func run() {
 		panic(err)
 	}
 	img.AddBatcher("stuff", stuffSheet, true, true)
+	scenerySheet, err := img.LoadSpriteSheet("assets/scenery.json")
+	if err != nil {
+		panic(err)
+	}
+	img.AddBatcher("sceneryfg", scenerySheet, true, true)
 	testSheet, err := img.LoadSpriteSheet("assets/test.json")
 	if err != nil {
 		panic(err)
