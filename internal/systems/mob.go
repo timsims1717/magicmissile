@@ -50,7 +50,7 @@ func MobSystem() {
 									mob.Char.Obj.Flip = false
 								} else {
 									obj.Pos.X -= mob.Speed * timing.DT
-									mob.Char.Obj.Flip = true
+	 								mob.Char.Obj.Flip = true
 								}
 							}
 						}

@@ -29,11 +29,11 @@ func TemporarySystem() {
 }
 
 func ClearSystem() {
-	for _, result := range myecs.Manager.Query(myecs.IsTemp) {
-		trans, ok := result.Components[myecs.Object].(*object.Object)
+	for _, result := range myecs.Manager.Query(myecs.IsObject) {
+		obj, ok := result.Components[myecs.Object].(*object.Object)
 		if ok {
-			trans.Hide = true
-			trans.Gone = true
+			obj.Hide = true
+			obj.Gone = true
 		}
 		myecs.Manager.DisposeEntity(result.Entity)
 	}

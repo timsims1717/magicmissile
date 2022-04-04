@@ -13,6 +13,7 @@ import (
 	"timsims1717/magicmissile/internal/states/game"
 	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/object"
+	"timsims1717/magicmissile/pkg/sfx"
 	"timsims1717/magicmissile/pkg/timing"
 )
 
@@ -223,6 +224,11 @@ func ChaosBolt(start, target pixel.Vec, speed float64, count int) {
 }
 
 func BasicExplosion(pos pixel.Vec, radius, expansion float64, rgba color.RGBA) {
+	if expansion < 1.5 {
+		sfx.SoundPlayer.PlaySound("explosion1", 0.)
+	} else {
+		sfx.SoundPlayer.PlaySound("explosion2", 0.)
+	}
 	obj := object.New()
 	obj.Pos = pos
 	exp := &data.Explosion{
@@ -399,6 +405,7 @@ func BigMeteor(spd float64) {
 }
 
 func BasicZombie() {
+	game.ZCount++
 	col := color.RGBA{
 		R: 91,
 		G: 149,
@@ -451,13 +458,37 @@ func BasicZombie() {
 	hitbox := pixel.R(-16., -32., 16., 32.)
 	zombieArm := figures.ZombieArm(col)
 	wobbleTimer := timing.New(0.8)
+	dead := false
+	var deadTimer *timing.Timer
 	arm := myecs.Manager.NewEntity()
+	e := myecs.Manager.NewEntity()
 	arm.AddComponent(myecs.Parent, mob.Char.Obj).
 		AddComponent(myecs.Object, zombieArm.Obj).
 		AddComponent(myecs.Drawable, zombieArm.Spr).
 		AddComponent(myecs.Update, data.NewFrameFunc(func() bool {
 			if mob.Char.Health.Dead {
-				myecs.Manager.DisposeEntity(arm)
+				if !dead {
+					game.ZCount--
+					sfx.SoundPlayer.PlaySound("zombie-hit", -1.)
+					dead = true
+					deadTimer = timing.New(1.)
+				}
+				if mob.Char.Obj.Rot < math.Pi * 0.5 {
+					mob.Char.Obj.Rot += 8. * timing.DT
+					if mob.Char.Obj.Rot > math.Pi * 0.5 {
+						mob.Char.Obj.Rot = math.Pi * 0.5
+					}
+				}
+				if mob.Char.Obj.Pos.Y > game.DeadYLvl {
+					mob.Char.Obj.Pos.Y -= 160. * timing.DT
+					if mob.Char.Obj.Pos.Y < game.DeadYLvl {
+						mob.Char.Obj.Pos.Y = game.DeadYLvl
+					}
+				}
+				if deadTimer.UpdateDone() {
+					myecs.Manager.DisposeEntity(e)
+					myecs.Manager.DisposeEntity(arm)
+				}
 				return false
 			}
 			if mob.Attack.Attacking {
@@ -491,8 +522,7 @@ func BasicZombie() {
 			}
 			return false
 		}))
-	myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, mob.Char.Obj).
+	e.AddComponent(myecs.Object, mob.Char.Obj).
 		AddComponent(myecs.Mob, mob).
 		AddComponent(myecs.Health, mob.Char.Health).
 		AddComponent(myecs.Hitbox, &hitbox).

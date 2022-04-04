@@ -7,7 +7,7 @@ import (
 
 type State interface {
 	Unload()
-	Load(chan struct{})
+	Load()
 	Update(*pixelgl.Window)
 	Draw(*pixelgl.Window)
 	SetAbstract(*AbstractState)
@@ -15,7 +15,6 @@ type State interface {
 
 type AbstractState struct {
 	State
-	LoadPrc float64
 }
 
 func New(state State) *AbstractState {
@@ -30,9 +29,6 @@ var (
 	switchState = false
 	currState   = "unknown"
 	nextState   = "unknown"
-	loading     = false
-	loadingDone = false
-	done        = make(chan struct{})
 
 	States = map[string]*AbstractState{}
 )
@@ -47,48 +43,26 @@ func Register(key string, state *AbstractState) {
 
 func Update(win *pixelgl.Window) {
 	updateState()
-	if loading {
-		select{
-		case <-done:
-			loading = false
-			loadingDone = true
-		default:
-			if LoadingScreen.Update != nil {
-				LoadingScreen.Update(win)
-			}
-		}
-	} else {
-		if cState, ok := States[currState]; ok {
-			cState.Update(win)
-		}
+	if cState, ok := States[currState]; ok {
+		cState.Update(win)
 	}
 }
 
 func Draw(win *pixelgl.Window) {
-	if loading {
-		if LoadingScreen.Draw != nil {
-			LoadingScreen.Draw(win)
-		}
-	} else if !loadingDone {
-		if cState, ok := States[currState]; ok {
-			cState.Draw(win)
-		}
-	} else {
-		loadingDone = false
+	if cState, ok := States[currState]; ok {
+		cState.Draw(win)
 	}
 }
 
 func updateState() {
-	if !loading && (currState != nextState || switchState) {
+	if currState != nextState || switchState {
 		// uninitialize
 		if cState, ok := States[currState]; ok {
-			go cState.Unload()
+			cState.Unload()
 		}
 		// initialize
 		if cState, ok := States[nextState]; ok {
-			go cState.Load(done)
-			loading = true
-			loadingDone = false
+			cState.Load()
 		}
 		currState = nextState
 		switchState = false

@@ -100,12 +100,3 @@ const (
 	Player
 	Enemy
 )
-
-type Animations int
-
-const (
-	Idle = iota
-	Move
-	WindUp
-	Atk
-)

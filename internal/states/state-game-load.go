@@ -2,6 +2,7 @@ package states
 
 import (
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"image/color"
 	"math"
 	"math/rand"
@@ -12,6 +13,7 @@ import (
 	"timsims1717/magicmissile/internal/states/game"
 	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/object"
+	"timsims1717/magicmissile/pkg/sfx"
 	"timsims1717/magicmissile/pkg/timing"
 )
 
@@ -77,8 +79,19 @@ func loadWizard() {
 		AddComponent(myecs.Object, wandArm.Obj).
 		AddComponent(myecs.Drawable, wandArm.Spr).
 		AddComponent(myecs.Update, data.NewFrameFunc(func() bool {
+			game.WizText.Obj.Pos.X = pc.Char.Obj.Pos.X
 			if waitTimer.UpdateDone() {
 				pc.Move.Wait = false
+				var s string
+				switch spell {
+				case 0:
+					s = "Magic Missile"
+				case 1:
+					s = "Chaos Bolt"
+				case 2:
+					s = "Fireball"
+				}
+				game.WizText.SetText(s)
 			}
 			angle := game.Cursor.Sub(pc.Char.Obj.Pos).Angle()
 			if pc.Char.Obj.Flip {
@@ -86,17 +99,17 @@ func loadWizard() {
 			} else {
 				wandArm.Obj.Rot = angle
 			}
-			if data.TheInput.Get("click").JustPressed() && pc.Move.Selected {
+			if data.TheInput.Get("click").JustPressed() && pc.Move.Selected && !pc.Move.Wait {
 				switch spell {
 				case 0:
-					payloads.MagicMissile(pc.Char.Obj.Pos, data.TheInput.World, 500., wizCol)
+					payloads.MagicMissile(pc.Char.Obj.Pos, game.Cursor, 500., wizCol)
 				case 1:
-					payloads.ChaosBolt(pc.Char.Obj.Pos, data.TheInput.World, 500., 0)
+					payloads.ChaosBolt(pc.Char.Obj.Pos, game.Cursor, 500., 0)
 				case 2:
-					payloads.Fireball(pc.Char.Obj.Pos, data.TheInput.World, 500.)
+					payloads.Fireball(pc.Char.Obj.Pos, game.Cursor, 500.)
 				}
 				spell = rand.Intn(3)
-				waitTimer = timing.New(0.)
+				waitTimer = timing.New(0.25)
 				pc.Move.Wait = true
 			}
 			return false
@@ -128,9 +141,11 @@ func loadWizard() {
 				}
 				e.RemoveComponent(myecs.Movable)
 				arm.RemoveComponent(myecs.Update)
+				game.WizText.SetText("Aaargh.")
 			}
 			return false
 		}))
+	HPBar(&pc.Char.Obj.Pos, pc.Char.Health, 4)
 	game.PCs = append(game.PCs, pc)
 }
 
@@ -240,6 +255,7 @@ func loadFighter() {
 }
 
 func loadTowns() {
+	game.Towns = []*data.Town{}
 	spr := &img.Sprite{
 		Key:    "house1",
 		Color:  white,
@@ -265,18 +281,111 @@ func loadTowns() {
 		}
 		hitbox := pixel.R(-2., -2., 2., 2.)
 		e := myecs.Manager.NewEntity()
-		e.AddComponent(myecs.Object, obj).
-			AddComponent(myecs.Health, hp).
+		e.AddComponent(myecs.Object, town.Obj).
+			AddComponent(myecs.Health, town.Health).
 			AddComponent(myecs.Hitbox, &hitbox).
 			AddComponent(myecs.Drawable, spr).
 			AddComponent(myecs.Update, data.NewFrameFunc(func() bool {
-				if hp.Dead {
+				if town.Health.Dead {
 					e.RemoveComponent(myecs.Health)
 					e.RemoveComponent(myecs.Hitbox)
 					e.AddComponent(myecs.Drawable, sprD)
+					sfx.SoundPlayer.PlaySound("smash", -2.)
+					return true
 				}
 				return false
 			}))
+		HPBar(&town.Obj.Pos, town.Health, 5)
 		game.Towns = append(game.Towns, town)
+	}
+}
+
+func HPBar(parent *pixel.Vec, hp *data.Health, total int) {
+	y := parent.Y
+	obj := object.New()
+	e := myecs.Manager.NewEntity()
+	e.AddComponent(myecs.Object, obj).
+		AddComponent(myecs.Update, data.NewFrameFunc(func() bool {
+			obj.Pos.Y = y + 50.
+			obj.Pos.X = parent.X
+			return false
+		})).
+		AddComponent(myecs.Drawable, data.NewImdFunc("health", func(vec pixel.Vec, imd *imdraw.IMDraw) {
+			if !hp.Dead && hp.HP < total {
+				imd.Color = color.RGBA{
+					R: 109,
+					G: 117,
+					B: 141,
+					A: 255,
+				}
+				imd.EndShape = imdraw.RoundEndShape
+				l := obj.Pos.X - 16.
+				r := obj.Pos.X + 16.
+				t := obj.Pos.Y + 3.
+				b := obj.Pos.Y - 3.
+				il := obj.Pos.X - 14.
+				ir := obj.Pos.X + (28. / float64(total) * float64(hp.HP)) - 14.
+				it := obj.Pos.Y + 2.
+				ib := obj.Pos.Y - 2.
+				imd.Push(pixel.V(l, b))
+				imd.Push(pixel.V(l, t))
+				imd.Push(pixel.V(r, t))
+				imd.Push(pixel.V(r, b))
+				imd.Polygon(0.)
+				imd.Color = color.RGBA{
+					R: 180,
+					G: 32,
+					B: 42,
+					A: 255,
+				}
+				imd.Push(pixel.V(il, ib))
+				imd.Push(pixel.V(il, it))
+				imd.Push(pixel.V(ir, it))
+				imd.Push(pixel.V(ir, ib))
+				imd.Polygon(0.)
+			}
+		}))
+}
+
+func loadScenery() {
+	grass := &img.Sprite{
+		Key:    "grass",
+		Color:  white,
+		Batch:  "scenery",
+	}
+	//path := &img.Sprite{
+	//	Key:    "grass",
+	//	Color:  white,
+	//	Batch:  "scenery",
+	//}
+	layer1Y := -450.
+	layer2Y := layer1Y + 32.
+	layer3Y := layer1Y + 64.
+	layer4Y := layer1Y + 96.
+	layer1X := -800.
+	layer2X := layer1X + 10.
+	layer3X := layer1X + 17.
+	layer4X := layer1X + 22.
+	for i := 0; i < 16; i++ {
+		obj1 := object.New()
+		obj1.Pos = pixel.V(layer1X + float64(i) * 128., layer1Y)
+		myecs.Manager.NewEntity().
+			AddComponent(myecs.Object, obj1).
+			AddComponent(myecs.Drawable, grass)
+		obj2 := object.New()
+		obj2.Pos = pixel.V(layer2X + float64(i) * 128., layer2Y)
+		myecs.Manager.NewEntity().
+			AddComponent(myecs.Object, obj2).
+			AddComponent(myecs.Drawable, grass)
+		obj3 := object.New()
+		obj3.Pos = pixel.V(layer3X + float64(i) * 128., layer3Y)
+		myecs.Manager.NewEntity().
+			AddComponent(myecs.Object, obj3).
+			AddComponent(myecs.Drawable, grass)
+		obj4 := object.New()
+		obj4.Pos = pixel.V(layer4X + float64(i) * 128., layer4Y)
+		myecs.Manager.NewEntity().
+			AddComponent(myecs.Object, obj4).
+			AddComponent(myecs.Drawable, grass)
 	}
 }
