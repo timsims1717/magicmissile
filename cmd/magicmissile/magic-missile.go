@@ -4,24 +4,27 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
-	"image/color"
 	"math/rand"
 	"time"
+	"timsims1717/magicmissile/internal/data"
 	"timsims1717/magicmissile/internal/states"
-	"timsims1717/magicmissile/pkg/camera"
+	"timsims1717/magicmissile/pkg/debug"
 	"timsims1717/magicmissile/pkg/img"
+	"timsims1717/magicmissile/pkg/options"
 	"timsims1717/magicmissile/pkg/sfx"
 	"timsims1717/magicmissile/pkg/state"
 	"timsims1717/magicmissile/pkg/timing"
 	"timsims1717/magicmissile/pkg/typeface"
+	"timsims1717/magicmissile/pkg/viewport"
 )
 
 func run() {
 	rand.Seed(time.Now().Unix())
 	conf := pixelgl.WindowConfig{
-		Title:  "Magic Missile",
-		Bounds: pixel.R(0, 0, 1600, 900),
-		VSync:  true,
+		Title:     "Magic Missile",
+		Bounds:    pixel.R(0, 0, 1600, 900),
+		VSync:     true,
+		Invisible: true,
 	}
 	win, err := pixelgl.NewWindow(conf)
 	if err != nil {
@@ -29,10 +32,11 @@ func run() {
 	}
 	win.SetSmooth(true)
 
-	camera.Cam = camera.New(true)
-	camera.Cam.Opt.WindowScale = 900.
-	camera.Cam.SetZoom(1.)
-	camera.Cam.SetSize(1600., 900.)
+	viewport.MainCamera = viewport.New(win.Canvas())
+	viewport.MainCamera.SetRect(pixel.R(0, 0, 1600, 900))
+	viewport.MainCamera.PortPos = pixel.V(0., 0.)
+
+	options.VSync = true
 
 	// sfx
 	sfx.SoundPlayer.RegisterSound("assets/click.wav", "click")
@@ -80,25 +84,36 @@ func run() {
 	img.AddIMDrawer("explosions", true, true)
 	img.AddIMDrawer("health", true, true)
 
+	state.Register("bgtest", state.New(states.BGTestState))
 	state.Register("menu", state.New(states.MenuState))
 	state.Register("game", state.New(states.GameState))
-	state.SwitchState("menu")
+	state.SwitchState("bgtest")
 
+	debug.Initialize(&viewport.MainCamera.PostCamPos, &viewport.MainCamera.PostCamPos)
+
+	win.Show()
+	win.Canvas()
 	timing.Reset()
 	for !win.Closed() {
 		timing.Update()
+		debug.Clear()
+		options.WindowUpdate(win)
+
+		data.TheInput.Update(win, viewport.MainCamera.Mat)
+		if data.TheInput.Get("fullscreen").JustPressed() {
+			options.FullScreen = !options.FullScreen
+		}
+		if data.TheInput.Get("debugText").JustPressed() {
+			debug.Text = !debug.Text
+		}
 
 		state.Update(win)
-		camera.Cam.Update(win)
-
-		win.Clear(color.RGBA{
-			R: 0,
-			G: 0,
-			B: 0,
-			A: 255,
-		})
+		viewport.MainCamera.Update()
 
 		state.Draw(win)
+		//win.SetSmooth(false)
+		debug.Draw(win)
+		//win.SetSmooth(true)
 
 		sfx.MusicPlayer.Update()
 		win.Update()

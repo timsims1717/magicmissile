@@ -38,11 +38,11 @@ func New(parent *pixel.Vec, atlas string, align Alignment, lineHeight, relativeS
 	tex := text.New(pixel.ZV, Atlases[atlas])
 	tex.LineHeight *= lineHeight
 	obj := object.New()
-	obj.Scalar = pixel.V(relativeSize, relativeSize)
+	obj.Sca = pixel.V(relativeSize, relativeSize)
 	return &Text{
-		Text:         tex,
-		Align:        align,
-		Color:        color.RGBA{
+		Text:  tex,
+		Align: align,
+		Color: color.RGBA{
 			R: 255,
 			G: 255,
 			B: 255,

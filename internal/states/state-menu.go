@@ -8,11 +8,11 @@ import (
 	"timsims1717/magicmissile/internal/myecs"
 	"timsims1717/magicmissile/internal/states/game"
 	"timsims1717/magicmissile/internal/systems"
-	"timsims1717/magicmissile/pkg/camera"
 	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/sfx"
 	"timsims1717/magicmissile/pkg/state"
 	"timsims1717/magicmissile/pkg/typeface"
+	"timsims1717/magicmissile/pkg/viewport"
 )
 
 var MenuState = &menuState{}
@@ -43,12 +43,11 @@ func (s *menuState) Load() {
 }
 
 func (s *menuState) Update(win *pixelgl.Window) {
-	data.TheInput.Update(win)
+	data.TheInput.Update(win, viewport.MainCamera.Mat)
 	systems.TemporarySystem()
 	systems.FunctionSystem()
 	systems.FullTransformSystem()
 	UpdateMenus(data.TheInput)
-	camera.Cam.Update(win)
 }
 
 func (s *menuState) Draw(win *pixelgl.Window) {

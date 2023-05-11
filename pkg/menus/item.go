@@ -2,15 +2,15 @@ package menus
 
 import (
 	"github.com/faiface/pixel"
-	"timsims1717/magicmissile/pkg/camera"
 	"timsims1717/magicmissile/pkg/typeface"
+	"timsims1717/magicmissile/pkg/viewport"
 )
 
 type Item struct {
-	Key     string
-	Raw     string
-	Hint    string
-	Text    *typeface.Text
+	Key  string
+	Raw  string
+	Hint string
+	Text *typeface.Text
 
 	clickFn   func()
 	leftFn    func()
@@ -35,7 +35,7 @@ func NewItem(key, raw string, right bool) *Item {
 	if right {
 		align = typeface.Right
 	}
-	tex := typeface.New(&camera.Cam.APos, "main", typeface.NewAlign(typeface.Align(align), typeface.Bottom), 1.5, MenuSize, 0., 0.)
+	tex := typeface.New(&viewport.MainCamera.PostCamPos, "main", typeface.NewAlign(typeface.Align(align), typeface.Bottom), 1.5, MenuSize, 0., 0.)
 	tex.SetColor(DefaultColor)
 	tex.SetText(raw)
 	return &Item{

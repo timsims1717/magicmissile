@@ -18,7 +18,7 @@ func PayloadSystem() {
 				norm := util.Normalize(missile.Target.Sub(obj.Pos))
 				obj.Pos.X += norm.X * missile.Speed * timing.DT
 				obj.Pos.Y += norm.Y * missile.Speed * timing.DT
-				if obj.Gone || l == (missile.Target.X < obj.Pos.X) || b == (missile.Target.Y < obj.Pos.Y) {
+				if obj.Kill || l == (missile.Target.X < obj.Pos.X) || b == (missile.Target.Y < obj.Pos.Y) {
 					// missile reached target or was destroyed
 					if missile.Finish != nil {
 						missile.Finish(obj.Pos)

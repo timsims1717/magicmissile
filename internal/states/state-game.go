@@ -11,12 +11,12 @@ import (
 	"timsims1717/magicmissile/internal/payloads"
 	"timsims1717/magicmissile/internal/states/game"
 	"timsims1717/magicmissile/internal/systems"
-	"timsims1717/magicmissile/pkg/camera"
 	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/sfx"
 	"timsims1717/magicmissile/pkg/state"
 	"timsims1717/magicmissile/pkg/timing"
 	"timsims1717/magicmissile/pkg/typeface"
+	"timsims1717/magicmissile/pkg/viewport"
 )
 
 var white = color.RGBA{
@@ -68,12 +68,12 @@ func (s *gameState) Load() {
 	game.MsgTimer = timing.New(10.)
 	myecs.Manager.NewEntity().AddComponent(myecs.Object, game.OverText.Obj)
 	game.WizText = typeface.New(nil, "main", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 0.08, 0., 0.)
-	game.WizText.SetPos(pixel.V(0., game.CharYLvl - 60.))
+	game.WizText.SetPos(pixel.V(0., game.CharYLvl-60.))
 	myecs.Manager.NewEntity().AddComponent(myecs.Object, game.WizText.Obj)
 }
 
 func (s *gameState) Update(win *pixelgl.Window) {
-	data.TheInput.Update(win)
+	data.TheInput.Update(win, viewport.MainCamera.Mat)
 	if data.TheInput.Get("killAll").JustPressed() {
 		for _, town := range game.Towns {
 			town.Health.Dead = true
@@ -142,13 +142,13 @@ func (s *gameState) Update(win *pixelgl.Window) {
 			game.DTimer = timing.New(10.)
 		}
 		if game.ZSoundT.UpdateDone() {
-			game.ZSoundT = timing.New(4. + rand.Float64() * 8.)
+			game.ZSoundT = timing.New(4. + rand.Float64()*8.)
 			if game.ZCount > 0 {
 				sfx.SoundPlayer.PlaySound("zombie", 0.)
 			}
 		}
 		if game.ThunT.UpdateDone() {
-			game.ThunT = timing.New(40. + rand.Float64() * 240.)
+			game.ThunT = timing.New(40. + rand.Float64()*240.)
 			sfx.SoundPlayer.PlaySound(fmt.Sprintf("thunder%d", rand.Intn(2)+1), 0.)
 		}
 		if game.Timer != nil && !game.GameOver {
@@ -188,7 +188,6 @@ func (s *gameState) Update(win *pixelgl.Window) {
 		}
 	}
 	UpdateMenus(data.TheInput)
-	camera.Cam.Update(win)
 }
 
 func (s *gameState) Draw(win *pixelgl.Window) {

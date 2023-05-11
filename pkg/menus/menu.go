@@ -3,13 +3,13 @@ package menus
 import (
 	"fmt"
 	"github.com/faiface/pixel"
+	pxginput "github.com/timsims1717/pixel-go-input"
 	"image/color"
 	"math"
-	"timsims1717/magicmissile/pkg/camera"
-	"timsims1717/magicmissile/pkg/input"
 	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/sfx"
 	"timsims1717/magicmissile/pkg/util"
+	"timsims1717/magicmissile/pkg/viewport"
 )
 
 const (
@@ -35,32 +35,32 @@ var (
 		B: 141,
 		A: 255,
 	}
-	MenuSize = 0.45
+	MenuSize  = 0.45
 	HoverSize = 0.5
 )
 
 type Menu struct {
-	Key       string
-	ItemMap   map[string]*Item
-	Items     []*Item
-	Hovered   int
-	Top       int
-	Title     bool
-	Roll      bool
-	TLines    int
+	Key     string
+	ItemMap map[string]*Item
+	Items   []*Item
+	Hovered int
+	Top     int
+	Title   bool
+	Roll    bool
+	TLines  int
 
 	Tran *object.Object
-	Cam  *camera.Camera
+	Cam  *viewport.ViewPort
 
 	backFn   func()
 	openFn   func()
 	closeFn  func()
-	updateFn func(*input.Input)
+	updateFn func(*pxginput.Input)
 
 	Opened bool
 }
 
-func New(key string, cam *camera.Camera) *Menu {
+func New(key string, cam *viewport.ViewPort) *Menu {
 	tran := object.New()
 	return &Menu{
 		Key:     key,
@@ -90,7 +90,7 @@ func (m *Menu) InsertItem(key, raw, after string, right bool) *Item {
 	i := 0
 	for j, itemAfter := range m.Items {
 		if itemAfter.Key == after {
-			i = j+1
+			i = j + 1
 			break
 		}
 	}
@@ -149,7 +149,7 @@ func (m *Menu) CloseInstant() {
 	}
 }
 
-func (m *Menu) Update(in *input.Input) {
+func (m *Menu) Update(in *pxginput.Input) {
 	if m.Opened && in != nil {
 		m.UpdateView(in)
 	}
@@ -159,7 +159,7 @@ func (m *Menu) Update(in *input.Input) {
 	}
 }
 
-func (m *Menu) UpdateView(in *input.Input) {
+func (m *Menu) UpdateView(in *pxginput.Input) {
 	if in.Get("scrollUp").JustPressed() {
 		m.menuUp()
 	}
@@ -246,9 +246,9 @@ func (m *Menu) UpdateSize() {
 	for i, item := range m.Items {
 		if !item.noShowT {
 			if item.Right {
-				item.Text.SetPos(pixel.V(minWidth*0.5 - 10., minHeight*0.5 - float64(line+1)*item.Text.Text.LineHeight * MenuSize))
+				item.Text.SetPos(pixel.V(minWidth*0.5-10., minHeight*0.5-float64(line+1)*item.Text.Text.LineHeight*MenuSize))
 			} else {
-				nextY := minHeight*0.5 - float64(line+1)*item.Text.Text.LineHeight * MenuSize
+				nextY := minHeight*0.5 - float64(line+1)*item.Text.Text.LineHeight*MenuSize
 				nextX := minWidth*-0.5 + 5.
 				item.Text.SetPos(pixel.V(nextX, nextY))
 			}
@@ -259,7 +259,7 @@ func (m *Menu) UpdateSize() {
 	}
 }
 
-func (m *Menu) UpdateItems(in *input.Input) {
+func (m *Menu) UpdateItems(in *pxginput.Input) {
 	if in.Get("menuBack").JustPressed() {
 		m.Back()
 		in.Get("menuBack").Consume()
@@ -353,7 +353,7 @@ func (m *Menu) UnhoverAll() {
 	m.Hovered = -1
 }
 
-func (m *Menu) GetNextHover(dir, curr int, in *input.Input) {
+func (m *Menu) GetNextHover(dir, curr int, in *pxginput.Input) {
 	if curr == -1 {
 		m.setHover(-1)
 	}
@@ -368,7 +368,7 @@ func (m *Menu) GetNextHover(dir, curr int, in *input.Input) {
 	}
 }
 
-func (m *Menu) GetNextHoverHor(dir, curr int, in *input.Input) {
+func (m *Menu) GetNextHoverHor(dir, curr int, in *pxginput.Input) {
 	this := m.Items[curr]
 	nextI := -1
 	if dir == 2 && !this.Right && curr < len(m.Items)-1 {
@@ -389,7 +389,7 @@ func (m *Menu) GetNextHoverHor(dir, curr int, in *input.Input) {
 	}
 }
 
-func (m *Menu) GetNextHoverVert(dir, curr int, right bool, in *input.Input) {
+func (m *Menu) GetNextHoverVert(dir, curr int, right bool, in *pxginput.Input) {
 	nextI := curr
 	if dir == 0 {
 		nextI--

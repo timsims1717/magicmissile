@@ -12,6 +12,7 @@ require (
 )
 
 require (
+	github.com/aquilax/go-perlin v1.1.0 // indirect
 	github.com/faiface/beep v1.1.0 // indirect
 	github.com/faiface/glhf v0.0.0-20211013000516-57b20770c369 // indirect
 	github.com/faiface/mainthread v0.0.0-20171120011319-8b78f0a41ae3 // indirect
@@ -22,6 +23,7 @@ require (
 	github.com/hajimehoshi/oto v0.7.1 // indirect
 	github.com/jfreymuth/oggvorbis v1.0.1 // indirect
 	github.com/jfreymuth/vorbis v1.0.0 // indirect
+	github.com/timsims1717/pixel-go-input v0.0.0-20220809154241-bd3c6f7600c7 // indirect
 	golang.org/x/exp v0.0.0-20190306152737-a1d7652674e8 // indirect
 	golang.org/x/mobile v0.0.0-20190415191353-3e0bab5405d6 // indirect
 	golang.org/x/sys v0.0.0-20190626150813-e07cf5db2756 // indirect

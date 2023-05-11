@@ -2,8 +2,8 @@ package states
 
 import (
 	"github.com/faiface/pixel/pixelgl"
+	pxginput "github.com/timsims1717/pixel-go-input"
 	"timsims1717/magicmissile/internal/myecs"
-	"timsims1717/magicmissile/pkg/input"
 	"timsims1717/magicmissile/pkg/menus"
 	"timsims1717/magicmissile/pkg/sfx"
 	"timsims1717/magicmissile/pkg/state"
@@ -81,7 +81,7 @@ func InitGameOverMenu(win *pixelgl.Window) {
 	})
 }
 
-func UpdateMenus(in *input.Input) {
+func UpdateMenus(in *pxginput.Input) {
 	MainMenu.Update(in)
 	PauseMenu.Update(in)
 	GameOverMenu.Update(in)

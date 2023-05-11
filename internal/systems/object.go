@@ -37,11 +37,11 @@ func PreParentSystem() {
 func TransformSystem() {
 	for _, result := range myecs.Manager.Query(myecs.IsObject) {
 		if trans, ok := result.Components[myecs.Object].(*object.Object); ok {
-			trans.APos = trans.Pos.Add(trans.Offset)
+			trans.PostPos = trans.Pos.Add(trans.Offset)
 			//trans.APos.X = math.Round(trans.APos.X)
 			//trans.APos.Y = math.Round(trans.APos.Y)
-			trans.Mat = trans.Mat.ScaledXY(pixel.ZV, trans.Scalar)
-			trans.Mat = trans.Mat.Rotated(trans.RotArnd, trans.Rot)
+			trans.Mat = trans.Mat.ScaledXY(pixel.ZV, trans.Sca)
+			//trans.Mat = trans.Mat.Rotated(trans.RotArnd, trans.Rot)
 			if trans.Flip && trans.Flop {
 				trans.Mat = trans.Mat.Scaled(pixel.ZV, -1.)
 			} else if trans.Flip {
@@ -49,7 +49,7 @@ func TransformSystem() {
 			} else if trans.Flop {
 				trans.Mat = trans.Mat.ScaledXY(pixel.ZV, pixel.V(1., -1.))
 			}
-			trans.Mat = trans.Mat.Moved(trans.APos)
+			trans.Mat = trans.Mat.Moved(trans.PostPos)
 		}
 	}
 }

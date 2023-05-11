@@ -87,7 +87,7 @@ func (item *Text) SetText(raw string) {
 						widthMod -= sym.spr.Frame().W() * item.SymbolSize * sym.sca / item.RelativeSize
 					}
 				}
-				widthMod += item.Text.BoundsOf(item.Raw[bb:i+1]).W()
+				widthMod += item.Text.BoundsOf(item.Raw[bb : i+1]).W()
 				inBrackets = false
 				mode = ""
 				buf.Reset()
@@ -155,10 +155,10 @@ func (item *Text) updateText() {
 						if sym, ok := theSymbols[buf.String()]; ok {
 							item.roundDot()
 							trans := object.New()
-							trans.Scalar = pixel.V(item.SymbolSize, item.SymbolSize).Scaled(sym.sca)
+							trans.Sca = pixel.V(item.SymbolSize, item.SymbolSize).Scaled(sym.sca)
 							trans.Pos = item.Obj.Pos
 							trans.Pos = trans.Pos.Add(item.Text.Dot.Scaled(item.RelativeSize))
-							trans.Pos = trans.Pos.Add(pixel.V(sym.spr.Frame().W() * 0.5, sym.spr.Frame().H() * 0.25).Scaled(item.SymbolSize * sym.sca))
+							trans.Pos = trans.Pos.Add(pixel.V(sym.spr.Frame().W()*0.5, sym.spr.Frame().H()*0.25).Scaled(item.SymbolSize * sym.sca))
 							item.Symbols = append(item.Symbols, symbolHandle{
 								symbol: sym,
 								trans:  trans,
@@ -166,7 +166,7 @@ func (item *Text) updateText() {
 							item.Text.Dot.X += sym.spr.Frame().W() * item.SymbolSize * sym.sca / item.RelativeSize
 						}
 					}
-					b = i+1
+					b = i + 1
 					inBrackets = false
 					mode = ""
 					buf.Reset()

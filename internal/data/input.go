@@ -2,26 +2,32 @@ package data
 
 import (
 	"github.com/faiface/pixel/pixelgl"
-	"timsims1717/magicmissile/pkg/input"
+	pxginput "github.com/timsims1717/pixel-go-input"
 )
 
-var TheInput = &input.Input{
-	Buttons: map[string]*input.ButtonSet{
-		"moveLeft":  input.NewJoyless(pixelgl.KeyA),
-		"moveRight": input.NewJoyless(pixelgl.KeyD),
-		"1":         input.NewJoyless(pixelgl.Key1),
-		"2":         input.NewJoyless(pixelgl.Key2),
-		"click":     input.NewJoyless(pixelgl.MouseButtonLeft),
-		"switchR":   {
-			Keys:     []pixelgl.Button{pixelgl.KeyE, pixelgl.KeySpace},
-			Scroll:   1,
+var TheInput = &pxginput.Input{
+	Buttons: map[string]*pxginput.ButtonSet{
+		"moveLeft":  pxginput.NewJoyless(pixelgl.KeyA),
+		"moveRight": pxginput.NewJoyless(pixelgl.KeyD),
+		"1":         pxginput.NewJoyless(pixelgl.Key1),
+		"2":         pxginput.NewJoyless(pixelgl.Key2),
+		"click":     pxginput.NewJoyless(pixelgl.MouseButtonLeft),
+		"switchR": {
+			Keys:   []pixelgl.Button{pixelgl.KeyE, pixelgl.KeySpace},
+			Scroll: 1,
 		},
-		"switchL":   {
-			Keys:     []pixelgl.Button{pixelgl.KeyQ},
-			Scroll:   -1,
+		"switchL": {
+			Keys:   []pixelgl.Button{pixelgl.KeyQ},
+			Scroll: -1,
 		},
-		"killAll": input.NewJoyless(pixelgl.KeyF5),
-		"menuBack": input.NewJoyless(pixelgl.KeyEscape),
+		"killAll":    pxginput.NewJoyless(pixelgl.KeyF10),
+		"menuBack":   pxginput.NewJoyless(pixelgl.KeyEscape),
+		"fullscreen": pxginput.NewJoyless(pixelgl.KeyF5),
+		"debugText":  pxginput.NewJoyless(pixelgl.KeyF4),
+		"debugCU":    pxginput.NewJoyless(pixelgl.KeyKP8),
+		"debugCD":    pxginput.NewJoyless(pixelgl.KeyKP5),
+		"debugCR":    pxginput.NewJoyless(pixelgl.KeyKP6),
+		"debugCL":    pxginput.NewJoyless(pixelgl.KeyKP4),
 	},
-	Mode: input.KeyboardMouse,
+	Mode: pxginput.KeyboardMouse,
 }

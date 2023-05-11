@@ -1,7 +1,6 @@
 package figures
 
 import (
-	"github.com/faiface/pixel"
 	"image/color"
 	"math"
 	"timsims1717/magicmissile/internal/data"
@@ -13,7 +12,6 @@ func ArmObj() *object.Object {
 	armObj := object.New()
 	armObj.Pos.X += 12.
 	armObj.Pos.Y += 12.
-	armObj.RotArnd = pixel.V(-12., -12.)
 	return armObj
 }
 
