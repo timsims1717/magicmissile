@@ -26,17 +26,17 @@ func PayloadSystem() {
 					myecs.Manager.DisposeEntity(result)
 				}
 			} else if explosion, okE := result.Components[myecs.Payload].(*data.Explosion); okE {
-				if explosion.Expansion > 0. && explosion.Radius == explosion.CurrRadius {
+				if explosion.ExpandRate > 0. && explosion.FullRadius == explosion.CurrRadius {
 					// explosion is maximized
-					explosion.Expansion *= -1.
-				} else if explosion.Expansion < 0. && explosion.CurrRadius == 0. {
+					explosion.ExpandRate *= -1.
+				} else if explosion.ExpandRate < 0. && explosion.CurrRadius == 0. {
 					// explosion is done
 					myecs.Manager.DisposeEntity(result)
 					continue
 				} else {
-					explosion.CurrRadius += explosion.Expansion * explosion.Radius * timing.DT
-					if explosion.CurrRadius > explosion.Radius {
-						explosion.CurrRadius = explosion.Radius
+					explosion.CurrRadius += explosion.ExpandRate * explosion.FullRadius * timing.DT
+					if explosion.CurrRadius > explosion.FullRadius {
+						explosion.CurrRadius = explosion.FullRadius
 					}
 					if explosion.CurrRadius < 0. {
 						explosion.CurrRadius = 0.

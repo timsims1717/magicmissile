@@ -46,7 +46,6 @@ func (s *menuState) Update(win *pixelgl.Window) {
 	data.TheInput.Update(win, viewport.MainCamera.Mat)
 	systems.TemporarySystem()
 	systems.FunctionSystem()
-	systems.FullTransformSystem()
 	UpdateMenus(data.TheInput)
 }
 

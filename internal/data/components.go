@@ -3,6 +3,7 @@ package data
 import (
 	"github.com/bytearena/ecs"
 	"github.com/faiface/pixel"
+	"image/color"
 	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/timing"
@@ -43,15 +44,23 @@ type Character struct {
 }
 
 type Missile struct {
-	Target  pixel.Vec
-	Speed   float64
-	Finish  func(pixel.Vec)
+	Target pixel.Vec
+	Speed  float64
+	Finish func(pixel.Vec)
 }
 
 type Explosion struct {
-	Radius     float64
 	CurrRadius float64
-	Expansion  float64
+	FullRadius float64
+	ExpandRate float64
+	Dissipate  float64
+	DisRate    float64
+	DisRadius  float64
+	DisYOffset float64
+	StartColor color.RGBA
+	FullColor  color.RGBA
+	EndColor   color.RGBA
+	Timer      *timing.Timer
 }
 
 type Health struct {
@@ -61,12 +70,12 @@ type Health struct {
 }
 
 type Moving struct {
-	Selected  bool
-	Moving    bool
-	Speed     float64
-	Key       string
-	Up        bool
-	Wait      bool
+	Selected bool
+	Moving   bool
+	Speed    float64
+	Key      string
+	Up       bool
+	Wait     bool
 }
 
 type Town struct {

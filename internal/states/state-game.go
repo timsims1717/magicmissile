@@ -108,7 +108,6 @@ func (s *gameState) Update(win *pixelgl.Window) {
 		systems.AttackSystem()
 		systems.MobSystem()
 		systems.HealthSystem()
-		systems.FullTransformSystem()
 		systems.AnimationSystem()
 		if game.MTimer.UpdateDone() {
 			if game.BigOn && rand.Intn(5) == 0 {

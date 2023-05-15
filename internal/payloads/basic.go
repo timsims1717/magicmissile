@@ -22,9 +22,9 @@ func BasicMissile(start, target pixel.Vec, speed float64, rgba color.RGBA) {
 	obj.Pos = start
 	obj.Rot = target.Sub(start).Angle()
 	spr := &img.Sprite{
-		Key:    "missile",
-		Color:  rgba,
-		Batch:  "figures",
+		Key:   "missile",
+		Color: rgba,
+		Batch: "figures",
 	}
 	hp := &data.Health{
 		HP:   1,
@@ -53,12 +53,12 @@ func MagicMissile(start, target pixel.Vec, speed float64, rgba color.RGBA) {
 		col := rgba
 		e := myecs.Manager.NewEntity()
 		e.AddComponent(myecs.Update, data.NewTimerFunc(func() bool {
-			pos.X += rand.Float64() * 40. - 20.
-			pos.Y += rand.Float64() * 40. - 20.
+			pos.X += rand.Float64()*40. - 20.
+			pos.Y += rand.Float64()*40. - 20.
 			BasicMissile(s, pos, spd, col)
 			myecs.Manager.DisposeEntity(e)
 			return false
-		}, float64(i) * 0.15))
+		}, float64(i)*0.15))
 	}
 }
 
@@ -73,9 +73,9 @@ func Fireball(start, target pixel.Vec, speed float64) {
 		A: 255,
 	}
 	spr := &img.Sprite{
-		Key:    "missile",
-		Color:  col,
-		Batch:  "figures",
+		Key:   "missile",
+		Color: col,
+		Batch: "figures",
 	}
 	hp := &data.Health{
 		HP:   1,
@@ -122,9 +122,9 @@ func ChaosBolt(start, target pixel.Vec, speed float64, count int) {
 		A: 255,
 	}
 	spr := &img.Sprite{
-		Key:    "missile",
-		Color:  col,
-		Batch:  "figures",
+		Key:   "missile",
+		Color: col,
+		Batch: "figures",
 	}
 	hitbox := pixel.R(-16., -3.5, 16, 3.5)
 	e := myecs.Manager.NewEntity().
@@ -135,57 +135,57 @@ func ChaosBolt(start, target pixel.Vec, speed float64, count int) {
 			add := int(timing.DT * 450.)
 			R, G, B := int(spr.Color.R), int(spr.Color.G), int(spr.Color.B)
 			if r {
-				if R + add > 255 {
+				if R+add > 255 {
 					R = 255
 					r = false
 					g = true
 				} else {
 					R += add
 				}
-				if G - add < 0 {
+				if G-add < 0 {
 					G = 0
 				} else {
 					G -= add
 				}
-				if B - add < 0 {
+				if B-add < 0 {
 					B = 0
 				} else {
 					B -= add
 				}
 			}
 			if g {
-				if G + add > 255 {
+				if G+add > 255 {
 					G = 255
 					g = false
 					b = true
 				} else {
 					G += add
 				}
-				if R - add < 0 {
+				if R-add < 0 {
 					R = 0
 				} else {
 					R -= add
 				}
-				if B - add < 0 {
+				if B-add < 0 {
 					B = 0
 				} else {
 					B -= add
 				}
 			}
 			if b {
-				if B + add > 255 {
+				if B+add > 255 {
 					B = 255
 					b = false
 					r = true
 				} else {
 					B += add
 				}
-				if R - add < 0 {
+				if R-add < 0 {
 					R = 0
 				} else {
 					R -= add
 				}
-				if G - add < 0 {
+				if G-add < 0 {
 					G = 0
 				} else {
 					G -= add
@@ -200,7 +200,7 @@ func ChaosBolt(start, target pixel.Vec, speed float64, count int) {
 			Target: target,
 			Speed:  speed,
 			Finish: func(pos pixel.Vec) {
-				if count < rand.Intn(6) + 1 {
+				if count < rand.Intn(6)+1 {
 					tar := pos
 					tar.X += rand.Float64()*150. - 75.
 					tar.Y += rand.Float64()*150. - 75.
@@ -208,7 +208,7 @@ func ChaosBolt(start, target pixel.Vec, speed float64, count int) {
 						tar.Y = game.Frame.Min.Y
 					}
 					ChaosBolt(pos, tar, speed, count+1)
-					BasicExplosion(obj.Pos, 20. + (2. * float64(count+1)), 2., spr.Color)
+					BasicExplosion(obj.Pos, 20.+(2.*float64(count+1)), 2., spr.Color)
 				} else {
 					BasicExplosion(obj.Pos, 40., 2., spr.Color)
 				}
@@ -232,8 +232,8 @@ func BasicExplosion(pos pixel.Vec, radius, expansion float64, rgba color.RGBA) {
 	obj := object.New()
 	obj.Pos = pos
 	exp := &data.Explosion{
-		Radius:    radius,
-		Expansion: expansion,
+		FullRadius: radius,
+		ExpandRate: expansion,
 	}
 	myecs.Manager.NewEntity().
 		AddComponent(myecs.Object, obj).
@@ -260,19 +260,19 @@ func BasicMeteor(spd float64, pos pixel.Vec) {
 		obj.Pos.Y = 460.
 	} else {
 		obj.Pos = pos
-		obj.Pos.X += rand.Float64() * 48. - 24.
-		obj.Pos.Y += rand.Float64() * 48. - 24.
+		obj.Pos.X += rand.Float64()*48. - 24.
+		obj.Pos.Y += rand.Float64()*48. - 24.
 	}
-	obj.Rot = math.Pi * rand.Float64() * 2. - 1.
+	obj.Rot = math.Pi*rand.Float64()*2. - 1.
 	spr := &img.Sprite{
-		Key:    fmt.Sprintf("meteor_sm_%d", rand.Intn(2)),
-		Color:  color.RGBA{
+		Key: fmt.Sprintf("meteor_sm_%d", rand.Intn(2)),
+		Color: color.RGBA{
 			R: 255,
 			G: 255,
 			B: 255,
 			A: 255,
 		},
-		Batch:  "stuff",
+		Batch: "stuff",
 	}
 	var target pixel.Vec
 	try := 0
@@ -293,8 +293,8 @@ func BasicMeteor(spd float64, pos pixel.Vec) {
 		HP: 1,
 	}
 	hitbox := pixel.C(pixel.ZV, 16.)
-	obj.Rot = math.Pi * rand.Float64() * 2. - 1.
-	rSpd := rand.Float64() * 2. - 1.
+	obj.Rot = math.Pi*rand.Float64()*2. - 1.
+	rSpd := rand.Float64()*2. - 1.
 	myecs.Manager.NewEntity().
 		AddComponent(myecs.Object, obj).
 		AddComponent(myecs.Drawable, spr).
@@ -327,16 +327,16 @@ func BigMeteor(spd float64) {
 	obj := object.New()
 	obj.Pos.X = float64(rand.Intn(1520) - 760)
 	obj.Pos.Y = 460.
-	obj.Rot = math.Pi * rand.Float64() * 2. - 1.
+	obj.Rot = math.Pi*rand.Float64()*2. - 1.
 	spr := &img.Sprite{
-		Key:    "meteor_lrg",
-		Color:  color.RGBA{
+		Key: "meteor_lrg",
+		Color: color.RGBA{
 			R: 255,
 			G: 255,
 			B: 255,
 			A: 255,
 		},
-		Batch:  "stuff",
+		Batch: "stuff",
 	}
 	var target pixel.Vec
 	try := 0
@@ -357,8 +357,8 @@ func BigMeteor(spd float64) {
 		HP: 1,
 	}
 	hitbox := pixel.C(pixel.ZV, 32.)
-	obj.Rot = math.Pi * rand.Float64() * 2. - 1.
-	rSpd := rand.Float64() * 2. - 1.
+	obj.Rot = math.Pi*rand.Float64()*2. - 1.
+	rSpd := rand.Float64()*2. - 1.
 	var breakUp *timing.Timer
 	if rand.Intn(2) == 0 {
 		breakUp = timing.New(rand.Float64()*3. + 2.)
@@ -433,7 +433,7 @@ func BasicZombie() {
 	if twn != nil {
 		obj.Pos.X = twn.Obj.Pos.X
 		for math.Abs(obj.Pos.X-twn.Obj.Pos.X) < 250. {
-			obj.Pos.X = float64(rand.Intn(1520)-760)
+			obj.Pos.X = float64(rand.Intn(1520) - 760)
 		}
 		mob.Target = twn
 	} else if rand.Intn(2) == 0 {
@@ -448,12 +448,12 @@ func BasicZombie() {
 	}
 	mob.Char.Obj = obj
 	mob.Attack = &data.Attack{
-		WindUp:    1.,
-		WindDown:  0.5,
-		Recover:   2.,
-		Damage:    1,
-		Range:     20.,
-		Team:      data.Enemy,
+		WindUp:   1.,
+		WindDown: 0.5,
+		Recover:  2.,
+		Damage:   1,
+		Range:    20.,
+		Team:     data.Enemy,
 	}
 	hitbox := pixel.R(-16., -32., 16., 32.)
 	zombieArm := figures.ZombieArm(col)
@@ -473,9 +473,9 @@ func BasicZombie() {
 					dead = true
 					deadTimer = timing.New(1.)
 				}
-				if mob.Char.Obj.Rot < math.Pi * 0.5 {
+				if mob.Char.Obj.Rot < math.Pi*0.5 {
 					mob.Char.Obj.Rot += 8. * timing.DT
-					if mob.Char.Obj.Rot > math.Pi * 0.5 {
+					if mob.Char.Obj.Rot > math.Pi*0.5 {
 						mob.Char.Obj.Rot = math.Pi * 0.5
 					}
 				}

@@ -3,7 +3,6 @@ package debug
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"strings"
 )
 
 var (
@@ -26,5 +25,5 @@ func Draw(win *pixelgl.Window) {
 
 func Clear() {
 	imd.Clear()
-	lines = &strings.Builder{}
+	lines = []string{}
 }

@@ -6,6 +6,14 @@ import (
 	"timsims1717/magicmissile/pkg/timing"
 )
 
+type Funky struct {
+	Fn func()
+}
+
+func NewFn(fn func()) *Funky {
+	return &Funky{Fn: fn}
+}
+
 type TimerFunc struct {
 	Timer *timing.Timer
 	Func  func() bool
@@ -33,7 +41,7 @@ type ImdFunc struct {
 
 func NewImdFunc(key string, fn func(pixel.Vec, *imdraw.IMDraw)) *ImdFunc {
 	return &ImdFunc{
-		Key: key,
+		Key:  key,
 		Func: fn,
 	}
 }

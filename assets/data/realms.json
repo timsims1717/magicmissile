@@ -1,0 +1,137 @@
+[
+  {
+    "name": "Sunshine Valley",
+    "code": "ForestValley",
+    "backgrounds": [
+      {
+        "layers": [
+          {
+            "scale": 200,
+            "waveLength": 200,
+            "color": {
+              "R": 255,
+              "G": 249,
+              "B": 125,
+              "A": 255
+            },
+            "vCode": "Valley"
+          },
+          {
+            "scale": 100,
+            "waveLength": 150,
+            "color": {
+              "R": 177,
+              "G": 230,
+              "B": 44,
+              "A": 255
+            },
+            "vCode": "Valley"
+          },
+          {
+            "scale": 50,
+            "waveLength": 200,
+            "color": {
+              "R": 105,
+              "G": 181,
+              "B": 78,
+              "A": 255
+            },
+            "vCode": "Valley"
+          },
+          {
+            "scale": 50,
+            "waveLength": 300,
+            "color": {
+              "R": 65,
+              "G": 94,
+              "B": 69,
+              "A": 255
+            },
+            "vCode": "Valley"
+          },
+          {
+            "scale": 10,
+            "waveLength": 500,
+            "color": {
+              "R": 45,
+              "G": 74,
+              "B": 49,
+              "A": 255
+            },
+            "vCode": "None"
+          }
+        ],
+        "sky": {
+          "R": 245,
+          "G": 232,
+          "B": 171,
+          "A": 255
+        }
+      },{
+        "layers": [
+          {
+            "scale": 500,
+            "waveLength": 200,
+            "color": {
+              "R": 255,
+              "G": 249,
+              "B": 125,
+              "A": 255
+            },
+            "vCode": "Peak"
+          },
+          {
+            "scale": 100,
+            "waveLength": 150,
+            "color": {
+              "R": 177,
+              "G": 230,
+              "B": 44,
+              "A": 255
+            },
+            "vCode": "Valley"
+          },
+          {
+            "scale": 50,
+            "waveLength": 200,
+            "color": {
+              "R": 105,
+              "G": 181,
+              "B": 78,
+              "A": 255
+            },
+            "vCode": "Valley"
+          },
+          {
+            "scale": 50,
+            "waveLength": 300,
+            "color": {
+              "R": 65,
+              "G": 94,
+              "B": 69,
+              "A": 255
+            },
+            "vCode": "Valley"
+          },
+          {
+            "scale": 10,
+            "waveLength": 500,
+            "color": {
+              "R": 45,
+              "G": 74,
+              "B": 49,
+              "A": 255
+            },
+            "vCode": "None"
+          }
+        ],
+        "sky": {
+          "R": 245,
+          "G": 232,
+          "B": 171,
+          "A": 255
+        }
+      }
+    ]
+  }
+]

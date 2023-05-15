@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"time"
 	"timsims1717/magicmissile/internal/data"
+	"timsims1717/magicmissile/internal/loading"
 	"timsims1717/magicmissile/internal/states"
 	"timsims1717/magicmissile/pkg/debug"
 	"timsims1717/magicmissile/pkg/img"
@@ -91,6 +92,13 @@ func run() {
 
 	debug.Initialize(&viewport.MainCamera.PostCamPos, &viewport.MainCamera.PostCamPos)
 
+	loading.LoadShaders()
+
+	err = data.LoadRealms("assets/data/realms.json")
+	if err != nil {
+		panic(err)
+	}
+
 	win.Show()
 	win.Canvas()
 	timing.Reset()
@@ -106,14 +114,27 @@ func run() {
 		if data.TheInput.Get("debugText").JustPressed() {
 			debug.Text = !debug.Text
 		}
+		if data.TheInput.Get("debugExpDrawType").JustPressed() {
+			data.ExpDrawType++
+			data.ExpDrawType %= 3
+		}
+		if data.TheInput.Get("debugExpDrawNum1").JustPressed() {
+			data.ExpTestNum = 1
+		}
+		if data.TheInput.Get("debugExpDrawNum20").JustPressed() {
+			data.ExpTestNum = 20
+		}
+		if data.TheInput.Get("debugExpDrawNum100").JustPressed() {
+			data.ExpTestNum = 100
+		}
 
 		state.Update(win)
 		viewport.MainCamera.Update()
 
 		state.Draw(win)
-		//win.SetSmooth(false)
+		win.SetSmooth(false)
 		debug.Draw(win)
-		//win.SetSmooth(true)
+		win.SetSmooth(true)
 
 		sfx.MusicPlayer.Update()
 		win.Update()

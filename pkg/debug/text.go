@@ -1,7 +1,6 @@
 package debug
 
 import (
-	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"golang.org/x/image/colornames"
@@ -11,7 +10,7 @@ import (
 
 var (
 	debugText *typeface.Text
-	lines     = &strings.Builder{}
+	lines     []string
 )
 
 func InitializeText(v *pixel.Vec) {
@@ -21,12 +20,29 @@ func InitializeText(v *pixel.Vec) {
 }
 
 func DrawText(win *pixelgl.Window) {
-	debugText.SetText(lines.String())
-	debugText.Obj.Pos = pixel.V(5., win.Bounds().H()-5.)
+	var sb strings.Builder
+	for i, line := range lines {
+		if i != 0 {
+			sb.WriteString("\n")
+		}
+		sb.WriteString(line)
+	}
+	debugText.SetText(sb.String())
+	debugText.Obj.Pos = pixel.V(win.Bounds().W()*-0.5+2., win.Bounds().H()*0.5-2)
 	debugText.Obj.Update()
 	debugText.Draw(win)
 }
 
 func AddText(s string) {
-	lines.WriteString(fmt.Sprintf("%s\n", s))
+	lines = append(lines, s)
+}
+
+func InsertText(s string, i int) {
+	if i < 0 || len(lines) <= i || len(lines) == 0 {
+		AddText(s)
+	} else {
+		tmp := append(lines[:i], s)
+		tmp = append(tmp, lines[i:]...)
+		lines = tmp
+	}
 }

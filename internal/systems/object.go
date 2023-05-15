@@ -1,72 +1,89 @@
 package systems
 
 import (
-	"github.com/faiface/pixel"
+	"timsims1717/magicmissile/internal/data"
 	"timsims1717/magicmissile/internal/myecs"
 	"timsims1717/magicmissile/pkg/object"
+	"timsims1717/magicmissile/pkg/timing"
 )
 
-func FullTransformSystem() {
+func ObjectSystem() {
 	for _, result := range myecs.Manager.Query(myecs.IsObject) {
-		if trans, ok := result.Components[myecs.Object].(*object.Object); ok {
-			trans.Mat = pixel.IM
+		if obj, ok := result.Components[myecs.Object].(*object.Object); ok {
+			if obj.Kill {
+				myecs.Manager.DisposeEntity(result)
+			} else {
+				obj.Update()
+			}
 		}
 	}
-	PreParentSystem()
-	TransformSystem()
-	PostParentSystem()
 }
 
-func PreParentSystem() {
+func ParentSystem() {
 	for _, result := range myecs.Manager.Query(myecs.HasParent) {
-		trans, okT := result.Components[myecs.Object].(*object.Object)
+		tran, okT := result.Components[myecs.Object].(*object.Object)
 		parent, okP := result.Components[myecs.Parent].(*object.Object)
 		if okT && okP {
-			if parent.Flip != trans.Flip {
-				trans.Flip = parent.Flip
-				trans.Pos.X *= -1.
-			}
-			if parent.Flop != trans.Flop {
-				trans.Flop = parent.Flop
-				trans.Pos.Y *= -1.
+			if parent.Kill {
+				myecs.Manager.DisposeEntity(result)
+			} else {
+				tran.Pos = parent.Pos
+				tran.Hide = parent.Hide
 			}
 		}
 	}
 }
 
-func TransformSystem() {
-	for _, result := range myecs.Manager.Query(myecs.IsObject) {
-		if trans, ok := result.Components[myecs.Object].(*object.Object); ok {
-			trans.PostPos = trans.Pos.Add(trans.Offset)
-			//trans.APos.X = math.Round(trans.APos.X)
-			//trans.APos.Y = math.Round(trans.APos.Y)
-			trans.Mat = trans.Mat.ScaledXY(pixel.ZV, trans.Sca)
-			//trans.Mat = trans.Mat.Rotated(trans.RotArnd, trans.Rot)
-			if trans.Flip && trans.Flop {
-				trans.Mat = trans.Mat.Scaled(pixel.ZV, -1.)
-			} else if trans.Flip {
-				trans.Mat = trans.Mat.ScaledXY(pixel.ZV, pixel.V(-1., 1.))
-			} else if trans.Flop {
-				trans.Mat = trans.Mat.ScaledXY(pixel.ZV, pixel.V(1., -1.))
+func FunctionSystem() {
+	for _, result := range myecs.Manager.Query(myecs.HasUpdate) {
+		fnA := result.Components[myecs.Update]
+		if fnT, ok := fnA.(*data.TimerFunc); ok {
+			if fnT.Timer.UpdateDone() {
+				if fnT.Func() {
+					result.Entity.RemoveComponent(myecs.Update)
+				} else {
+					fnT.Timer.Reset()
+				}
 			}
-			trans.Mat = trans.Mat.Moved(trans.PostPos)
+		} else if fnF, ok := fnA.(*data.FrameFunc); ok {
+			if fnF.Func() {
+				result.Entity.RemoveComponent(myecs.Update)
+			}
+		} else if fnU, ok := fnA.(*data.Funky); ok {
+			fnU.Fn()
 		}
 	}
 }
 
-func PostParentSystem() {
-	for _, result := range myecs.Manager.Query(myecs.HasParent) {
-		trans, okT := result.Components[myecs.Object].(*object.Object)
-		parent := result.Components[myecs.Parent]
+func TemporarySystem() {
+	for _, result := range myecs.Manager.Query(myecs.IsTemp) {
+		temp := result.Components[myecs.Temp]
+		obj, okT := result.Components[myecs.Object].(*object.Object)
 		if okT {
-			if pos, ok := parent.(*pixel.Vec); ok {
-				trans.Mat = trans.Mat.Moved(*pos)
-			} else if pos, ok := parent.(pixel.Vec); ok {
-				// using a non-pointer to a pixel.Vec will freeze the item forever
-				trans.Mat = trans.Mat.Moved(pos)
-			} else if par, ok := parent.(*object.Object); ok {
-				trans.Mat = trans.Mat.Moved(par.Pos)
+			if timer, ok := temp.(*timing.Timer); ok {
+				if timer.UpdateDone() {
+					obj.Hide = true
+					obj.Kill = true
+					myecs.Manager.DisposeEntity(result.Entity)
+				}
+			} else if check, ok := temp.(myecs.ClearFlag); ok {
+				if check {
+					obj.Hide = true
+					obj.Kill = true
+					myecs.Manager.DisposeEntity(result.Entity)
+				}
 			}
 		}
+	}
+}
+
+func ClearSystem() {
+	for _, result := range myecs.Manager.Query(myecs.IsObject) {
+		obj, ok := result.Components[myecs.Object].(*object.Object)
+		if ok {
+			obj.Hide = true
+			obj.Kill = true
+		}
+		myecs.Manager.DisposeEntity(result.Entity)
 	}
 }
