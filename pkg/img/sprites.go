@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/pkg/errors"
+	"golang.org/x/image/colornames"
 	"image/color"
 	"os"
 	"path/filepath"
@@ -56,8 +57,26 @@ func Draw(target pixel.Target) {
 
 type Sprite struct {
 	Key    string
-	Color  color.RGBA
 	Batch  string
+	Offset pixel.Vec
+	Color  color.RGBA
+}
+
+func NewSprite(key, batch string) *Sprite {
+	return &Sprite{
+		Key:   key,
+		Batch: batch,
+		Color: colornames.White,
+	}
+}
+
+func NewOffsetSprite(key, batch string, offset pixel.Vec) *Sprite {
+	return &Sprite{
+		Key:    key,
+		Batch:  batch,
+		Offset: offset,
+		Color:  colornames.White,
+	}
 }
 
 type SpriteSheet struct {

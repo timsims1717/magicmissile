@@ -44,9 +44,11 @@ type Character struct {
 }
 
 type Missile struct {
+	Object *object.Object
+	Sprite *img.Sprite
 	Target pixel.Vec
 	Speed  float64
-	Finish func(pixel.Vec)
+	Finish []interface{}
 }
 
 type Explosion struct {
@@ -80,7 +82,17 @@ type Moving struct {
 
 type Town struct {
 	Health *Health
-	Obj    *object.Object
+	Object *object.Object
+	Sprite *img.Sprite
+	Entity *ecs.Entity
+}
+
+type Tower struct {
+	Health *Health
+	Object *object.Object
+	Sprite *img.Sprite
+	Entity *ecs.Entity
+	Origin pixel.Vec
 }
 
 type Mob struct {

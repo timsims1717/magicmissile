@@ -20,6 +20,6 @@ func (obj *Object) Update() {
 		obj.Mat = obj.Mat.ScaledXY(pixel.ZV, pixel.V(1., -1.))
 	}
 	obj.Mat = obj.Mat.ScaledXY(pixel.ZV, obj.Sca)
-	obj.Mat = obj.Mat.Rotated(pixel.ZV, math.Pi*obj.Rot)
+	obj.Mat = obj.Mat.Rotated(pixel.ZV, obj.Rot)
 	obj.Mat = obj.Mat.Moved(obj.PostPos)
 }

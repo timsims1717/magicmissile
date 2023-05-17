@@ -14,7 +14,21 @@
               "B": 125,
               "A": 255
             },
-            "vCode": "Valley"
+            "vCode": "Valley",
+            "sprites": [
+              {
+                "key": "spruce1",
+                "freq": 6
+              },
+              {
+                "key": "spruce2",
+                "freq": 8
+              },
+              {
+                "key": "spruce3",
+                "freq": 2
+              }
+            ]
           },
           {
             "scale": 100,
@@ -25,7 +39,21 @@
               "B": 44,
               "A": 255
             },
-            "vCode": "Valley"
+            "vCode": "Valley",
+            "sprites": [
+              {
+                "key": "spruce1",
+                "freq": 8
+              },
+              {
+                "key": "spruce2",
+                "freq": 12
+              },
+              {
+                "key": "spruce3",
+                "freq": 10
+              }
+            ]
           },
           {
             "scale": 50,
@@ -36,18 +64,46 @@
               "B": 78,
               "A": 255
             },
-            "vCode": "Valley"
+            "vCode": "Valley",
+            "sprites": [
+              {
+                "key": "spruce1",
+                "freq": 15
+              },
+              {
+                "key": "spruce2",
+                "freq": 25
+              },
+              {
+                "key": "spruce3",
+                "freq": 10
+              }
+            ]
           },
           {
             "scale": 50,
             "waveLength": 300,
             "color": {
-              "R": 65,
-              "G": 94,
-              "B": 69,
+              "R": 95,
+              "G": 144,
+              "B": 73,
               "A": 255
             },
-            "vCode": "Valley"
+            "vCode": "Valley",
+            "sprites": [
+              {
+                "key": "spruce1",
+                "freq": 15
+              },
+              {
+                "key": "spruce2",
+                "freq": 25
+              },
+              {
+                "key": "spruce3",
+                "freq": 10
+              }
+            ]
           },
           {
             "scale": 10,
@@ -58,7 +114,8 @@
               "B": 49,
               "A": 255
             },
-            "vCode": "None"
+            "vCode": "None",
+            "sprites": []
           }
         ],
         "sky": {
@@ -67,7 +124,8 @@
           "B": 171,
           "A": 255
         }
-      },{
+      },
+      {
         "layers": [
           {
             "scale": 500,
@@ -78,7 +136,21 @@
               "B": 125,
               "A": 255
             },
-            "vCode": "Peak"
+            "vCode": "Peak",
+            "sprites": [
+              {
+                "key": "spruce1",
+                "freq": 15
+              },
+              {
+                "key": "spruce2",
+                "freq": 25
+              },
+              {
+                "key": "spruce3",
+                "freq": 10
+              }
+            ]
           },
           {
             "scale": 100,
@@ -89,7 +161,21 @@
               "B": 44,
               "A": 255
             },
-            "vCode": "Valley"
+            "vCode": "Valley",
+            "sprites": [
+              {
+                "key": "spruce1",
+                "freq": 15
+              },
+              {
+                "key": "spruce2",
+                "freq": 25
+              },
+              {
+                "key": "spruce3",
+                "freq": 10
+              }
+            ]
           },
           {
             "scale": 50,
@@ -100,18 +186,46 @@
               "B": 78,
               "A": 255
             },
-            "vCode": "Valley"
+            "vCode": "Valley",
+            "sprites": [
+              {
+                "key": "spruce1",
+                "freq": 15
+              },
+              {
+                "key": "spruce2",
+                "freq": 25
+              },
+              {
+                "key": "spruce3",
+                "freq": 10
+              }
+            ]
           },
           {
             "scale": 50,
             "waveLength": 300,
             "color": {
-              "R": 65,
-              "G": 94,
-              "B": 69,
+              "R": 95,
+              "G": 144,
+              "B": 73,
               "A": 255
             },
-            "vCode": "Valley"
+            "vCode": "Valley",
+            "sprites": [
+              {
+                "key": "spruce1",
+                "freq": 15
+              },
+              {
+                "key": "spruce2",
+                "freq": 25
+              },
+              {
+                "key": "spruce3",
+                "freq": 10
+              }
+            ]
           },
           {
             "scale": 10,
@@ -122,7 +236,8 @@
               "B": 49,
               "A": 255
             },
-            "vCode": "None"
+            "vCode": "None",
+            "sprites": []
           }
         ],
         "sky": {

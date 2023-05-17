@@ -26,8 +26,6 @@ void main() {
     vec4 color = vec4(0, 0, 0, 0);
     if (b) {
         color = vec4(uRed, uGreen, uBlue, 1.);
-    } else {
-        color = vec4(1., 1., 1., 0.25);
     }
     fragColor = color;
 }

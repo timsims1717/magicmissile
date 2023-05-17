@@ -191,7 +191,7 @@ func (s *gameState) Update(win *pixelgl.Window) {
 
 func (s *gameState) Draw(win *pixelgl.Window) {
 	img.Clear()
-	systems.DrawSystem(win)
+	systems.DrawSystem(win, 0)
 	img.Draw(win)
 	game.TimeText.Draw(win)
 	game.OverText.Draw(win)

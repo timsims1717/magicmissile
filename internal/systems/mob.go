@@ -25,11 +25,11 @@ func MobSystem() {
 							}
 						}
 						if mob.Target != nil {
-							xDist := mob.Target.Obj.Pos.X - obj.Pos.X
+							xDist := mob.Target.Object.Pos.X - obj.Pos.X
 							if math.Abs(xDist) < 30. {
 								obj.Pos.Y += mob.Speed * timing.DT
-								if obj.Pos.Y > mob.Target.Obj.Pos.Y {
-									obj.Pos.Y = mob.Target.Obj.Pos.Y
+								if obj.Pos.Y > mob.Target.Object.Pos.Y {
+									obj.Pos.Y = mob.Target.Object.Pos.Y
 								}
 							} else {
 								if obj.Pos.Y > game.CharYLvl {
@@ -44,13 +44,13 @@ func MobSystem() {
 									}
 								}
 							}
-							if math.Abs(mob.Target.Obj.Pos.X - obj.Pos.X) > 1. {
+							if math.Abs(mob.Target.Object.Pos.X-obj.Pos.X) > 1. {
 								if xDist > 0. {
 									obj.Pos.X += mob.Speed * timing.DT
 									mob.Char.Obj.Flip = false
 								} else {
 									obj.Pos.X -= mob.Speed * timing.DT
-	 								mob.Char.Obj.Flip = true
+									mob.Char.Obj.Flip = true
 								}
 							}
 						}

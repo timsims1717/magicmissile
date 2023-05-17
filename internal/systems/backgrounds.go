@@ -2,14 +2,25 @@ package systems
 
 import (
 	"github.com/aquilax/go-perlin"
+	"github.com/bytearena/ecs"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"math/rand"
 	"timsims1717/magicmissile/internal/data"
+	"timsims1717/magicmissile/internal/myecs"
+	"timsims1717/magicmissile/pkg/img"
+	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/viewport"
 )
 
 func GenerateRandomBackground(code string) {
+	if data.CurrBackground != nil {
+		for _, bg := range data.CurrBackground.Backgrounds {
+			for _, sprite := range bg.Sprites {
+				myecs.Manager.DisposeEntity(sprite)
+			}
+		}
+	}
 	realm := data.AllRealms[code]
 	data.CurrBackground = realm.Backgrounds[rand.Intn(len(realm.Backgrounds))]
 	GenerateBackground()
@@ -17,6 +28,7 @@ func GenerateRandomBackground(code string) {
 
 func GenerateBackground() {
 	layers := len(data.CurrBackground.Layers)
+	data.TownLayer = layers - 1
 	layerD := (data.BackOffset - data.ForeOffset) / float64(layers-1)
 	data.CurrBackground.Backgrounds = []*data.BackgroundLayer{}
 	for i, layer := range data.CurrBackground.Layers {
@@ -34,13 +46,39 @@ func GenerateBackground() {
 		if i == layers-1 {
 			offset = data.ForeOffset
 		}
+		var sprs []*ecs.Entity
+		for _, sprite := range layer.Sprites {
+			r := sprite.Freq / 8
+			count := sprite.Freq
+			if r > 0 {
+				count += rand.Intn(r) - r/2
+			}
+			for j := 0; j < count; j++ {
+				x := rand.Float64()*data.BaseWidth - data.BaseWidth*0.5
+				y := p.Noise1D(x/layer.WaveLength)*layer.Scale + offset + layer.VOffset(x)
+				spr := img.NewSprite(sprite.Key, data.ObjectKey)
+				layerSca := float64(i) / float64(layers)
+				obj := object.New()
+				obj.Pos = pixel.V(x, y)
+				obj.Layer = i
+				obj.Offset.Y += img.Batchers[data.ObjectKey].Sprites[sprite.Key].Frame().H() * rand.Float64() * 0.5 * layerSca
+				obj.Flip = rand.Intn(2) == 0
+				obj.Sca.X *= rand.Float64()*0.5*layerSca + 0.7
+				obj.Sca.Y *= rand.Float64()*0.5*layerSca + 0.7
+				e := myecs.Manager.NewEntity().
+					AddComponent(myecs.Object, obj).
+					AddComponent(myecs.Drawable, spr)
+				sprs = append(sprs, e)
+			}
+		}
 		data.CurrBackground.Backgrounds = append(data.CurrBackground.Backgrounds, &data.BackgroundLayer{
-			Layer:  layer,
-			Offset: offset,
-			Perlin: p,
-			Color:  layer.Color,
-			IMDraw: imdraw.New(nil),
-			View:   vp,
+			Layer:   layer,
+			Offset:  offset,
+			Perlin:  p,
+			Color:   layer.Color,
+			IMDraw:  imdraw.New(nil),
+			View:    vp,
+			Sprites: sprs,
 		})
 	}
 }

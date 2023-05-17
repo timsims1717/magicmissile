@@ -3,6 +3,7 @@ package data
 import (
 	"encoding/json"
 	"github.com/aquilax/go-perlin"
+	"github.com/bytearena/ecs"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/pkg/errors"
 	"image/color"
@@ -58,15 +59,22 @@ type LayerGenerator struct {
 	VOffset    func(float64) float64 `json:"-"`
 	Color      color.RGBA            `json:"color"`
 	VFnCode    VFnCode               `json:"vCode"`
+	Sprites    []*BackgroundSprite   `json:"sprites"`
 }
 
 type BackgroundLayer struct {
-	Layer  *LayerGenerator
-	Offset float64
-	Perlin *perlin.Perlin
-	Color  color.Color
-	View   *viewport.ViewPort
-	IMDraw *imdraw.IMDraw
+	Layer   *LayerGenerator
+	Offset  float64
+	Perlin  *perlin.Perlin
+	Color   color.Color
+	View    *viewport.ViewPort
+	IMDraw  *imdraw.IMDraw
+	Sprites []*ecs.Entity
+}
+
+type BackgroundSprite struct {
+	Key  string `json:"key"`
+	Freq int    `json:"freq"`
 }
 
 var (

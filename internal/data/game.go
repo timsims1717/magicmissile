@@ -13,10 +13,8 @@ var (
 
 	ExpDrawType = 2
 	ExpTestNum  = 1
-	ExpTexture  []uint8
-)
 
-const (
-	BaseWidth  = 1600
-	BaseHeight = 900
+	TownLayer = 0
+	Towns     []*Town
+	Towers    []*Tower
 )

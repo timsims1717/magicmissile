@@ -39,9 +39,9 @@ func BasicMissile(start, target pixel.Vec, speed float64, rgba color.RGBA) {
 		AddComponent(myecs.Payload, &data.Missile{
 			Target: target,
 			Speed:  speed,
-			Finish: func(pos pixel.Vec) {
-				BasicExplosion(obj.Pos, 30., 2., rgba)
-			},
+			//Finish: func(pos pixel.Vec) {
+			//	BasicExplosion(obj.Pos, 30., 2., rgba)
+			//},
 		})
 }
 
@@ -90,9 +90,9 @@ func Fireball(start, target pixel.Vec, speed float64) {
 		AddComponent(myecs.Payload, &data.Missile{
 			Target: target,
 			Speed:  speed,
-			Finish: func(pos pixel.Vec) {
-				BasicExplosion(obj.Pos, 75., 2., col)
-			},
+			//Finish: func(pos pixel.Vec) {
+			//	BasicExplosion(obj.Pos, 75., 2., col)
+			//},
 		})
 }
 
@@ -199,20 +199,20 @@ func ChaosBolt(start, target pixel.Vec, speed float64, count int) {
 		AddComponent(myecs.Payload, &data.Missile{
 			Target: target,
 			Speed:  speed,
-			Finish: func(pos pixel.Vec) {
-				if count < rand.Intn(6)+1 {
-					tar := pos
-					tar.X += rand.Float64()*150. - 75.
-					tar.Y += rand.Float64()*150. - 75.
-					if tar.Y < game.Frame.Min.Y {
-						tar.Y = game.Frame.Min.Y
-					}
-					ChaosBolt(pos, tar, speed, count+1)
-					BasicExplosion(obj.Pos, 20.+(2.*float64(count+1)), 2., spr.Color)
-				} else {
-					BasicExplosion(obj.Pos, 40., 2., spr.Color)
-				}
-			},
+			//Finish: func(pos pixel.Vec) {
+			//	if count < rand.Intn(6)+1 {
+			//		tar := pos
+			//		tar.X += rand.Float64()*150. - 75.
+			//		tar.Y += rand.Float64()*150. - 75.
+			//		if tar.Y < game.Frame.Min.Y {
+			//			tar.Y = game.Frame.Min.Y
+			//		}
+			//		ChaosBolt(pos, tar, speed, count+1)
+			//		BasicExplosion(obj.Pos, 20.+(2.*float64(count+1)), 2., spr.Color)
+			//	} else {
+			//		BasicExplosion(obj.Pos, 40., 2., spr.Color)
+			//	}
+			//},
 		})
 	if count == 0 {
 		hp := &data.Health{
@@ -279,7 +279,7 @@ func BasicMeteor(spd float64, pos pixel.Vec) {
 	for {
 		town := game.Towns[rand.Intn(len(game.Towns))]
 		if !town.Health.Dead {
-			target = town.Obj.Pos
+			target = town.Object.Pos
 			break
 		}
 		try++
@@ -312,14 +312,14 @@ func BasicMeteor(spd float64, pos pixel.Vec) {
 		AddComponent(myecs.Payload, &data.Missile{
 			Target: target,
 			Speed:  speed,
-			Finish: func(pos pixel.Vec) {
-				BasicExplosion(obj.Pos, 60., 1., color.RGBA{
-					R: 223,
-					G: 62,
-					B: 35,
-					A: 255,
-				})
-			},
+			//Finish: func(pos pixel.Vec) {
+			//	BasicExplosion(obj.Pos, 60., 1., color.RGBA{
+			//		R: 223,
+			//		G: 62,
+			//		B: 35,
+			//		A: 255,
+			//	})
+			//},
 		})
 }
 
@@ -343,7 +343,7 @@ func BigMeteor(spd float64) {
 	for {
 		town := game.Towns[rand.Intn(len(game.Towns))]
 		if !town.Health.Dead {
-			target = town.Obj.Pos
+			target = town.Object.Pos
 			break
 		}
 		try++
@@ -393,14 +393,14 @@ func BigMeteor(spd float64) {
 		AddComponent(myecs.Payload, &data.Missile{
 			Target: target,
 			Speed:  speed,
-			Finish: func(pos pixel.Vec) {
-				BasicExplosion(obj.Pos, 90., 1., color.RGBA{
-					R: 223,
-					G: 62,
-					B: 35,
-					A: 255,
-				})
-			},
+			//Finish: func(pos pixel.Vec) {
+			//	BasicExplosion(obj.Pos, 90., 1., color.RGBA{
+			//		R: 223,
+			//		G: 62,
+			//		B: 35,
+			//		A: 255,
+			//	})
+			//},
 		})
 }
 
@@ -431,8 +431,8 @@ func BasicZombie() {
 	}
 	obj := object.New()
 	if twn != nil {
-		obj.Pos.X = twn.Obj.Pos.X
-		for math.Abs(obj.Pos.X-twn.Obj.Pos.X) < 250. {
+		obj.Pos.X = twn.Object.Pos.X
+		for math.Abs(obj.Pos.X-twn.Object.Pos.X) < 250. {
 			obj.Pos.X = float64(rand.Intn(1520) - 760)
 		}
 		mob.Target = twn

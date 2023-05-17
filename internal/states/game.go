@@ -7,10 +7,12 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"golang.org/x/image/colornames"
 	"image/color"
+	"math/rand"
 	"timsims1717/magicmissile/internal/data"
 	"timsims1717/magicmissile/internal/myecs"
 	"timsims1717/magicmissile/internal/systems"
 	"timsims1717/magicmissile/pkg/debug"
+	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/options"
 	"timsims1717/magicmissile/pkg/state"
@@ -45,6 +47,8 @@ func (s *backgroundTestState) Load() {
 	data.GameDraw = imdraw.New(nil)
 	systems.GenerateRandomBackground("ForestValley")
 	systems.UpdateBackgrounds()
+	systems.CreateTowns()
+	systems.CreateTowers()
 }
 
 func (s *backgroundTestState) Update(win *pixelgl.Window) {
@@ -72,30 +76,53 @@ func (s *backgroundTestState) Update(win *pixelgl.Window) {
 		data.CurrBackground.Backgrounds[0].View.PortPos.X -= timing.DT * 50.
 	}
 	if data.TheInput.Get("click").JustPressed() {
-		for i := 0; i < data.ExpTestNum; i++ {
-			obj := object.New()
-			obj.Pos = inPos
-			obj.Pos.X -= data.BaseWidth * 0.5
-			obj.Pos.Y -= data.BaseHeight * 0.5
-			obj.Pos.X += 50. * float64(i%6)
-			obj.Pos.Y += 50. * float64(i/6)
-			exp := &data.Explosion{
-				FullRadius: 50,
-				ExpandRate: 5,
-				Dissipate:  0.25,
-				DisRate:    100,
-				StartColor: colornames.Orange,
-				EndColor:   colornames.Pink,
-			}
-			myecs.Manager.NewEntity().
-				AddComponent(myecs.Object, obj).
-				AddComponent(myecs.Explosion, exp)
+		//for i := 0; i < data.ExpTestNum; i++ {
+		//	obj := object.New()
+		//	obj.Pos = inPos
+		//	obj.Pos.X -= data.BaseWidth * 0.5
+		//	obj.Pos.Y -= data.BaseHeight * 0.5
+		//	obj.Pos.X += 50. * float64(i%6)
+		//	obj.Pos.Y += 50. * float64(i/6)
+		exp := &data.Explosion{
+			FullRadius: 50,
+			ExpandRate: 5,
+			Dissipate:  0.25,
+			DisRate:    100,
+			StartColor: colornames.Orange,
+			EndColor:   colornames.Pink,
 		}
+		//	myecs.Manager.NewEntity().
+		//		AddComponent(myecs.Object, obj).
+		//		AddComponent(myecs.Explosion, exp)
+		//}
+		spr := img.NewSprite("missile", data.ParticleKey)
+		spr.Color = colornames.Orange
+		target := inPos
+		target.X -= data.BaseWidth * 0.5
+		target.Y -= data.BaseHeight * 0.5
+		tower := data.Towers[rand.Intn(len(data.Towers))]
+		obj := object.New()
+		obj.Pos = tower.Object.Pos.Add(tower.Origin)
+		obj.Rot = target.Sub(obj.Pos).Angle()
+		obj.Layer = 10
+		obj.Rect = img.Batchers[data.ParticleKey].GetSprite(spr.Key).Frame()
+		m := &data.Missile{
+			Object: obj,
+			Sprite: spr,
+			Target: target,
+			Speed:  500.,
+			Finish: []interface{}{exp},
+		}
+		myecs.Manager.NewEntity().
+			AddComponent(myecs.Object, obj).
+			AddComponent(myecs.Drawable, m.Sprite).
+			AddComponent(myecs.Missile, m)
 	}
 
+	systems.MissileSystem()
+	systems.ExplosionSystem()
 	systems.ParentSystem()
 	systems.ObjectSystem()
-	systems.ExplosionSystem()
 	//systems.UpdateBackgrounds()
 	for _, bg := range data.CurrBackground.Backgrounds {
 		bg.View.Update()
@@ -109,32 +136,19 @@ func (s *backgroundTestState) Update(win *pixelgl.Window) {
 }
 
 func (s *backgroundTestState) Draw(win *pixelgl.Window) {
-	switch data.ExpDrawType {
-	case 0:
-		systems.DrawNewExplosionSystem()
-	case 1:
-		systems.DrawNewExplosionSystem1()
-	case 2:
-		systems.DrawNewExplosionSystem2()
-	}
-	data.ExpTexture = data.ExpView.Canvas.Pixels()
+	systems.DrawExplosionSystem()
 	data.GameView.Canvas.Clear(data.CurrBackground.BackCol)
-	for _, bg := range data.CurrBackground.Backgrounds {
+	for i, bg := range data.CurrBackground.Backgrounds {
 		bg.View.Canvas.Clear(color.RGBA{})
-		//spr := &img.Sprite{
-		//	Key:    "house1",
-		//	Color:  white,
-		//	Batch:  "stuff",
-		//}
-		//img.Batchers["stuff"].DrawSprite("house1", pixel.IM.Moved(pixel.V(bg.View.Rect.W()*-0.5, bg.View.Rect.H()*-0.5)))
-		//img.Batchers["stuff"].DrawSprite("house1", pixel.IM.Moved(pixel.V(bg.View.Rect.W()*0.5, bg.View.Rect.H()*-0.5)))
-		//img.Batchers["stuff"].DrawSprite("house1", pixel.IM.Moved(pixel.V(bg.View.Rect.W()*0.5, bg.View.Rect.H()*0.5)))
-		//img.Batchers["stuff"].DrawSprite("house1", pixel.IM.Moved(pixel.V(bg.View.Rect.W()*-0.5, bg.View.Rect.H()*0.5)))
-		//img.Batchers["stuff"].Draw(bg.View.Canvas)
+		img.Clear()
+		systems.DrawSystem(win, i)
+		img.Batchers[data.ObjectKey].Draw(bg.View.Canvas)
 		bg.IMDraw.Draw(bg.View.Canvas)
 		bg.View.Canvas.Draw(data.GameView.Canvas, bg.View.Mat)
 	}
 	data.ExpView.Canvas.Draw(data.GameView.Canvas, data.ExpView.Mat)
+	systems.DrawSystem(win, 10)
+	img.Batchers[data.ParticleKey].Draw(data.GameView.Canvas)
 	data.GameView.Canvas.Draw(win, data.GameView.Mat)
 }
 

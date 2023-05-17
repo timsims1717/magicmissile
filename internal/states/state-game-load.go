@@ -52,13 +52,13 @@ func loadWizard() {
 		B: 128,
 		A: 255,
 	}
-	wPos := pixel.V(-90.,game.CharYLvl)
+	wPos := pixel.V(-90., game.CharYLvl)
 	wObj := object.New()
 	wObj.Pos = wPos
 	pc := &data.PC{
 		Char: &data.Character{
-			Obj:    wObj,
-			Spr:    figures.WizardFigure(wizCol),
+			Obj: wObj,
+			Spr: figures.WizardFigure(wizCol),
 			Health: &data.Health{
 				HP:   4,
 				Team: data.Player,
@@ -127,9 +127,9 @@ func loadWizard() {
 				} else {
 					wandArm.Obj.Rot = 0.
 				}
-				if pc.Char.Obj.Rot < math.Pi * 0.5 {
+				if pc.Char.Obj.Rot < math.Pi*0.5 {
 					pc.Char.Obj.Rot += 8. * timing.DT
-					if pc.Char.Obj.Rot > math.Pi * 0.5 {
+					if pc.Char.Obj.Rot > math.Pi*0.5 {
 						pc.Char.Obj.Rot = math.Pi * 0.5
 					}
 				}
@@ -156,13 +156,13 @@ func loadFighter() {
 		B: 45,
 		A: 255,
 	}
-	fPos := pixel.V(0.,game.CharYLvl)
+	fPos := pixel.V(0., game.CharYLvl)
 	fObj := object.New()
 	fObj.Pos = fPos
 	pc := &data.PC{
 		Char: &data.Character{
-			Obj:    fObj,
-			Spr:    figures.FighterFigure(fightCol),
+			Obj: fObj,
+			Spr: figures.FighterFigure(fightCol),
 			Health: &data.Health{
 				HP:   7,
 				Team: data.Player,
@@ -175,12 +175,12 @@ func loadFighter() {
 		},
 	}
 	atk := &data.Attack{
-		WindUp:    0.2,
-		WindDown:  0.5,
-		Recover:   0.5,
-		Damage:    1,
-		Range:     60.,
-		Team:      data.Player,
+		WindUp:   0.2,
+		WindDown: 0.5,
+		Recover:  0.5,
+		Damage:   1,
+		Range:    60.,
+		Team:     data.Player,
 	}
 	e := myecs.Manager.NewEntity()
 	axeArm := figures.AxeArm(fightCol)
@@ -233,9 +233,9 @@ func loadFighter() {
 				} else {
 					axeArm.Obj.Rot = 0.
 				}
-				if pc.Char.Obj.Rot < math.Pi * 0.5 {
+				if pc.Char.Obj.Rot < math.Pi*0.5 {
 					pc.Char.Obj.Rot += 8. * timing.DT
-					if pc.Char.Obj.Rot > math.Pi * 0.5 {
+					if pc.Char.Obj.Rot > math.Pi*0.5 {
 						pc.Char.Obj.Rot = math.Pi * 0.5
 					}
 				}
@@ -257,17 +257,17 @@ func loadFighter() {
 func loadTowns() {
 	game.Towns = []*data.Town{}
 	spr := &img.Sprite{
-		Key:    "house1",
-		Color:  white,
-		Batch:  "stuff",
+		Key:   "house1",
+		Color: white,
+		Batch: "stuff",
 	}
 	sprD := &img.Sprite{
-		Key:    "house1dead",
-		Color:  white,
-		Batch:  "stuff",
+		Key:   "house1dead",
+		Color: white,
+		Batch: "stuff",
 	}
 	for i := 0; i < 8; i++ {
-		x := game.TownX * -0.5 + float64(i) * (game.TownX / 7.)
+		x := game.TownX*-0.5 + float64(i)*(game.TownX/7.)
 		y := game.TownYLvl
 		obj := object.New()
 		obj.Pos = pixel.V(x, y)
@@ -277,11 +277,11 @@ func loadTowns() {
 		}
 		town := &data.Town{
 			Health: hp,
-			Obj:    obj,
+			Object: obj,
 		}
 		hitbox := pixel.R(-2., -2., 2., 2.)
 		e := myecs.Manager.NewEntity()
-		e.AddComponent(myecs.Object, town.Obj).
+		e.AddComponent(myecs.Object, town.Object).
 			AddComponent(myecs.Health, town.Health).
 			AddComponent(myecs.Hitbox, &hitbox).
 			AddComponent(myecs.Drawable, spr).
@@ -295,7 +295,7 @@ func loadTowns() {
 				}
 				return false
 			}))
-		HPBar(&town.Obj.Pos, town.Health, 5)
+		HPBar(&town.Object.Pos, town.Health, 5)
 		game.Towns = append(game.Towns, town)
 	}
 }
@@ -349,14 +349,14 @@ func HPBar(parent *pixel.Vec, hp *data.Health, total int) {
 
 func loadScenery() {
 	grass := &img.Sprite{
-		Key:    "grass",
-		Color:  white,
-		Batch:  "sceneryfg",
+		Key:   "grass",
+		Color: white,
+		Batch: "sceneryfg",
 	}
 	path := &img.Sprite{
-		Key:    "path",
-		Color:  white,
-		Batch:  "sceneryfg",
+		Key:   "path",
+		Color: white,
+		Batch: "sceneryfg",
 	}
 	layer1Y := -460.
 	layer2Y := layer1Y + 24.
@@ -368,37 +368,37 @@ func loadScenery() {
 	layer1X := -800.
 	for i := 0; i < 16; i++ {
 		obj7 := object.New()
-		obj7.Pos = pixel.V(layer1X + float64(i) * 128., layer7Y)
+		obj7.Pos = pixel.V(layer1X+float64(i)*128., layer7Y)
 		myecs.Manager.NewEntity().
 			AddComponent(myecs.Object, obj7).
 			AddComponent(myecs.Drawable, path)
 		obj6 := object.New()
-		obj6.Pos = pixel.V(layer1X + float64(i) * 128., layer6Y)
+		obj6.Pos = pixel.V(layer1X+float64(i)*128., layer6Y)
 		myecs.Manager.NewEntity().
 			AddComponent(myecs.Object, obj6).
 			AddComponent(myecs.Drawable, grass)
 		obj5 := object.New()
-		obj5.Pos = pixel.V(layer1X + float64(i) * 128., layer5Y)
+		obj5.Pos = pixel.V(layer1X+float64(i)*128., layer5Y)
 		myecs.Manager.NewEntity().
 			AddComponent(myecs.Object, obj5).
 			AddComponent(myecs.Drawable, grass)
 		obj4 := object.New()
-		obj4.Pos = pixel.V(layer1X + float64(i) * 128., layer4Y)
+		obj4.Pos = pixel.V(layer1X+float64(i)*128., layer4Y)
 		myecs.Manager.NewEntity().
 			AddComponent(myecs.Object, obj4).
 			AddComponent(myecs.Drawable, grass)
 		obj3 := object.New()
-		obj3.Pos = pixel.V(layer1X + float64(i) * 128., layer3Y)
+		obj3.Pos = pixel.V(layer1X+float64(i)*128., layer3Y)
 		myecs.Manager.NewEntity().
 			AddComponent(myecs.Object, obj3).
 			AddComponent(myecs.Drawable, grass)
 		obj2 := object.New()
-		obj2.Pos = pixel.V(layer1X + float64(i) * 128., layer2Y)
+		obj2.Pos = pixel.V(layer1X+float64(i)*128., layer2Y)
 		myecs.Manager.NewEntity().
 			AddComponent(myecs.Object, obj2).
 			AddComponent(myecs.Drawable, grass)
 		obj1 := object.New()
-		obj1.Pos = pixel.V(layer1X + float64(i) * 128., layer1Y)
+		obj1.Pos = pixel.V(layer1X+float64(i)*128., layer1Y)
 		myecs.Manager.NewEntity().
 			AddComponent(myecs.Object, obj1).
 			AddComponent(myecs.Drawable, grass)

@@ -43,6 +43,17 @@ func ExplosionSystem() {
 	}
 }
 
+func DrawExplosionSystem() {
+	switch data.ExpDrawType {
+	case 0:
+		DrawNewExplosionSystem()
+	case 1:
+		DrawNewExplosionSystem1()
+	case 2:
+		DrawNewExplosionSystem2()
+	}
+}
+
 // DrawNewExplosionSystem
 // This one looks the best, since each explosion is totally independent.
 // Once you get above 15 or so explosions, the performance drops, though.

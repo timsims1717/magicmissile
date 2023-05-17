@@ -93,6 +93,7 @@ func run() {
 	debug.Initialize(&viewport.MainCamera.PostCamPos, &viewport.MainCamera.PostCamPos)
 
 	loading.LoadShaders()
+	loading.LoadImg()
 
 	err = data.LoadRealms("assets/data/realms.json")
 	if err != nil {

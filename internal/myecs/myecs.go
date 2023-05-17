@@ -24,6 +24,7 @@ var (
 	Animated = Manager.NewComponent()
 
 	Payload = Manager.NewComponent()
+	Missile = Manager.NewComponent()
 	Health  = Manager.NewComponent()
 	Movable = Manager.NewComponent()
 	Attack  = Manager.NewComponent()
@@ -33,16 +34,17 @@ var (
 	Explosion = Manager.NewComponent()
 
 	// Tags
-	IsObject   = ecs.BuildTag(Object)
-	IsTemp     = ecs.BuildTag(Temp, Object)
-	HasParent  = ecs.BuildTag(Object, Parent)
-	IsDrawable = ecs.BuildTag(Object, Drawable)
-	HasAnim    = ecs.BuildTag(Animated)
-	HasUpdate  = ecs.BuildTag(Update)
+	IsObject     = ecs.BuildTag(Object)
+	IsTemp       = ecs.BuildTag(Temp, Object)
+	HasParent    = ecs.BuildTag(Object, Parent)
+	IsDrawable   = ecs.BuildTag(Object, Drawable)
+	HasAnimation = ecs.BuildTag(Animated, Object)
+	HasUpdate    = ecs.BuildTag(Update)
 
 	HasHealth  = ecs.BuildTag(Object, Health, Hitbox)
 	PlayerChar = ecs.BuildTag(Object, Movable, Health)
 	HasPayload = ecs.BuildTag(Object, Payload)
+	IsMissile  = ecs.BuildTag(Object, Missile)
 	CanAttack  = ecs.BuildTag(Object, Attack)
 	IsMob      = ecs.BuildTag(Object, Mob)
 

@@ -51,7 +51,7 @@ func (s *menuState) Update(win *pixelgl.Window) {
 
 func (s *menuState) Draw(win *pixelgl.Window) {
 	img.Clear()
-	systems.DrawSystem(win)
+	systems.DrawSystem(win, 0)
 	img.Draw(win)
 	DrawMenus(win)
 	game.Title.Draw(win)

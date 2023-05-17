@@ -20,9 +20,9 @@ func PayloadSystem() {
 				obj.Pos.Y += norm.Y * missile.Speed * timing.DT
 				if obj.Kill || l == (missile.Target.X < obj.Pos.X) || b == (missile.Target.Y < obj.Pos.Y) {
 					// missile reached target or was destroyed
-					if missile.Finish != nil {
-						missile.Finish(obj.Pos)
-					}
+					//if missile.Finish != nil {
+					//	missile.Finish(obj.Pos)
+					//}
 					myecs.Manager.DisposeEntity(result)
 				}
 			} else if explosion, okE := result.Components[myecs.Payload].(*data.Explosion); okE {
