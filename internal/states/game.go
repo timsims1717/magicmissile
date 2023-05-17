@@ -5,15 +5,12 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
-	"golang.org/x/image/colornames"
 	"image/color"
-	"math/rand"
 	"timsims1717/magicmissile/internal/data"
 	"timsims1717/magicmissile/internal/myecs"
 	"timsims1717/magicmissile/internal/systems"
 	"timsims1717/magicmissile/pkg/debug"
 	"timsims1717/magicmissile/pkg/img"
-	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/options"
 	"timsims1717/magicmissile/pkg/state"
 	"timsims1717/magicmissile/pkg/timing"
@@ -65,6 +62,14 @@ func (s *backgroundTestState) Update(win *pixelgl.Window) {
 		systems.GenerateRandomBackground("ForestValley")
 		systems.UpdateBackgrounds()
 	}
+	if data.TheInput.Get("debugSpellTier").JustPressed() {
+		data.TierTest++
+		data.TierTest %= 5
+	}
+	if data.TheInput.Get("debugSpellName").JustPressed() {
+		data.SpellTest++
+		data.SpellTest %= len(data.SpellKeys)
+	}
 	if data.TheInput.Get("debugCU").Pressed() {
 		data.CurrBackground.Backgrounds[0].View.PortPos.Y += timing.DT * 50.
 	} else if data.TheInput.Get("debugCD").Pressed() {
@@ -75,52 +80,35 @@ func (s *backgroundTestState) Update(win *pixelgl.Window) {
 	} else if data.TheInput.Get("debugCL").Pressed() {
 		data.CurrBackground.Backgrounds[0].View.PortPos.X -= timing.DT * 50.
 	}
-	if data.TheInput.Get("click").JustPressed() {
-		//for i := 0; i < data.ExpTestNum; i++ {
-		//	obj := object.New()
-		//	obj.Pos = inPos
-		//	obj.Pos.X -= data.BaseWidth * 0.5
-		//	obj.Pos.Y -= data.BaseHeight * 0.5
-		//	obj.Pos.X += 50. * float64(i%6)
-		//	obj.Pos.Y += 50. * float64(i/6)
-		exp := &data.Explosion{
-			FullRadius: 50,
-			ExpandRate: 5,
-			Dissipate:  0.25,
-			DisRate:    100,
-			StartColor: colornames.Orange,
-			EndColor:   colornames.Pink,
-		}
-		//	myecs.Manager.NewEntity().
-		//		AddComponent(myecs.Object, obj).
-		//		AddComponent(myecs.Explosion, exp)
-		//}
-		spr := img.NewSprite("missile", data.ParticleKey)
-		spr.Color = colornames.Orange
+	if data.TheInput.Get("fireLeft").JustPressed() {
+		tower := data.Towers[0]
 		target := inPos
 		target.X -= data.BaseWidth * 0.5
 		target.Y -= data.BaseHeight * 0.5
-		tower := data.Towers[rand.Intn(len(data.Towers))]
-		obj := object.New()
-		obj.Pos = tower.Object.Pos.Add(tower.Origin)
-		obj.Rot = target.Sub(obj.Pos).Angle()
-		obj.Layer = 10
-		obj.Rect = img.Batchers[data.ParticleKey].GetSprite(spr.Key).Frame()
-		m := &data.Missile{
-			Object: obj,
-			Sprite: spr,
-			Target: target,
-			Speed:  500.,
-			Finish: []interface{}{exp},
-		}
-		myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, obj).
-			AddComponent(myecs.Drawable, m.Sprite).
-			AddComponent(myecs.Missile, m)
+		missile := data.Missiles[data.SpellKeys[data.SpellTest]][data.TierTest]
+		systems.FireFromTower(missile, tower, target)
+	}
+	if data.TheInput.Get("fireMid").JustPressed() {
+		tower := data.Towers[1]
+		target := inPos
+		target.X -= data.BaseWidth * 0.5
+		target.Y -= data.BaseHeight * 0.5
+		missile := data.Missiles[data.SpellKeys[data.SpellTest]][data.TierTest]
+		systems.FireFromTower(missile, tower, target)
+	}
+	if data.TheInput.Get("fireRight").JustPressed() {
+		tower := data.Towers[2]
+		target := inPos
+		target.X -= data.BaseWidth * 0.5
+		target.Y -= data.BaseHeight * 0.5
+		missile := data.Missiles[data.SpellKeys[data.SpellTest]][data.TierTest]
+		systems.FireFromTower(missile, tower, target)
 	}
 
+	systems.FunctionSystem()
 	systems.MissileSystem()
 	systems.ExplosionSystem()
+	//systems.HealthSystem()
 	systems.ParentSystem()
 	systems.ObjectSystem()
 	//systems.UpdateBackgrounds()

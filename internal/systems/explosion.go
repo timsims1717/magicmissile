@@ -2,12 +2,28 @@ package systems
 
 import (
 	"github.com/faiface/pixel"
+	"golang.org/x/image/colornames"
 	"image/color"
 	"timsims1717/magicmissile/internal/data"
 	"timsims1717/magicmissile/internal/myecs"
 	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/timing"
 )
+
+func MakeExplosion(eFab *data.Explosion, pos pixel.Vec, col color.RGBA) {
+	obj := object.New()
+	obj.Pos = pos
+	exp := &data.Explosion{
+		FullRadius: eFab.FullRadius,
+		ExpandRate: eFab.ExpandRate,
+		Dissipate:  eFab.Dissipate,
+		DisRate:    eFab.DisRate,
+		StartColor: col,
+	}
+	myecs.Manager.NewEntity().
+		AddComponent(myecs.Object, obj).
+		AddComponent(myecs.Explosion, exp)
+}
 
 func ExplosionSystem() {
 	for _, result := range myecs.Manager.Query(myecs.IsExplosion) {
@@ -72,7 +88,7 @@ func DrawNewExplosionSystem() {
 			data.GameDraw.Circle(exp.CurrRadius, 0.)
 			data.GameDraw.Draw(data.ExpView1.Canvas)
 			data.GameDraw.Clear()
-			data.GameDraw.Color = exp.EndColor
+			data.GameDraw.Color = colornames.Pink
 			data.GameDraw.Push(obj.Pos)
 			data.GameDraw.Circle(exp.DisRadius, 0.)
 			data.GameDraw.Draw(data.ExpView1.Canvas)
@@ -110,7 +126,7 @@ func DrawNewExplosionSystem1() {
 		obj, okO := result.Components[myecs.Object].(*object.Object)
 		exp, okE := result.Components[myecs.Explosion].(*data.Explosion)
 		if okO && okE {
-			data.GameDraw.Color = exp.EndColor
+			data.GameDraw.Color = colornames.Pink
 			data.GameDraw.Push(obj.Pos)
 			data.GameDraw.Circle(exp.DisRadius, 0.)
 		}
@@ -135,7 +151,7 @@ func DrawNewExplosionSystem2() {
 			data.GameDraw.Draw(data.ExpView.Canvas)
 			data.ExpView.Canvas.SetComposeMethod(pixel.ComposeXor)
 			data.GameDraw.Clear()
-			data.GameDraw.Color = exp.EndColor
+			data.GameDraw.Color = colornames.Pink
 			data.GameDraw.Push(obj.Pos)
 			data.GameDraw.Circle(exp.DisRadius, 0.)
 			data.GameDraw.Draw(data.ExpView.Canvas)

@@ -1,0 +1,124 @@
+[
+  {
+    "name": "Magic Missile",
+    "key": "magicmissile",
+    "desc": "Fire three arcane missiles.",
+    "tier": 1,
+    "sprite": "missile",
+    "count": 3,
+    "delay": 0.15,
+    "spread": 30,
+    "speed": 500,
+    "colors": [
+      "#CC2FF7",
+      "#A728D4",
+      "#B538EB",
+      "#9928D4",
+      "#A930F4"
+    ],
+    "payloads": [
+      {
+        "explosion": {
+          "radius": 35,
+          "expandRate": 5,
+          "dissipateAfter": 0.15,
+          "dissipateRate": 75
+        }
+      }
+    ],
+    "tiers": [
+      {
+        "desc": "Fire four arcane missiles.",
+        "count": 4,
+        "spread": 40
+      },
+      {
+        "desc": "Fire five arcane missiles.",
+        "count": 5,
+        "spread": 50
+      },
+      {
+        "desc": "Fire six arcane missiles.",
+        "count": 6,
+        "spread": 60
+      },
+      {
+        "desc": "Fire seven arcane missiles.",
+        "count": 7,
+        "spread": 70
+      }
+    ]
+  },
+  {
+    "name": "Fireball",
+    "key": "fireball",
+    "desc": "Creates a large explosion.",
+    "tier": 1,
+    "sprite": "missile",
+    "speed": 500,
+    "colors": [
+      "#FA790F",
+      "#F58600"
+    ],
+    "payloads": [
+      {
+        "explosion": {
+          "radius": 50,
+          "expandRate": 5,
+          "dissipateAfter": 0.25,
+          "dissipateRate": 100
+        }
+      }
+    ],
+    "tiers": [
+      {
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 65,
+              "expandRate": 5,
+              "dissipateAfter": 0.25,
+              "dissipateRate": 110
+            }
+          }
+        ]
+      },
+      {
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 77,
+              "expandRate": 5,
+              "dissipateAfter": 0.25,
+              "dissipateRate": 120
+            }
+          }
+        ]
+      },
+      {
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 87,
+              "expandRate": 5,
+              "dissipateAfter": 0.25,
+              "dissipateRate": 130
+            }
+          }
+        ]
+      },
+      {
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 95,
+              "expandRate": 5,
+              "dissipateAfter": 0.25,
+              "dissipateRate": 140
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -95,7 +95,11 @@ func run() {
 	loading.LoadShaders()
 	loading.LoadImg()
 
-	err = data.LoadRealms("assets/data/realms.json")
+	err = loading.LoadRealms("assets/data/realms.json")
+	if err != nil {
+		panic(err)
+	}
+	err = loading.LoadSpells("assets/data/spells.json")
 	if err != nil {
 		panic(err)
 	}
@@ -118,15 +122,6 @@ func run() {
 		if data.TheInput.Get("debugExpDrawType").JustPressed() {
 			data.ExpDrawType++
 			data.ExpDrawType %= 3
-		}
-		if data.TheInput.Get("debugExpDrawNum1").JustPressed() {
-			data.ExpTestNum = 1
-		}
-		if data.TheInput.Get("debugExpDrawNum20").JustPressed() {
-			data.ExpTestNum = 20
-		}
-		if data.TheInput.Get("debugExpDrawNum100").JustPressed() {
-			data.ExpTestNum = 100
 		}
 
 		state.Update(win)

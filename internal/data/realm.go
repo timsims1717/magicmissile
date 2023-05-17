@@ -1,45 +1,12 @@
 package data
 
 import (
-	"encoding/json"
 	"github.com/aquilax/go-perlin"
 	"github.com/bytearena/ecs"
 	"github.com/faiface/pixel/imdraw"
-	"github.com/pkg/errors"
 	"image/color"
-	"os"
 	"timsims1717/magicmissile/pkg/viewport"
 )
-
-func LoadRealms(path string) error {
-	errMsg := "load realms"
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return errors.Wrap(err, errMsg)
-	}
-	var realms []*Realm
-	err = json.Unmarshal(content, &realms)
-	if err != nil {
-		return errors.Wrap(err, errMsg)
-	}
-	AllRealms = make(map[string]*Realm)
-	for _, realm := range realms {
-		for _, background := range realm.Backgrounds {
-			for _, layer := range background.Layers {
-				switch layer.VFnCode {
-				case Peak:
-					layer.VOffset = RandPeak()
-				case Valley:
-					layer.VOffset = RandValley()
-				case None:
-					layer.VOffset = NoShape
-				}
-			}
-		}
-		AllRealms[realm.Code] = realm
-	}
-	return nil
-}
 
 type Realm struct {
 	Name        string        `json:"name"`

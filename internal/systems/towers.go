@@ -34,7 +34,7 @@ func CreateTowers() {
 					Object: obj,
 					Sprite: spr,
 					Entity: e,
-					Origin: pixel.V(0, 92.),
+					Origin: pixel.V(0, 96.),
 				})
 			}
 		}

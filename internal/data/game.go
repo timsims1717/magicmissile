@@ -12,7 +12,8 @@ var (
 	GameDraw *imdraw.IMDraw
 
 	ExpDrawType = 2
-	ExpTestNum  = 1
+	TierTest    = 0
+	SpellTest   = 0
 
 	TownLayer = 0
 	Towns     []*Town
