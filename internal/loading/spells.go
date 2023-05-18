@@ -2,12 +2,17 @@ package loading
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/pkg/errors"
 	"os"
 	"timsims1717/magicmissile/internal/data"
+	"timsims1717/magicmissile/internal/payloads"
+	"timsims1717/magicmissile/pkg/object"
 )
 
+// LoadSpells creates the map of spells from a .json file
+// Might use this later, but I'm going to just do things in go instead of config
 func LoadSpells(path string) error {
 	errMsg := "load spells"
 	data.Missiles = make(map[string][data.MaxSpellTier]*data.Missile)
@@ -32,10 +37,13 @@ func LoadSpells(path string) error {
 					Desc:    missile.Desc,
 					Tier:    i,
 					Target:  missile.Target,
+					Limit:   missile.Limit,
 					SprKey:  missile.SprKey,
 					Count:   missile.Count,
 					Delay:   missile.Delay,
 					Spread:  missile.Spread,
+					Arc:     missile.Arc,
+					Angle:   missile.Angle,
 					Speed:   missile.Speed,
 					Colors:  missile.Colors,
 					Payload: missile.Payload,
@@ -54,6 +62,9 @@ func LoadSpells(path string) error {
 						if tier.Target != pixel.ZV {
 							nMissile.Target = tier.Target
 						}
+						if tier.Limit != 0. {
+							nMissile.Limit = tier.Limit
+						}
 						if tier.Count > 0 {
 							nMissile.Count = tier.Count
 						}
@@ -63,6 +74,12 @@ func LoadSpells(path string) error {
 						if tier.Spread > 0 {
 							nMissile.Spread = tier.Spread
 						}
+						if tier.Arc > 0 {
+							nMissile.Arc = tier.Arc
+						}
+						if tier.Angle > 0 {
+							nMissile.Angle = tier.Angle
+						}
 						if len(tier.Colors) > 0 {
 							nMissile.Colors = tier.Colors
 						}
@@ -71,12 +88,6 @@ func LoadSpells(path string) error {
 						}
 					}
 				}
-				// set the payload settings
-				//for j, f := range nMissile.Payload {
-				//	if f.Explosion != nil {
-				//
-				//	}
-				//}
 				// add the missile to its set
 				if _, ok := data.Missiles[missile.Key]; ok {
 					set := data.Missiles[missile.Key]
@@ -90,5 +101,26 @@ func LoadSpells(path string) error {
 			}
 		}
 	}
+	// add custom payloads
+	AddFuncPayload("flamewall", payloads.Flamewall)
+	AddFuncPayload("iceshatter", payloads.IceShatter)
+	AddFuncPayload("disintegrate", payloads.Disintegrate)
+	AddFuncPayload("rainbow", payloads.RainbowSpray)
 	return nil
+}
+
+func AddFuncPayload(key string, fn func(*data.Missile, *object.Object)) {
+	if set, ok := data.Missiles[key]; ok {
+		for i, m := range set {
+			if m != nil {
+				m.Payload = append(m.Payload, data.Payload{
+					Function: fn,
+				})
+				set[i] = m
+			}
+		}
+		data.Missiles[key] = set
+	} else {
+		panic(fmt.Sprintf("no spell with key %s", key))
+	}
 }

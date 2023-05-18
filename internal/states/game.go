@@ -70,6 +70,8 @@ func (s *backgroundTestState) Update(win *pixelgl.Window) {
 		data.SpellTest++
 		data.SpellTest %= len(data.SpellKeys)
 	}
+	debug.AddText(fmt.Sprintf("Spell Tier: %d", data.TierTest+1))
+	debug.AddText(fmt.Sprintf("Spell Name: %s", data.SpellKeys[data.SpellTest]))
 	if data.TheInput.Get("debugCU").Pressed() {
 		data.CurrBackground.Backgrounds[0].View.PortPos.Y += timing.DT * 50.
 	} else if data.TheInput.Get("debugCD").Pressed() {

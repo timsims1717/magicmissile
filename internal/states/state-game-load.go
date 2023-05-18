@@ -6,10 +6,10 @@ import (
 	"image/color"
 	"math"
 	"math/rand"
+	"timsims1717/magicmissile/_archived"
 	"timsims1717/magicmissile/internal/data"
 	"timsims1717/magicmissile/internal/figures"
 	"timsims1717/magicmissile/internal/myecs"
-	"timsims1717/magicmissile/internal/payloads"
 	"timsims1717/magicmissile/internal/states/game"
 	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/object"
@@ -102,11 +102,11 @@ func loadWizard() {
 			if data.TheInput.Get("click").JustPressed() && pc.Move.Selected && !pc.Move.Wait {
 				switch spell {
 				case 0:
-					payloads.MagicMissile(pc.Char.Obj.Pos, game.Cursor, 500., wizCol)
+					_archived.MagicMissile(pc.Char.Obj.Pos, game.Cursor, 500., wizCol)
 				case 1:
-					payloads.ChaosBolt(pc.Char.Obj.Pos, game.Cursor, 500., 0)
-				case 2:
-					payloads.Fireball(pc.Char.Obj.Pos, game.Cursor, 500.)
+					_archived.ChaosBolt(pc.Char.Obj.Pos, game.Cursor, 500., 0)
+					//case 2:
+					//	payloads.Fireball(pc.Char.Obj.Pos, game.Cursor, 500.)
 				}
 				spell = rand.Intn(3)
 				waitTimer = timing.New(0.25)

@@ -12,6 +12,7 @@ require (
 )
 
 require (
+	github.com/Shopify/go-lua v0.0.0-20221004153744-91867de107cf // indirect
 	github.com/aquilax/go-perlin v1.1.0 // indirect
 	github.com/faiface/beep v1.1.0 // indirect
 	github.com/faiface/glhf v0.0.0-20211013000516-57b20770c369 // indirect

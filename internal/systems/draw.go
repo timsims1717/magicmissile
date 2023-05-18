@@ -58,8 +58,10 @@ func DrawThing(draw interface{}, obj *object.Object, win *pixelgl.Window) {
 	if spr, ok0 := draw.(*pixel.Sprite); ok0 {
 		spr.Draw(win, obj.Mat)
 	} else if sprH, ok1 := draw.(*img.Sprite); ok1 {
-		if batch, okB := img.Batchers[sprH.Batch]; okB {
-			batch.DrawSpriteColor(sprH.Key, obj.Mat.Moved(sprH.Offset), sprH.Color)
+		if sprH.Batch != "" && sprH.Key != "" {
+			if batch, okB := img.Batchers[sprH.Batch]; okB {
+				batch.DrawSpriteColor(sprH.Key, obj.Mat.Moved(sprH.Offset), sprH.Color)
+			}
 		}
 	} else if anim, ok2 := draw.(*reanimator.Tree); ok2 {
 		res := anim.CurrentSprite()

@@ -1,13 +1,10 @@
 [
   {
-    "name": "Magic Missile",
-    "key": "magicmissile",
-    "desc": "Fire three arcane missiles.",
+    "name": "Arcane Shot",
+    "key": "arcaneshot",
+    "desc": "Fire a basic arcane missile.",
     "tier": 1,
     "sprite": "missile",
-    "count": 3,
-    "delay": 0.15,
-    "spread": 30,
     "speed": 500,
     "colors": [
       "#CC2FF7",
@@ -19,33 +16,95 @@
     "payloads": [
       {
         "explosion": {
-          "radius": 35,
+          "radius": 40,
           "expandRate": 5,
           "dissipateAfter": 0.15,
           "dissipateRate": 75
         }
       }
+    ]
+  },
+  {
+    "name": "Acid Bubble",
+    "key": "acidbubble",
+    "desc": "Conjures a bubble of acid that floats around for three seconds.",
+    "tier": 1,
+    "sprite": "missile",
+    "speed": 500,
+    "colors": [
+      "#17F0A8",
+      "#14F791",
+      "#1DE072",
+      "#14F75C",
+      "#13ED3F"
+    ],
+    "payloads": [
+      {
+        "explosion": {
+          "radius": 31,
+          "expandRate": 50,
+          "dissipateAfter": 3,
+          "dissipateRate": 200,
+          "moveSpeed": 50
+        }
+      }
     ],
     "tiers": [
       {
-        "desc": "Fire four arcane missiles.",
-        "count": 4,
-        "spread": 40
+        "desc": "Conjures a bubble of acid that floats around for four seconds.",
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 32,
+              "expandRate": 50,
+              "dissipateAfter": 4,
+              "dissipateRate": 200,
+              "moveSpeed": 50
+            }
+          }
+        ]
       },
       {
-        "desc": "Fire five arcane missiles.",
-        "count": 5,
-        "spread": 50
+        "desc": "Conjures a bubble of acid that floats around for five seconds.",
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 33,
+              "expandRate": 50,
+              "dissipateAfter": 5,
+              "dissipateRate": 200,
+              "moveSpeed": 50
+            }
+          }
+        ]
       },
       {
-        "desc": "Fire six arcane missiles.",
-        "count": 6,
-        "spread": 60
+        "desc": "Conjures a bubble of acid that floats around for six seconds.",
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 34,
+              "expandRate": 50,
+              "dissipateAfter": 6,
+              "dissipateRate": 200,
+              "moveSpeed": 50
+            }
+          }
+        ]
       },
       {
-        "desc": "Fire seven arcane missiles.",
-        "count": 7,
-        "spread": 70
+        "desc": "Conjures a bubble of acid that floats around for seven seconds.",
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 35,
+              "expandRate": 50,
+              "dissipateAfter": 7,
+              "dissipateRate": 200,
+              "moveSpeed": 50
+            }
+          }
+        ]
       }
     ]
   },
@@ -119,6 +178,274 @@
           }
         ]
       }
+    ]
+  },
+  {
+    "name": "Magic Missile",
+    "key": "magicmissile",
+    "desc": "Fire three arcane missiles.",
+    "tier": 1,
+    "sprite": "missile",
+    "count": 3,
+    "delay": 0.15,
+    "spread": 30,
+    "speed": 500,
+    "colors": [
+      "#CC2FF7",
+      "#A728D4",
+      "#B538EB",
+      "#9928D4",
+      "#A930F4"
+    ],
+    "payloads": [
+      {
+        "explosion": {
+          "radius": 35,
+          "expandRate": 5,
+          "dissipateAfter": 0.15,
+          "dissipateRate": 75
+        }
+      }
+    ],
+    "tiers": [
+      {
+        "desc": "Fire four arcane missiles.",
+        "count": 4,
+        "spread": 40
+      },
+      {
+        "desc": "Fire five arcane missiles.",
+        "count": 5,
+        "spread": 50
+      },
+      {
+        "desc": "Fire six arcane missiles.",
+        "count": 6,
+        "spread": 60
+      },
+      {
+        "desc": "Fire seven arcane missiles.",
+        "count": 7,
+        "spread": 70
+      }
+    ]
+  },
+  {
+    "name": "Thunder",
+    "key": "thunder",
+    "desc": "A peal of thunder cracks instantly at the target.",
+    "tier": 1,
+    "sprite": "",
+    "speed": 0,
+    "colors": [
+      "#DCF5F4",
+      "#E3FCF9",
+      "#E1E5E4",
+      "#E3FCF3",
+      "#DAF2E7"
+    ],
+    "payloads": [
+      {
+        "explosion": {
+          "radius": 35,
+          "expandRate": 12,
+          "dissipateAfter": 0.05,
+          "dissipateRate": 110
+        }
+      }
+    ],
+    "tiers": [
+      {
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 42,
+              "expandRate": 13,
+              "dissipateAfter": 0.05,
+              "dissipateRate": 118
+            }
+          }
+        ]
+      },
+      {
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 50,
+              "expandRate": 14,
+              "dissipateAfter": 0.05,
+              "dissipateRate": 130
+            }
+          }
+        ]
+      },
+      {
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 60,
+              "expandRate": 15,
+              "dissipateAfter": 0.05,
+              "dissipateRate": 145
+            }
+          }
+        ]
+      },
+      {
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 62,
+              "expandRate": 16,
+              "dissipateAfter": 0.05,
+              "dissipateRate": 160
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Wall of Flame",
+    "key": "flamewall",
+    "desc": "Create a wall of fire that goes out after five seconds.",
+    "tier": 2,
+    "sprite": "missile",
+    "speed": 350,
+    "colors": [
+      "#FA790F",
+      "#F58600"
+    ],
+    "payloads": [
+      {
+        "explosion": {
+          "radius": 20,
+          "expandRate": 8,
+          "dissipateAfter": 5,
+          "dissipateRate": 45
+        }
+      }
+    ]
+  },
+  {
+    "name": "Ice Shatter",
+    "key": "iceshatter",
+    "desc": "A piece of ice that shatters when it reaches the target.",
+    "tier": 3,
+    "sprite": "missile",
+    "speed": 500,
+    "colors": [
+      "#DCF5F4",
+      "#E3FCF9",
+      "#E1E5E4",
+      "#E3FCF3",
+      "#DAF2E7"
+    ],
+    "payloads": [
+    {
+      "explosion": {
+        "radius": 20,
+        "expandRate": 8,
+        "dissipateAfter": 0.15,
+        "dissipateRate": 75
+      }
+    }
+  ]
+  },
+  {
+    "name": "Disintegrate",
+    "key": "disintegrate",
+    "desc": "A stream of fire cutting through the sky.",
+    "tier": 3,
+    "limit": 45,
+    "sprite": "missile",
+    "speed": 900,
+    "colors": [
+      "#FA790F",
+      "#F58600"
+    ],
+    "payloads": [
+      {
+        "explosion": {
+          "radius": 25,
+          "expandRate": 15,
+          "dissipateAfter": 1.6,
+          "dissipateRate": 100
+        }
+      }
+    ],
+    "tiers": [
+      {
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 25,
+              "expandRate": 15,
+              "dissipateAfter": 2.8,
+              "dissipateRate": 100
+            }
+          }
+        ]
+      },
+      {
+        "payloads": [
+          {
+            "explosion": {
+              "radius": 25,
+              "expandRate": 15,
+              "dissipateAfter": 4,
+              "dissipateRate": 100
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Conjure Sun",
+    "key": "conjuresun",
+    "desc": "Summon a small star that drifts and fades slowly.",
+    "tier": 5,
+    "sprite": "missile",
+    "speed": 250,
+    "colors": [
+      "#FA6000",
+      "#E64C07",
+      "#FF4106"
+    ],
+    "payloads": [
+      {
+        "explosion": {
+          "radius": 300,
+          "expandRate": 25,
+          "dissipateAfter": 2,
+          "dissipateRate": 15,
+          "shrink": true,
+          "moveSpeed": 25
+        }
+      }
+    ]
+  },
+  {
+    "name": "Rainbow Spray",
+    "key": "rainbow",
+    "desc": "Fire a short range rainbow wave.",
+    "tier": 5,
+    "limit": 100,
+    "sprite": "missile",
+    "count": 9,
+    "angle": 1.45,
+    "target": {
+      "X": 0,
+      "Y": 500
+    },
+    "speed": 500,
+    "colors": [
+      "#CC2FF7",
+      "#A728D4",
+      "#B538EB",
+      "#9928D4",
+      "#A930F4"
     ]
   }
 ]

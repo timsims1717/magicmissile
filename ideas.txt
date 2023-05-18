@@ -1,0 +1,38 @@
+Spells:
+    Tier 0 (can't upgrade):
+        *Arcane Shot (arcane)
+    Tier I:
+        *Magic Missile (arcane, more projectiles at higher tiers)
+        *Fireball (fire, bigger at higher tiers)
+        *Acid Bubble (water, stays for a few seconds and moves around, stays longer at higher tiers)
+        Boulder (earth, launches a rock that explodes when it hits a missile, larger radius at higher tiers)
+        Chaos Bolt (arcane, has a random chance to continue on impact, higher chance at higher tiers)
+        *Thunder (lightning, instantly explodes, larger radius at higher tiers)
+        Heat Wave (fire, increases radius of all fire spells, lasts longer at higher tiers)
+        Rain (water, puts out a tower or town on fire, puts out adjacent at higher tiers)
+        Shock (lightning, gives a tower or town zap powers that zap a projectile heading for them, gives more zaps at higher tiers)
+        Floating Stone (earth, creates a wall at the target, larger at higher tiers)
+    Tier II:
+        *Wall of Flame (fire, stays for a few seconds, longer at higher tiers)
+        Lightning Bolt (lightning, damage from tower to target in a line, more branches at higher tiers)
+        Force Shield (arcane, doesn't damage, but missiles that hit it explode, slowly reduces, hits reduce it more, slower reduction at higher tiers)
+        Freeze (water, stops all projectiles caught in its blast for several seconds, larger radius + longer lasting at higher tiers)
+        Earth Launch (earth, launches from tower all the way offscreen, damaging the whole time, larger radius at higher tiers)
+    Tier III:
+        *Ice Shatter (water, on hit, a bunch of explosions, like a firework, larger "radius" at higher tiers)
+        Time Slow (arcane, slows time for several seconds, lasts longer at higher tiers)
+        Lightning Storm (lightning, conjures a cloud that zaps nearby projectiles, lasts longer at higher tiers)
+        Seeking Stone (earth, launches a homing rock, lasts longer at higher tiers)
+        *Disintegrate Ray (fire, slowly advancing missile creates explosions until off screen, gets wider at higher tiers)
+    Tier IV:
+        Tidal Wave (water, launches from one side of the screen to the other, taller at higher tiers)
+        Pebble Flak (earth, launches a shotgun blast of damaging pebbles, wider cone at higher tiers)
+        Firestorm (fire, explosion launches projectiles out from it randomly, lasts longer at higher tiers)
+        Magic Circle (arcane, creates a ring at target for several seconds, and projectiles that touch the ring are destroyed, larger radius at higher tiers)
+        Chain Lightning (lightning, creates a random branching lightning strike from the target, more branches at higher tiers)
+    Tier V:
+        Barrage (earth, launch several large boulders slowly, large spread, more projectiles at higher tiers)
+        *Rainbow Spray (arcane, fires 7 large, lasting projectiles in an arc)
+        Lightning Wave (lightning, screen clear)
+        Conjure Sun (fire, huge ball, lasts a while and moves slowly around, slowly shrinks)
+        Ice Wall (water, creates a sectioned wall that stays until destroyed, thicker at higher tiers)

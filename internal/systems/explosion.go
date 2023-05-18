@@ -2,12 +2,13 @@ package systems
 
 import (
 	"github.com/faiface/pixel"
-	"golang.org/x/image/colornames"
 	"image/color"
+	"math/rand"
 	"timsims1717/magicmissile/internal/data"
 	"timsims1717/magicmissile/internal/myecs"
 	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/timing"
+	"timsims1717/magicmissile/pkg/util"
 )
 
 func MakeExplosion(eFab *data.Explosion, pos pixel.Vec, col color.RGBA) {
@@ -18,7 +19,10 @@ func MakeExplosion(eFab *data.Explosion, pos pixel.Vec, col color.RGBA) {
 		ExpandRate: eFab.ExpandRate,
 		Dissipate:  eFab.Dissipate,
 		DisRate:    eFab.DisRate,
-		StartColor: col,
+		Shrink:     eFab.Shrink,
+		Color:      col,
+		Movement:   eFab.Movement,
+		MoveSpeed:  eFab.MoveSpeed,
 	}
 	myecs.Manager.NewEntity().
 		AddComponent(myecs.Object, obj).
@@ -27,7 +31,7 @@ func MakeExplosion(eFab *data.Explosion, pos pixel.Vec, col color.RGBA) {
 
 func ExplosionSystem() {
 	for _, result := range myecs.Manager.Query(myecs.IsExplosion) {
-		_, okO := result.Components[myecs.Object].(*object.Object)
+		obj, okO := result.Components[myecs.Object].(*object.Object)
 		exp, okE := result.Components[myecs.Explosion].(*data.Explosion)
 		if okO && okE {
 			if exp.Timer == nil {
@@ -36,23 +40,51 @@ func ExplosionSystem() {
 			exp.Timer.Update()
 			t := exp.Timer.Elapsed()
 			// expand current radius
-			diff := exp.FullRadius - exp.CurrRadius
-			exp.CurrRadius += exp.ExpandRate * diff * timing.DT
-			if exp.CurrRadius > exp.FullRadius {
-				exp.CurrRadius = exp.FullRadius
-			}
-			if exp.CurrRadius < 0. {
-				exp.CurrRadius = 0.
-			}
-			// if dissipating time is past, expand dissipate radius
-			if t > exp.Dissipate {
-				exp.DisRadius += exp.DisRate * timing.DT
-				if exp.DisRadius > exp.FullRadius {
+			if !exp.Shrinking {
+				diff := exp.FullRadius - exp.CurrRadius
+				exp.CurrRadius += exp.ExpandRate * diff * timing.DT
+				if exp.CurrRadius > exp.FullRadius {
+					exp.CurrRadius = exp.FullRadius
+				}
+				if exp.CurrRadius < 0. {
+					exp.CurrRadius = 0.
+				}
+			} else {
+				exp.CurrRadius -= exp.DisRate * timing.DT
+				if exp.CurrRadius < 0. {
 					// dispose of this entity
 					myecs.Manager.DisposeEntity(result.Entity)
 				}
-				if exp.DisRadius < 0. {
-					exp.DisRadius = 0.
+			}
+			// if dissipating time is past, expand dissipate radius
+			if t > exp.Dissipate {
+				if exp.Shrink {
+					exp.Shrinking = true
+				} else {
+					exp.DisRadius += exp.DisRate * timing.DT
+					if exp.DisRadius > exp.FullRadius || exp.DisRadius > exp.CurrRadius {
+						// dispose of this entity
+						myecs.Manager.DisposeEntity(result.Entity)
+					}
+					if exp.DisRadius < 0. {
+						exp.DisRadius = 0.
+					}
+				}
+			}
+			// move the explosion if move speed is greater than 0
+			if exp.MoveSpeed > 0 {
+				if exp.Movement != pixel.ZV {
+					obj.Pos.X += exp.Movement.X * exp.MoveSpeed * timing.DT
+					obj.Pos.Y += exp.Movement.Y * exp.MoveSpeed * timing.DT
+				} else {
+					newMove := exp.CurrMove
+					newMove.X += (rand.Float64() - 0.5) * exp.MoveSpeed * timing.DT
+					newMove.Y += (rand.Float64() - 0.5) * exp.MoveSpeed * timing.DT
+					newMove.X = exp.CurrMove.X + newMove.X
+					newMove.Y = exp.CurrMove.Y + newMove.Y
+					exp.CurrMove = util.Normalize(newMove)
+					obj.Pos.X += exp.CurrMove.X * exp.MoveSpeed * timing.DT
+					obj.Pos.Y += exp.CurrMove.Y * exp.MoveSpeed * timing.DT
 				}
 			}
 		}
@@ -83,12 +115,12 @@ func DrawNewExplosionSystem() {
 		if okO && okE {
 			data.ExpView1.Canvas.Clear(color.RGBA{})
 			data.GameDraw.Clear()
-			data.GameDraw.Color = exp.StartColor
+			data.GameDraw.Color = exp.Color
 			data.GameDraw.Push(obj.Pos)
 			data.GameDraw.Circle(exp.CurrRadius, 0.)
 			data.GameDraw.Draw(data.ExpView1.Canvas)
 			data.GameDraw.Clear()
-			data.GameDraw.Color = colornames.Pink
+			data.GameDraw.Color = exp.Color
 			data.GameDraw.Push(obj.Pos)
 			data.GameDraw.Circle(exp.DisRadius, 0.)
 			data.GameDraw.Draw(data.ExpView1.Canvas)
@@ -112,7 +144,7 @@ func DrawNewExplosionSystem1() {
 		obj, okO := result.Components[myecs.Object].(*object.Object)
 		exp, okE := result.Components[myecs.Explosion].(*data.Explosion)
 		if okO && okE {
-			data.GameDraw.Color = exp.StartColor
+			data.GameDraw.Color = exp.Color
 			data.GameDraw.Push(obj.Pos)
 			data.GameDraw.Circle(exp.CurrRadius, 0.)
 		}
@@ -126,7 +158,7 @@ func DrawNewExplosionSystem1() {
 		obj, okO := result.Components[myecs.Object].(*object.Object)
 		exp, okE := result.Components[myecs.Explosion].(*data.Explosion)
 		if okO && okE {
-			data.GameDraw.Color = colornames.Pink
+			data.GameDraw.Color = exp.Color
 			data.GameDraw.Push(obj.Pos)
 			data.GameDraw.Circle(exp.DisRadius, 0.)
 		}
@@ -145,13 +177,13 @@ func DrawNewExplosionSystem2() {
 		if okO && okE {
 			data.ExpView.Canvas.SetComposeMethod(pixel.ComposeOver)
 			data.GameDraw.Clear()
-			data.GameDraw.Color = exp.StartColor
+			data.GameDraw.Color = exp.Color
 			data.GameDraw.Push(obj.Pos)
 			data.GameDraw.Circle(exp.CurrRadius, 0.)
 			data.GameDraw.Draw(data.ExpView.Canvas)
 			data.ExpView.Canvas.SetComposeMethod(pixel.ComposeXor)
 			data.GameDraw.Clear()
-			data.GameDraw.Color = colornames.Pink
+			data.GameDraw.Color = exp.Color
 			data.GameDraw.Push(obj.Pos)
 			data.GameDraw.Circle(exp.DisRadius, 0.)
 			data.GameDraw.Draw(data.ExpView.Canvas)

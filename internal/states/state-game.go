@@ -6,9 +6,9 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"image/color"
 	"math/rand"
+	"timsims1717/magicmissile/_archived"
 	"timsims1717/magicmissile/internal/data"
 	"timsims1717/magicmissile/internal/myecs"
-	"timsims1717/magicmissile/internal/payloads"
 	"timsims1717/magicmissile/internal/states/game"
 	"timsims1717/magicmissile/internal/systems"
 	"timsims1717/magicmissile/pkg/img"
@@ -111,14 +111,14 @@ func (s *gameState) Update(win *pixelgl.Window) {
 		systems.AnimationSystem()
 		if game.MTimer.UpdateDone() {
 			if game.BigOn && rand.Intn(5) == 0 {
-				payloads.BigMeteor(game.MSpd * 0.75)
+				_archived.BigMeteor(game.MSpd * 0.75)
 			} else {
-				payloads.BasicMeteor(game.MSpd, pixel.ZV)
+				_archived.BasicMeteor(game.MSpd, pixel.ZV)
 			}
 			game.MTimer = timing.New(rand.Float64()*game.MFreq + 0.5)
 		}
 		if game.ZTimer.UpdateDone() {
-			payloads.BasicZombie()
+			_archived.BasicZombie()
 			game.ZTimer = timing.New(rand.Float64()*game.ZFreq + 0.5)
 		}
 		if game.DTimer.UpdateDone() {

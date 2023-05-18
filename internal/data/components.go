@@ -51,8 +51,12 @@ type Missile struct {
 	Count   int            `json:"count"`
 	Delay   float64        `json:"delay"`
 	Spread  float64        `json:"spread"`
+	Arc     float64        `json:"arc"`
+	Angle   float64        `json:"angle"`
 	Tier    int            `json:"tier"`
 	Target  pixel.Vec      `json:"target"`
+	Limit   float64        `json:"limit"`
+	Travel  float64        `json:"-"`
 	Speed   float64        `json:"speed"`
 	Colors  []string       `json:"colors"`
 	Object  *object.Object `json:"-"`
@@ -67,18 +71,34 @@ type Explosion struct {
 	ExpandRate float64       `json:"expandRate"`
 	Dissipate  float64       `json:"dissipateAfter"`
 	DisRate    float64       `json:"dissipateRate"`
+	Shrink     bool          `json:"shrink"`
+	Shrinking  bool          `json:"-"`
+	Movement   pixel.Vec     `json:"movement"`
+	MoveSpeed  float64       `json:"moveSpeed"`
+	CurrMove   pixel.Vec     `json:"-"`
 	DisRadius  float64       `json:"-"`
-	StartColor color.RGBA    `json:"-"`
-	FullColor  color.RGBA    `json:"-"`
-	EndColor   color.RGBA    `json:"-"`
+	Color      color.RGBA    `json:"-"`
 	Timer      *timing.Timer `json:"-"`
+}
+
+func (e *Explosion) Copy() *Explosion {
+	return &Explosion{
+		FullRadius: e.FullRadius,
+		ExpandRate: e.ExpandRate,
+		Dissipate:  e.Dissipate,
+		DisRate:    e.DisRate,
+		Movement:   e.Movement,
+		MoveSpeed:  e.MoveSpeed,
+		Color:      e.Color,
+	}
 }
 
 type Payload struct {
 	Missile   *Missile   `json:"missile"`
 	Explosion *Explosion `json:"explosion"`
-	Spell     *string    `json:"spell"`
-	Function  func()     `json:"-"`
+	Script    *string    `json:"script"`
+
+	Function func(*Missile, *object.Object) `json:"-"`
 }
 
 type Health struct {

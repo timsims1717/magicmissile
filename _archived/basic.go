@@ -1,4 +1,4 @@
-package payloads
+package _archived
 
 import (
 	"fmt"
@@ -60,40 +60,6 @@ func MagicMissile(start, target pixel.Vec, speed float64, rgba color.RGBA) {
 			return false
 		}, float64(i)*0.15))
 	}
-}
-
-func Fireball(start, target pixel.Vec, speed float64) {
-	obj := object.New()
-	obj.Pos = start
-	obj.Rot = target.Sub(start).Angle()
-	col := color.RGBA{
-		R: 223,
-		G: 62,
-		B: 35,
-		A: 255,
-	}
-	spr := &img.Sprite{
-		Key:   "missile",
-		Color: col,
-		Batch: "figures",
-	}
-	hp := &data.Health{
-		HP:   1,
-		Team: data.NoTeam,
-	}
-	hitbox := pixel.R(-16., -3.5, 16, 3.5)
-	myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, obj).
-		AddComponent(myecs.Drawable, spr).
-		AddComponent(myecs.Health, hp).
-		AddComponent(myecs.Hitbox, &hitbox).
-		AddComponent(myecs.Payload, &data.Missile{
-			Target: target,
-			Speed:  speed,
-			//Finish: func(pos pixel.Vec) {
-			//	BasicExplosion(obj.Pos, 75., 2., col)
-			//},
-		})
 }
 
 func ChaosBolt(start, target pixel.Vec, speed float64, count int) {
