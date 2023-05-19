@@ -19,6 +19,7 @@ type AbstractState struct {
 	State
 	LoadPrc  float64
 	ShowLoad bool
+	loaded   bool
 }
 
 func New(state State) *AbstractState {
@@ -30,14 +31,16 @@ func New(state State) *AbstractState {
 }
 
 var (
-	switchState = false
-	currState   = "unknown"
-	nextState   = "unknown"
+	pushState  = false
+	nextState  = "unknown"
+	stateStack []string
+	stackPtr   = -1
+	states     = map[string]*AbstractState{}
+	defState   string
 
 	loading = false
 	done    = make(chan struct{})
 
-	states     = map[string]*AbstractState{}
 	clearColor color.Color
 )
 
@@ -47,8 +50,14 @@ func init() {
 
 func Register(key string, state *AbstractState) {
 	if _, ok := states[key]; ok {
-		fmt.Printf("error: state '%s' already registered", key)
+		fmt.Printf("Warning: state.Register - state '%s' already registered\n", key)
+	} else if state == nil {
+		panic(fmt.Sprintf("state.Register - state %s is nil\n", key))
 	} else {
+		if defState == "" {
+			defState = key
+			nextState = key
+		}
 		states[key] = state
 	}
 }
@@ -63,51 +72,94 @@ func Update(win *pixelgl.Window) {
 		select {
 		case <-done:
 			loading = false
-			currState = nextState
 		default:
-			//LoadingState.Update(win)
+			if LoadingScreen != nil {
+				LoadingScreen.Update(win)
+			}
 		}
-	}
-	if cState, ok := states[currState]; ok {
-		cState.Update(win)
+	} else {
+		if len(stateStack) > 0 && stackPtr > -1 {
+			if cState, ok := states[stateStack[stackPtr]]; ok {
+				cState.Update(win)
+			} else {
+				panic(fmt.Sprintf("state.Update - state %s doesn't exist\n", stateStack[stackPtr]))
+			}
+		}
 	}
 }
 
 func Draw(win *pixelgl.Window) {
 	win.Clear(clearColor)
-	cState, ok1 := states[currState]
-	nState, ok2 := states[nextState]
-	if !ok2 {
-		panic(fmt.Sprintf("state %s doesn't exist", nextState))
-	}
-	if loading && nState.ShowLoad || !ok1 {
-		//LoadingState.Draw(win)
+	if loading {
+		if lState, ok2 := states[stateStack[stackPtr]]; ok2 && lState.ShowLoad && LoadingScreen != nil {
+			LoadingScreen.Draw(win)
+			return
+		}
 	} else {
-		cState.Draw(win)
+		for _, state := range stateStack {
+			cState, ok1 := states[state]
+			if !ok1 {
+				panic(fmt.Sprintf("state.Draw - state %s doesn't exist\n", state))
+			} else {
+				cState.Draw(win)
+			}
+		}
 	}
 }
 
 func updateState() {
-	if !loading && (currState != nextState || switchState) {
-		go func() {
-			// uninitialize
-			if cState, ok := states[currState]; ok {
-				cState.Unload()
+	if !loading {
+		if len(stateStack)-1 > stackPtr {
+			// states need to be popped
+			for si := len(stateStack) - 1; si > stackPtr; si-- {
+				if cState, ok := states[stateStack[si]]; ok {
+					// unload
+					cState.Unload()
+				}
 			}
-			// initialize
+			if stackPtr == -1 {
+				stateStack = []string{}
+			} else {
+				stateStack = stateStack[:stackPtr+1]
+			}
+		}
+		if pushState {
 			if cState, ok := states[nextState]; ok {
-				cState.Load()
+				stateStack = append(stateStack, nextState)
+				stackPtr++
+				go func() {
+					// initialize
+					cState.Load()
+					done <- struct{}{}
+				}()
+				loading = true
 			}
-			done <- struct{}{}
-		}()
-		loading = true
-		switchState = false
+			pushState = false
+		}
+	}
+	if len(stateStack) == 0 || stackPtr == -1 {
+		PushState(defState)
 	}
 }
 
 func SwitchState(s string) {
-	if !switchState {
-		switchState = true
+	PopState()
+	PushState(s)
+}
+
+func PushState(s string) {
+	if !pushState {
+		pushState = true
 		nextState = s
+	} else {
+		panic(fmt.Sprintf("state.Push - tried to push state %s when a push is already happening\n", s))
+	}
+}
+
+func PopState() {
+	if len(stateStack) == 0 || stackPtr == -1 {
+		panic("state.Pop - tried to pop with an empty state stack")
+	} else {
+		stackPtr--
 	}
 }

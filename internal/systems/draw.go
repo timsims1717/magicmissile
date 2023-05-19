@@ -7,6 +7,7 @@ import (
 	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/reanimator"
+	"timsims1717/magicmissile/pkg/typeface"
 )
 
 func AnimationSystem() {
@@ -33,20 +34,27 @@ func DrawSystem(win *pixelgl.Window, layer int) {
 		obj, okO := result.Components[myecs.Object].(*object.Object)
 		if okO && obj.Layer == layer && !obj.Hide {
 			draw := result.Components[myecs.Drawable]
+			var target pixel.Target
+			target = win
+			if ok := result.Entity.HasComponent(myecs.DrawTarget); ok {
+				if tar, okT := result.Entity.GetComponentData(myecs.DrawTarget); okT {
+					target, okT = tar.(pixel.Target)
+				}
+			}
 			if draw == nil {
 				continue
 			} else if draws, okD := draw.([]*img.Sprite); okD {
 				for _, d := range draws {
-					DrawThing(d, obj, win)
+					DrawThing(d, obj, target)
 					count++
 				}
 			} else if anims, okA := draw.([]*reanimator.Tree); okA {
 				for _, d := range anims {
-					DrawThing(d, obj, win)
+					DrawThing(d, obj, target)
 					count++
 				}
 			} else {
-				DrawThing(draw, obj, win)
+				DrawThing(draw, obj, target)
 				count++
 			}
 		}
@@ -54,9 +62,9 @@ func DrawSystem(win *pixelgl.Window, layer int) {
 	//debug.AddText(fmt.Sprintf("Layer %d: %d entities", layer, count))
 }
 
-func DrawThing(draw interface{}, obj *object.Object, win *pixelgl.Window) {
+func DrawThing(draw interface{}, obj *object.Object, target pixel.Target) {
 	if spr, ok0 := draw.(*pixel.Sprite); ok0 {
-		spr.Draw(win, obj.Mat)
+		spr.Draw(target, obj.Mat)
 	} else if sprH, ok1 := draw.(*img.Sprite); ok1 {
 		if sprH.Batch != "" && sprH.Key != "" {
 			if batch, okB := img.Batchers[sprH.Batch]; okB {
@@ -70,5 +78,7 @@ func DrawThing(draw interface{}, obj *object.Object, win *pixelgl.Window) {
 				res.Spr.DrawColorMask(img.Batchers[res.Batch].Batch(), obj.Mat.Moved(res.Off), res.Col)
 			}
 		}
+	} else if txt, ok3 := draw.(*typeface.Text); ok3 {
+		txt.Draw(target)
 	}
 }

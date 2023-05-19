@@ -8,4 +8,4 @@ type loadingScreen struct {
 	Draw   func(*pixelgl.Window)
 }
 
-var LoadingScreen loadingScreen
+var LoadingScreen *loadingScreen

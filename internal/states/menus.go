@@ -29,7 +29,7 @@ func InitMainMenu(win *pixelgl.Window) {
 	myecs.Manager.NewEntity().AddComponent(myecs.Object, quit.Text.Obj)
 
 	start.SetClickFn(func() {
-		state.SwitchState("game")
+		state.PushState("game")
 		sfx.SoundPlayer.PlaySound("click", 0.0)
 		MainMenu.Close()
 	})
@@ -53,7 +53,7 @@ func InitPauseMenu(win *pixelgl.Window) {
 		PauseMenu.Close()
 	})
 	restart.SetClickFn(func() {
-		state.SwitchState("game")
+		state.PushState("game")
 		sfx.SoundPlayer.PlaySound("click", 0.0)
 		PauseMenu.Close()
 	})
@@ -71,7 +71,7 @@ func InitGameOverMenu(win *pixelgl.Window) {
 	myecs.Manager.NewEntity().AddComponent(myecs.Object, quit.Text.Obj)
 
 	restart.SetClickFn(func() {
-		state.SwitchState("game")
+		state.PushState("game")
 		sfx.SoundPlayer.PlaySound("click", 0.0)
 		GameOverMenu.Close()
 	})

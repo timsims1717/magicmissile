@@ -87,24 +87,21 @@ func (s *backgroundTestState) Update(win *pixelgl.Window) {
 		target := inPos
 		target.X -= data.BaseWidth * 0.5
 		target.Y -= data.BaseHeight * 0.5
-		missile := data.Missiles[data.SpellKeys[data.SpellTest]][data.TierTest]
-		systems.FireFromTower(missile, tower, target)
+		systems.FireNextFromTower(tower, target)
 	}
 	if data.TheInput.Get("fireMid").JustPressed() {
 		tower := data.Towers[1]
 		target := inPos
 		target.X -= data.BaseWidth * 0.5
 		target.Y -= data.BaseHeight * 0.5
-		missile := data.Missiles[data.SpellKeys[data.SpellTest]][data.TierTest]
-		systems.FireFromTower(missile, tower, target)
+		systems.FireNextFromTower(tower, target)
 	}
 	if data.TheInput.Get("fireRight").JustPressed() {
 		tower := data.Towers[2]
 		target := inPos
 		target.X -= data.BaseWidth * 0.5
 		target.Y -= data.BaseHeight * 0.5
-		missile := data.Missiles[data.SpellKeys[data.SpellTest]][data.TierTest]
-		systems.FireFromTower(missile, tower, target)
+		systems.FireNextFromTower(tower, target)
 	}
 
 	systems.FunctionSystem()

@@ -26,6 +26,21 @@ func CreateTowers() {
 				obj.Flip = rand.Intn(2) == 0
 				obj.Offset.Y += img.Batchers[data.ObjectKey].GetSprite(spr.Key).Frame().H()*0.5 - 10.
 				obj.Pos.Y += 6.
+				var slots []data.SpellSlot
+				for i := 0; i < data.SpellSlotNum; i++ {
+					spellKey := data.SpellKeys[rand.Intn(len(data.SpellKeys))]
+					slotTier := rand.Intn(data.MaxSpellTier)
+					for j, m := range data.Missiles[spellKey] {
+						if m != nil && j >= slotTier {
+							slotTier = j
+							break
+						}
+					}
+					slots = append(slots, data.SpellSlot{
+						Tier:  slotTier,
+						Spell: spellKey,
+					})
+				}
 				e := myecs.Manager.NewEntity()
 				e.AddComponent(myecs.Object, obj).
 					AddComponent(myecs.Drawable, spr)
@@ -35,6 +50,7 @@ func CreateTowers() {
 					Sprite: spr,
 					Entity: e,
 					Origin: pixel.V(0, 96.),
+					Slots:  slots,
 				})
 			}
 		}

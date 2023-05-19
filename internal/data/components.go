@@ -124,11 +124,18 @@ type Town struct {
 }
 
 type Tower struct {
-	Health *Health
-	Object *object.Object
-	Sprite *img.Sprite
-	Entity *ecs.Entity
-	Origin pixel.Vec
+	Health   *Health
+	Object   *object.Object
+	Sprite   *img.Sprite
+	Entity   *ecs.Entity
+	Origin   pixel.Vec
+	Slots    []SpellSlot
+	CurrSlot int
+}
+
+type SpellSlot struct {
+	Tier  int
+	Spell string
 }
 
 type Mob struct {

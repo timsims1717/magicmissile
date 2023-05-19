@@ -20,8 +20,9 @@ var (
 	Temp   = Manager.NewComponent()
 	Update = Manager.NewComponent()
 
-	Drawable = Manager.NewComponent()
-	Animated = Manager.NewComponent()
+	Drawable   = Manager.NewComponent()
+	Animated   = Manager.NewComponent()
+	DrawTarget = Manager.NewComponent()
 
 	Payload = Manager.NewComponent()
 	Missile = Manager.NewComponent()

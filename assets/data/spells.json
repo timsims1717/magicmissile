@@ -238,11 +238,11 @@
     "sprite": "",
     "speed": 0,
     "colors": [
-      "#DCF5F4",
-      "#E3FCF9",
-      "#E1E5E4",
-      "#E3FCF3",
-      "#DAF2E7"
+      "#FFFB8F",
+      "#FFF775",
+      "#FFF36E",
+      "#FFF59E",
+      "#FFEA6A"
     ],
     "payloads": [
       {
@@ -335,11 +335,11 @@
     "sprite": "missile",
     "speed": 500,
     "colors": [
-      "#DCF5F4",
-      "#E3FCF9",
-      "#E1E5E4",
-      "#E3FCF3",
-      "#DAF2E7"
+      "#50E0F5",
+      "#46C8D4",
+      "#59E6EB",
+      "#46D4D1",
+      "#52F7EB"
     ],
     "payloads": [
     {

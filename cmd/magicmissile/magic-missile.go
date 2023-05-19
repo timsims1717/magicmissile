@@ -88,7 +88,7 @@ func run() {
 	state.Register("bgtest", state.New(states.BGTestState))
 	state.Register("menu", state.New(states.MenuState))
 	state.Register("game", state.New(states.GameState))
-	state.SwitchState("bgtest")
+	//state.PushState("bgtest")
 
 	debug.Initialize(&viewport.MainCamera.PostCamPos, &viewport.MainCamera.PostCamPos)
 

@@ -26,6 +26,25 @@ func FireFromTower(mFab *data.Missile, tower *data.Tower, target pixel.Vec) {
 	}
 }
 
+func FireNextFromTower(tower *data.Tower, target pixel.Vec) {
+	if tower.CurrSlot < data.SpellSlotNum {
+		slot := tower.Slots[tower.CurrSlot]
+		mFab := data.Missiles[slot.Spell][slot.Tier]
+		tower.CurrSlot++
+		if mFab != nil {
+			origin := tower.Object.Pos.Add(tower.Origin)
+			if mFab.Target != pixel.ZV {
+				target = origin.Add(mFab.Target)
+			}
+			FireSpell(mFab, origin, target)
+		} else {
+			fmt.Println("Warning: no missile to fire")
+		}
+	} else {
+		fmt.Println("tower out of spells")
+	}
+}
+
 func FireSpell(mFab *data.Missile, origin, target pixel.Vec) {
 	if mFab != nil {
 		count := 1
