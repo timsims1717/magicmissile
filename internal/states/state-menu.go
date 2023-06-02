@@ -15,17 +15,17 @@ import (
 	"timsims1717/magicmissile/pkg/viewport"
 )
 
-var MenuState = &menuState{}
+var OldMenuState = &oldMenuState{}
 
-type menuState struct {
+type oldMenuState struct {
 	*state.AbstractState
 }
 
-func (s *menuState) Unload() {
+func (s *oldMenuState) Unload() {
 	systems.ClearSystem()
 }
 
-func (s *menuState) Load() {
+func (s *oldMenuState) Load() {
 	MainMenu.Open()
 	game.Title = typeface.New(nil, "title", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 1.0, 0., 0.)
 	game.Title.SetColor(color.RGBA{
@@ -42,14 +42,14 @@ func (s *menuState) Load() {
 	sfx.MusicPlayer.PlayMusic("ambience")
 }
 
-func (s *menuState) Update(win *pixelgl.Window) {
+func (s *oldMenuState) Update(win *pixelgl.Window) {
 	data.TheInput.Update(win, viewport.MainCamera.Mat)
 	systems.TemporarySystem()
 	systems.FunctionSystem()
 	UpdateMenus(data.TheInput)
 }
 
-func (s *menuState) Draw(win *pixelgl.Window) {
+func (s *oldMenuState) Draw(win *pixelgl.Window) {
 	img.Clear()
 	systems.DrawSystem(win, 0)
 	img.Draw(win)
@@ -57,6 +57,6 @@ func (s *menuState) Draw(win *pixelgl.Window) {
 	game.Title.Draw(win)
 }
 
-func (s *menuState) SetAbstract(aState *state.AbstractState) {
+func (s *oldMenuState) SetAbstract(aState *state.AbstractState) {
 	s.AbstractState = aState
 }

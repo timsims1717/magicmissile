@@ -27,7 +27,7 @@ func ParentSystem() {
 			if parent.Kill {
 				myecs.Manager.DisposeEntity(result)
 			} else {
-				tran.Pos = parent.Pos
+				tran.Pos = parent.Pos.Add(parent.Offset)
 				tran.Hide = parent.Hide
 			}
 		}

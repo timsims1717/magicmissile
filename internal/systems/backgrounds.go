@@ -14,13 +14,7 @@ import (
 )
 
 func GenerateRandomBackground(code string) {
-	if data.CurrBackground != nil {
-		for _, bg := range data.CurrBackground.Backgrounds {
-			for _, sprite := range bg.Sprites {
-				myecs.Manager.DisposeEntity(sprite)
-			}
-		}
-	}
+	DisposeBackground()
 	realm := data.AllRealms[code]
 	data.CurrBackground = realm.Backgrounds[rand.Intn(len(realm.Backgrounds))]
 	GenerateBackground()
@@ -81,6 +75,20 @@ func GenerateBackground() {
 			Sprites: sprs,
 		})
 	}
+}
+
+func DisposeBackground() {
+	if data.CurrBackground != nil {
+		for _, bg := range data.CurrBackground.Backgrounds {
+			for _, sprite := range bg.Sprites {
+				myecs.Manager.DisposeEntity(sprite)
+			}
+			bg.IMDraw = nil
+			bg.Perlin = nil
+		}
+		data.CurrBackground.Backgrounds = []*data.BackgroundLayer{}
+	}
+	data.CurrBackground = nil
 }
 
 func UpdateBackgrounds() {

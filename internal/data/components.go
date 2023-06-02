@@ -131,6 +131,8 @@ type Tower struct {
 	Origin   pixel.Vec
 	Slots    []SpellSlot
 	CurrSlot int
+	Exp      int
+	Level    int
 }
 
 type SpellSlot struct {

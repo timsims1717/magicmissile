@@ -1,0 +1,222 @@
+{
+  "img": "ui.png",
+  "sprites": [
+    {
+      "key": "scroll_bl",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 96
+    },
+    {
+      "key": "scroll_b",
+      "x": 32,
+      "y": 0,
+      "w": 16,
+      "h": 96
+    },
+    {
+      "key": "scroll_br",
+      "x": 48,
+      "y": 0,
+      "w": 16,
+      "h": 96
+    },
+    {
+      "key": "scroll_ml",
+      "x": 0,
+      "y": 96,
+      "w": 32,
+      "h": 48
+    },
+    {
+      "key": "scroll_m",
+      "x": 32,
+      "y": 96,
+      "w": 16,
+      "h": 48
+    },
+    {
+      "key": "scroll_mr",
+      "x": 48,
+      "y": 96,
+      "w": 16,
+      "h": 48
+    },
+    {
+      "key": "scroll_tl",
+      "x": 0,
+      "y": 144,
+      "w": 32,
+      "h": 96
+    },
+    {
+      "key": "scroll_t",
+      "x": 32,
+      "y": 144,
+      "w": 16,
+      "h": 96
+    },
+    {
+      "key": "scroll_tr",
+      "x": 48,
+      "y": 144,
+      "w": 16,
+      "h": 96
+    },
+    {
+      "key": "scroll_bar",
+      "x": 64,
+      "y": 0,
+      "w": 48,
+      "h": 64
+    },
+    {
+      "key": "scroll_arrow_dwn_pressed",
+      "x": 64,
+      "y": 64,
+      "w": 48,
+      "h": 32
+    },
+    {
+      "key": "scroll_arrow_up_pressed",
+      "x": 64,
+      "y": 96,
+      "w": 48,
+      "h": 32
+    },
+    {
+      "key": "scroll_arrow_dwn",
+      "x": 64,
+      "y": 128,
+      "w": 48,
+      "h": 32
+    },
+    {
+      "key": "scroll_arrow_up",
+      "x": 64,
+      "y": 160,
+      "w": 48,
+      "h": 32
+    },
+    {
+      "key": "scroll_square",
+      "x": 64,
+      "y": 192,
+      "w": 48,
+      "h": 48
+    },
+    {
+      "key": "scroll_square_l",
+      "x": 64,
+      "y": 192,
+      "w": 16,
+      "h": 48
+    },
+    {
+      "key": "scroll_square_m",
+      "x": 80,
+      "y": 192,
+      "w": 16,
+      "h": 48
+    },
+    {
+      "key": "scroll_square_r",
+      "x": 96,
+      "y": 192,
+      "w": 16,
+      "h": 48
+    },
+    {
+      "key": "scroll_square_tl",
+      "x": 64,
+      "y": 224,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "key": "scroll_square_tm",
+      "x": 80,
+      "y": 224,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "key": "scroll_square_tr",
+      "x": 96,
+      "y": 224,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "key": "scroll_square_ml",
+      "x": 64,
+      "y": 208,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "key": "scroll_square_mm",
+      "x": 80,
+      "y": 208,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "key": "scroll_square_mr",
+      "x": 96,
+      "y": 208,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "key": "scroll_square_bl",
+      "x": 64,
+      "y": 192,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "key": "scroll_square_bm",
+      "x": 80,
+      "y": 192,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "key": "scroll_square_br",
+      "x": 96,
+      "y": 192,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "key": "list_bg_m",
+      "x": 112,
+      "y": 0,
+      "w": 16,
+      "h": 16
+    },
+    {
+      "key": "list_bg_c",
+      "x": 128,
+      "y": 0,
+      "w": 22,
+      "h": 22
+    },
+    {
+      "key": "list_bg_sv",
+      "x": 112,
+      "y": 16,
+      "w": 16,
+      "h": 22
+    },
+    {
+      "key": "list_bg_sh",
+      "x": 128,
+      "y": 22,
+      "w": 22,
+      "h": 16
+    }
+  ]
+}

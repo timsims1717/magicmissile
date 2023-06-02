@@ -17,17 +17,23 @@ import (
 	"timsims1717/magicmissile/pkg/viewport"
 )
 
-var BGTestState = &backgroundTestState{}
+var GameState = &gameState{}
 
-type backgroundTestState struct {
+type gameState struct {
 	*state.AbstractState
 }
 
-func (s *backgroundTestState) Unload() {
+func (s *gameState) Unload() {
 	data.GameView = nil
+	data.ExpView = nil
+	data.ExpView1 = nil
+	data.GameDraw = nil
+	systems.DisposeBackground()
+	systems.DisposeTowns()
+	systems.DisposeTowers()
 }
 
-func (s *backgroundTestState) Load() {
+func (s *gameState) Load() {
 	data.GameView = viewport.New(nil)
 	data.GameView.SetRect(pixel.R(0, 0, data.BaseWidth, data.BaseHeight))
 	//data.GameView.CamPos = pixel.V(data.BaseWidth*0.5, data.BaseHeight*0.5)
@@ -48,7 +54,7 @@ func (s *backgroundTestState) Load() {
 	systems.CreateTowers()
 }
 
-func (s *backgroundTestState) Update(win *pixelgl.Window) {
+func (s *gameState) Update(win *pixelgl.Window) {
 	debug.AddText("Game State")
 	inPos := data.GameView.Projected(data.TheInput.World)
 	debug.AddText(fmt.Sprintf("World: (%d,%d)", int(data.TheInput.World.X), int(data.TheInput.World.Y)))
@@ -122,7 +128,7 @@ func (s *backgroundTestState) Update(win *pixelgl.Window) {
 	debug.AddText(fmt.Sprintf("Entity Count: %d", myecs.FullCount))
 }
 
-func (s *backgroundTestState) Draw(win *pixelgl.Window) {
+func (s *gameState) Draw(win *pixelgl.Window) {
 	systems.DrawExplosionSystem()
 	data.GameView.Canvas.Clear(data.CurrBackground.BackCol)
 	for i, bg := range data.CurrBackground.Backgrounds {
@@ -139,11 +145,11 @@ func (s *backgroundTestState) Draw(win *pixelgl.Window) {
 	data.GameView.Canvas.Draw(win, data.GameView.Mat)
 }
 
-func (s *backgroundTestState) SetAbstract(aState *state.AbstractState) {
+func (s *gameState) SetAbstract(aState *state.AbstractState) {
 	s.AbstractState = aState
 }
 
-func (s *backgroundTestState) UpdateViews() {
+func (s *gameState) UpdateViews() {
 	data.GameView.SetRect(pixel.R(0, 0, viewport.MainCamera.Rect.W(), viewport.MainCamera.Rect.H()))
 	data.GameView.SetZoom(viewport.MainCamera.Rect.W() / data.BaseWidth)
 }

@@ -91,6 +91,11 @@ func (item *Text) SetPos(pos pixel.Vec) {
 	item.updateText()
 }
 
+func (item *Text) SetOffset(pos pixel.Vec) {
+	item.Obj.Offset = pos
+	//item.updateText()
+}
+
 func (item *Text) IncrementTextPos() {
 	if item.Increment {
 

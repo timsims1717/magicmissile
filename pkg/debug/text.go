@@ -1,6 +1,7 @@
 package debug
 
 import (
+	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"golang.org/x/image/colornames"
@@ -35,6 +36,10 @@ func DrawText(win *pixelgl.Window) {
 
 func AddText(s string) {
 	lines = append(lines, s)
+}
+
+func AddIntCoords(label string, x, y int) {
+	lines = append(lines, fmt.Sprintf("%s: (%d,%d)", label, x, y))
 }
 
 func InsertText(s string, i int) {

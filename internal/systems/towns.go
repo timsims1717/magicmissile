@@ -40,3 +40,10 @@ func CreateTowns() {
 		panic("towns can't be created without a background")
 	}
 }
+
+func DisposeTowns() {
+	for _, town := range data.Towns {
+		myecs.Manager.DisposeEntity(town.Entity)
+	}
+	data.Towns = []*data.Town{}
+}

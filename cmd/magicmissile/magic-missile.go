@@ -20,7 +20,7 @@ import (
 )
 
 func run() {
-	rand.Seed(time.Now().Unix())
+	rand.New(rand.NewSource(time.Now().Unix()))
 	conf := pixelgl.WindowConfig{
 		Title:     "Magic Missile",
 		Bounds:    pixel.R(0, 0, 1600, 900),
@@ -54,10 +54,10 @@ func run() {
 	sfx.MusicPlayer.RegisterMusicTrack("assets/wind2.wav", "wind2")
 	sfx.MusicPlayer.NewSet("ambience", []string{"wind1", "wind2"}, sfx.Random, 0., 4.)
 
-	mainFont, err := typeface.LoadTTF("assets/FR73PixD.ttf", 200.)
+	mainFont, err := typeface.LoadTTF("assets/JunicodeTwoBeta-Bold.ttf", 200.)
 	typeface.Atlases["main"] = text.NewAtlas(mainFont, text.ASCII)
 
-	titleFont, err := typeface.LoadTTF("assets/KumarOne.ttf", 200.)
+	titleFont, err := typeface.LoadTTF("assets/Enchanted Land.ttf", 200.)
 	typeface.Atlases["title"] = text.NewAtlas(titleFont, text.ASCII)
 
 	states.InitMenus(win)
@@ -85,15 +85,17 @@ func run() {
 	img.AddIMDrawer("explosions", true, true)
 	img.AddIMDrawer("health", true, true)
 
-	state.Register("bgtest", state.New(states.BGTestState))
-	state.Register("menu", state.New(states.MenuState))
 	state.Register("game", state.New(states.GameState))
-	//state.PushState("bgtest")
+	state.Register("inventory", state.New(states.InventoryState))
+	state.Register("old-menu", state.New(states.OldMenuState))
+	state.Register("old-game", state.New(states.OldGameState))
+	state.PushState("inventory")
 
 	debug.Initialize(&viewport.MainCamera.PostCamPos, &viewport.MainCamera.PostCamPos)
 
 	loading.LoadShaders()
 	loading.LoadImg()
+	loading.LoadTileMaps()
 
 	err = loading.LoadRealms("assets/data/realms.json")
 	if err != nil {

@@ -26,17 +26,17 @@ var white = color.RGBA{
 	A: 255,
 }
 
-var GameState = &gameState{}
+var OldGameState = &oldGameState{}
 
-type gameState struct {
+type oldGameState struct {
 	*state.AbstractState
 }
 
-func (s *gameState) Unload() {
+func (s *oldGameState) Unload() {
 	systems.ClearSystem()
 }
 
-func (s *gameState) Load() {
+func (s *oldGameState) Load() {
 	game.PCs = []*data.PC{}
 	game.GameOver = false
 	loadUI()
@@ -72,7 +72,7 @@ func (s *gameState) Load() {
 	myecs.Manager.NewEntity().AddComponent(myecs.Object, game.WizText.Obj)
 }
 
-func (s *gameState) Update(win *pixelgl.Window) {
+func (s *oldGameState) Update(win *pixelgl.Window) {
 	data.TheInput.Update(win, viewport.MainCamera.Mat)
 	if data.TheInput.Get("killAll").JustPressed() {
 		for _, town := range game.Towns {
@@ -189,7 +189,7 @@ func (s *gameState) Update(win *pixelgl.Window) {
 	UpdateMenus(data.TheInput)
 }
 
-func (s *gameState) Draw(win *pixelgl.Window) {
+func (s *oldGameState) Draw(win *pixelgl.Window) {
 	img.Clear()
 	systems.DrawSystem(win, 0)
 	img.Draw(win)
@@ -199,6 +199,6 @@ func (s *gameState) Draw(win *pixelgl.Window) {
 	DrawMenus(win)
 }
 
-func (s *gameState) SetAbstract(aState *state.AbstractState) {
+func (s *oldGameState) SetAbstract(aState *state.AbstractState) {
 	s.AbstractState = aState
 }

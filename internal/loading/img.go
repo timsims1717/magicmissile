@@ -17,4 +17,10 @@ func LoadImg() {
 		panic(err)
 	}
 	img.AddBatcher(data.ParticleKey, partSheet, true, true)
+
+	uiSheet, err := img.LoadSpriteSheet("assets/img/ui.json")
+	if err != nil {
+		panic(err)
+	}
+	img.AddBatcher(data.UIKey, uiSheet, true, true)
 }
