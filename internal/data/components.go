@@ -138,6 +138,7 @@ type Tower struct {
 type SpellSlot struct {
 	Tier  int
 	Spell string
+	Name  string
 }
 
 type Mob struct {

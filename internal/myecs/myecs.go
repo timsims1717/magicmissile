@@ -20,6 +20,8 @@ var (
 	Temp   = Manager.NewComponent()
 	Update = Manager.NewComponent()
 
+	Interpolation = Manager.NewComponent()
+
 	Drawable   = Manager.NewComponent()
 	Animated   = Manager.NewComponent()
 	DrawTarget = Manager.NewComponent()
@@ -35,12 +37,13 @@ var (
 	Explosion = Manager.NewComponent()
 
 	// Tags
-	IsObject     = ecs.BuildTag(Object)
-	IsTemp       = ecs.BuildTag(Temp, Object)
-	HasParent    = ecs.BuildTag(Object, Parent)
-	IsDrawable   = ecs.BuildTag(Object, Drawable)
-	HasAnimation = ecs.BuildTag(Animated, Object)
-	HasUpdate    = ecs.BuildTag(Update)
+	IsObject         = ecs.BuildTag(Object)
+	IsTemp           = ecs.BuildTag(Temp, Object)
+	HasParent        = ecs.BuildTag(Object, Parent)
+	IsDrawable       = ecs.BuildTag(Object, Drawable)
+	HasAnimation     = ecs.BuildTag(Animated, Object)
+	HasUpdate        = ecs.BuildTag(Update)
+	HasInterpolation = ecs.BuildTag(Object, Interpolation)
 
 	HasHealth  = ecs.BuildTag(Object, Health, Hitbox)
 	PlayerChar = ecs.BuildTag(Object, Movable, Health)

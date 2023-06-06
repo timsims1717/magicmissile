@@ -27,18 +27,21 @@ func CreateTowers() {
 				obj.Offset.Y += img.Batchers[data.ObjectKey].GetSprite(spr.Key).Frame().H()*0.5 - 10.
 				obj.Pos.Y += 6.
 				var slots []data.SpellSlot
-				for i := 0; i < data.SpellSlotNum; i++ {
+				for j := 0; j < data.SpellSlotNum; j++ {
 					spellKey := data.SpellKeys[rand.Intn(len(data.SpellKeys))]
-					slotTier := rand.Intn(data.MaxSpellTier)
-					for j, m := range data.Missiles[spellKey] {
-						if m != nil && j >= slotTier {
-							slotTier = j
+					baseTier := data.Missiles[spellKey][0]
+					slotTier := baseTier.Tier
+					for slotTier < data.MaxSpellTier {
+						if rand.Intn(10) == 0 {
+							slotTier++
+						} else {
 							break
 						}
 					}
 					slots = append(slots, data.SpellSlot{
 						Tier:  slotTier,
 						Spell: spellKey,
+						Name:  baseTier.Name,
 					})
 				}
 				e := myecs.Manager.NewEntity()
@@ -74,18 +77,21 @@ func CreateTowersNoBG() {
 			obj.Offset.Y += img.Batchers[data.ObjectKey].GetSprite(spr.Key).Frame().H()*0.5 - 10.
 			obj.Pos.Y += 6.
 			var slots []data.SpellSlot
-			for i := 0; i < data.SpellSlotNum; i++ {
+			for j := 0; j < data.SpellSlotNum; j++ {
 				spellKey := data.SpellKeys[rand.Intn(len(data.SpellKeys))]
-				slotTier := rand.Intn(data.MaxSpellTier)
-				for j, m := range data.Missiles[spellKey] {
-					if m != nil && j >= slotTier {
-						slotTier = j
+				baseTier := data.Missiles[spellKey][0]
+				slotTier := baseTier.Tier
+				for slotTier < data.MaxSpellTier {
+					if rand.Intn(10) == 0 {
+						slotTier++
+					} else {
 						break
 					}
 				}
 				slots = append(slots, data.SpellSlot{
 					Tier:  slotTier,
 					Spell: spellKey,
+					Name:  baseTier.Name,
 				})
 			}
 			e := myecs.Manager.NewEntity()

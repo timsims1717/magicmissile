@@ -38,6 +38,7 @@ func run() {
 	viewport.MainCamera.PortPos = pixel.V(0., 0.)
 
 	options.VSync = true
+	options.BilinearFilter = true
 
 	// sfx
 	sfx.SoundPlayer.RegisterSound("assets/click.wav", "click")
@@ -92,6 +93,7 @@ func run() {
 	state.PushState("inventory")
 
 	debug.Initialize(&viewport.MainCamera.PostCamPos, &viewport.MainCamera.PostCamPos)
+	debug.Text = true
 
 	loading.LoadShaders()
 	loading.LoadImg()
@@ -118,12 +120,15 @@ func run() {
 		if data.TheInput.Get("fullscreen").JustPressed() {
 			options.FullScreen = !options.FullScreen
 		}
+		if data.TheInput.Get("fuzzy").JustPressed() {
+			options.BilinearFilter = !options.BilinearFilter
+		}
 		if data.TheInput.Get("debugText").JustPressed() {
 			debug.Text = !debug.Text
 		}
 		if data.TheInput.Get("debugExpDrawType").JustPressed() {
 			data.ExpDrawType++
-			data.ExpDrawType %= 3
+			data.ExpDrawType %= 4
 		}
 
 		state.Update(win)

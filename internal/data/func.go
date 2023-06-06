@@ -3,7 +3,9 @@ package data
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
+	pxginput "github.com/timsims1717/pixel-go-input"
 	"timsims1717/magicmissile/pkg/timing"
+	"timsims1717/magicmissile/pkg/viewport"
 )
 
 type Funky struct {
@@ -12,6 +14,21 @@ type Funky struct {
 
 func NewFn(fn func()) *Funky {
 	return &Funky{Fn: fn}
+}
+
+type HoverClick struct {
+	Input *pxginput.Input
+	View  *viewport.ViewPort
+	Func  func(*HoverClick)
+	Hover bool
+}
+
+func NewHoverClickFn(in *pxginput.Input, vp *viewport.ViewPort, fn func(*HoverClick)) *HoverClick {
+	return &HoverClick{
+		Input: in,
+		View:  vp,
+		Func:  fn,
+	}
 }
 
 type TimerFunc struct {

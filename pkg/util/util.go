@@ -65,6 +65,11 @@ func Normalize(p pixel.Vec) pixel.Vec {
 	return p.Scaled(1 / math.Sqrt(p.X*p.X+p.Y*p.Y))
 }
 
+// RectToOrigin moves a rectangle's min to (0,0)
+func RectToOrigin(r pixel.Rect) pixel.Rect {
+	return r.Moved(pixel.V(-r.Min.X, -r.Min.Y))
+}
+
 // Magnitude takes a pixel.Vec and returns the magnitude of the vector
 func Magnitude(p pixel.Vec) float64 {
 	return math.Sqrt(p.X*p.X + p.Y*p.Y)

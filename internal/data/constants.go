@@ -19,4 +19,10 @@ var (
 		B: 175,
 		A: 255,
 	}
+	ScrollText = color.RGBA{
+		R: 61,
+		G: 53,
+		B: 40,
+		A: 255,
+	}
 )

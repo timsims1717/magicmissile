@@ -5,6 +5,7 @@ import (
 	"github.com/faiface/pixel"
 	"golang.org/x/image/colornames"
 	"image/color"
+	"timsims1717/magicmissile/pkg/util"
 )
 
 var objIndex = uint32(0)
@@ -31,7 +32,8 @@ type Object struct {
 	Mask  color.RGBA
 	Layer int
 
-	ILock bool
+	ILock        bool
+	HideChildren bool
 }
 
 func New() *Object {
@@ -51,5 +53,9 @@ func (obj *Object) WithID(code string) *Object {
 }
 
 func (obj *Object) PointInside(vec pixel.Vec) bool {
-	return obj.Rect.Moved(obj.Pos).Moved(pixel.V(-(obj.Rect.W() * 0.5), -(obj.Rect.H() * 0.5))).Contains(vec)
+	return obj.Rect.Moved(obj.PostPos).Contains(vec)
+}
+
+func (obj *Object) SetRect(r pixel.Rect) {
+	obj.Rect = util.RectToOrigin(r).Moved(pixel.V(r.W()*-0.5, r.H()*-0.5))
 }

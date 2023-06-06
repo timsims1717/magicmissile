@@ -99,6 +99,8 @@ func DrawExplosionSystem() {
 		DrawNewExplosionSystem1()
 	case 2:
 		DrawNewExplosionSystem2()
+	case 3:
+		DrawNewExplosionSystem3()
 	}
 }
 
@@ -124,11 +126,11 @@ func DrawNewExplosionSystem() {
 			data.GameDraw.Push(obj.Pos)
 			data.GameDraw.Circle(exp.DisRadius, 0.)
 			data.GameDraw.Draw(data.ExpView1.Canvas)
-			data.ExpView1.Canvas.Draw(data.GameView.Canvas, data.ExpView1.Mat)
+			data.ExpView1.Draw(data.GameView.Canvas)
 		}
 	}
 	data.ExpView1.Canvas.SetComposeMethod(pixel.ComposeOver)
-	data.ExpView1.Canvas.Draw(data.ExpView.Canvas, data.ExpView1.Mat)
+	data.ExpView1.Draw(data.ExpView.Canvas)
 }
 
 // DrawNewExplosionSystem1
@@ -151,7 +153,7 @@ func DrawNewExplosionSystem1() {
 	}
 	data.GameDraw.Draw(data.ExpView1.Canvas)
 	data.GameDraw.Clear()
-	data.ExpView1.Canvas.Draw(data.ExpView.Canvas, data.ExpView1.Mat)
+	data.ExpView1.Draw(data.ExpView.Canvas)
 	data.ExpView1.Canvas.Clear(color.RGBA{})
 	//data.ExpView.Canvas.SetComposeMethod(pixel.ComposeOut)
 	for _, result := range myecs.Manager.Query(myecs.IsExplosion) {
@@ -187,6 +189,28 @@ func DrawNewExplosionSystem2() {
 			data.GameDraw.Push(obj.Pos)
 			data.GameDraw.Circle(exp.DisRadius, 0.)
 			data.GameDraw.Draw(data.ExpView.Canvas)
+		}
+	}
+}
+
+// DrawNewExplosionSystem3
+// Doesn't use XOR. Todo: Test
+func DrawNewExplosionSystem3() {
+	data.ExpView.Canvas.Clear(color.RGBA{})
+	for _, result := range myecs.Manager.Query(myecs.IsExplosion) {
+		obj, okO := result.Components[myecs.Object].(*object.Object)
+		exp, okE := result.Components[myecs.Explosion].(*data.Explosion)
+		if okO && okE {
+			data.ExpView.Canvas.SetComposeMethod(pixel.ComposeOver)
+			data.GameDraw.Clear()
+			data.GameDraw.Color = exp.Color
+			data.GameDraw.Push(obj.Pos)
+			if exp.DisRadius > 0. {
+				data.GameDraw.Circle(exp.CurrRadius-(exp.CurrRadius-exp.DisRadius)*0.5, exp.CurrRadius-exp.DisRadius)
+			} else {
+				data.GameDraw.Circle(exp.CurrRadius, 0.)
+				data.GameDraw.Draw(data.ExpView.Canvas)
+			}
 		}
 	}
 }

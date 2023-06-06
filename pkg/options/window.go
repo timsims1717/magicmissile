@@ -10,6 +10,7 @@ var (
 	Updated         bool
 	VSync           bool
 	FullScreen      bool
+	BilinearFilter  bool
 	ResolutionIndex int
 	Resolutions     = []pixel.Vec{
 		pixel.V(1600, 900),
@@ -27,6 +28,7 @@ func WindowUpdate(win *pixelgl.Window) {
 	Updated = false
 	if win.Focused() {
 		win.SetVSync(VSync)
+		win.SetSmooth(BilinearFilter)
 		if FullScreen != fullscreen {
 			// get window position (center)
 			pos := win.GetPos()

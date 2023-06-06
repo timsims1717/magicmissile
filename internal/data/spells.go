@@ -5,6 +5,6 @@ const (
 	SpellSlotNum = 15
 )
 
-var Missiles map[string][MaxSpellTier]*Missile
+var Missiles map[string][]*Missile
 
 var SpellKeys []string

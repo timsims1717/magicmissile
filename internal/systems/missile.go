@@ -29,7 +29,13 @@ func FireFromTower(mFab *data.Missile, tower *data.Tower, target pixel.Vec) {
 func FireNextFromTower(tower *data.Tower, target pixel.Vec) {
 	if tower.CurrSlot < data.SpellSlotNum {
 		slot := tower.Slots[tower.CurrSlot]
-		mFab := data.Missiles[slot.Spell][slot.Tier]
+		mSet := data.Missiles[slot.Spell]
+		var mFab *data.Missile
+		for _, mf := range mSet {
+			if mf.Tier == slot.Tier {
+				mFab = mf
+			}
+		}
 		tower.CurrSlot++
 		if mFab != nil {
 			origin := tower.Object.Pos.Add(tower.Origin)
@@ -112,7 +118,7 @@ func MakeMissile(mFab *data.Missile, origin, target pixel.Vec) {
 		obj.Rot = target.Sub(obj.Pos).Angle()
 		obj.Layer = 10
 		if spr.Key != "" {
-			obj.Rect = img.Batchers[data.ParticleKey].GetSprite(spr.Key).Frame()
+			obj.SetRect(img.Batchers[data.ParticleKey].GetSprite(spr.Key).Frame())
 		}
 		if mFab.Spread > 0 {
 			// todo: change to circle instead of square

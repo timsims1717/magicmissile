@@ -31,6 +31,7 @@ type ViewPort struct {
 	PortSize    pixel.Vec
 
 	CamSpeed  float64
+	CamAccel  float64
 	ZoomSpeed float64
 	ZoomStep  float64
 
@@ -40,6 +41,12 @@ type ViewPort struct {
 	shakeX *gween.Tween
 	shakeY *gween.Tween
 	shakeZ *gween.Tween
+	velX   float64
+	velY   float64
+	velZ   float64
+	limX   *pixel.Vec
+	limY   *pixel.Vec
+	limZ   *pixel.Vec
 
 	lock  bool
 	Mask  color.RGBA
@@ -49,6 +56,7 @@ type ViewPort struct {
 func New(winCan *pixelgl.Canvas) *ViewPort {
 	viewPort := &ViewPort{
 		CamSpeed:  50.,
+		CamAccel:  1000.,
 		ZoomSpeed: 1.,
 		ZoomStep:  1.2,
 		PortSize:  pixel.V(1., 1.),
@@ -65,32 +73,14 @@ func New(winCan *pixelgl.Canvas) *ViewPort {
 
 func (v *ViewPort) Update() {
 	fin := true
-	if v.interX != nil {
-		x, finX := v.interX.Update(timing.DT)
-		v.CamPos.X = x
-		if finX {
-			v.interX = nil
-		} else {
-			fin = false
-		}
+	if !v.updateX() {
+		fin = false
 	}
-	if v.interY != nil {
-		y, finY := v.interY.Update(timing.DT)
-		v.CamPos.Y = y
-		if finY {
-			v.interY = nil
-		} else {
-			fin = false
-		}
+	if !v.updateY() {
+		fin = false
 	}
-	if v.interZ != nil {
-		z, finZ := v.interZ.Update(timing.DT)
-		v.Zoom = z
-		if finZ {
-			v.interZ = nil
-		} else {
-			fin = false
-		}
+	if !v.updateZ() {
+		fin = false
 	}
 	if fin && v.lock {
 		v.lock = false
@@ -139,6 +129,121 @@ func (v *ViewPort) Update() {
 	v.Canvas.SetColorMask(v.Mask)
 }
 
+func (v *ViewPort) updateX() bool {
+	fin := true
+	if v.interX != nil {
+		x, finX := v.interX.Update(timing.DT)
+		v.CamPos.X = x
+		if finX {
+			v.interX = nil
+		} else {
+			fin = false
+		}
+	} else if v.velX != 0. {
+		v.CamPos.X += v.velX * timing.DT
+		fin = false
+	}
+	if v.velX > 0 {
+		v.velX -= v.CamAccel * timing.DT
+		if v.velX < 0 {
+			v.velX = 0.
+		}
+	} else if v.velX < 0 {
+		v.velX += v.CamAccel * timing.DT
+		if v.velX > 0 {
+			v.velX = 0.
+		}
+	}
+	if v.limX != nil {
+		if v.CamPos.X > v.limX.X {
+			v.CamPos.X = v.limX.X
+			fin = true
+		} else if v.CamPos.X < v.limX.Y {
+			v.CamPos.X = v.limX.Y
+			fin = true
+		}
+	}
+	return fin
+}
+
+func (v *ViewPort) updateY() bool {
+	fin := true
+	if v.interY != nil {
+		y, finY := v.interY.Update(timing.DT)
+		v.CamPos.Y = y
+		if finY {
+			v.interY = nil
+		} else {
+			fin = false
+		}
+	} else if v.velY != 0. {
+		v.CamPos.Y += v.velY * timing.DT
+		fin = false
+	}
+	if v.velY > 0 {
+		v.velY -= v.CamAccel * timing.DT
+		if v.velY < 0 {
+			v.velY = 0.
+		}
+	} else if v.velY < 0 {
+		v.velY += v.CamAccel * timing.DT
+		if v.velY > 0 {
+			v.velY = 0.
+		}
+	}
+	if v.limY != nil {
+		if v.CamPos.Y > v.limY.X {
+			v.CamPos.Y = v.limY.X
+			fin = true
+		} else if v.CamPos.Y < v.limY.Y {
+			v.CamPos.Y = v.limY.Y
+			fin = true
+		}
+	}
+	return fin
+}
+
+func (v *ViewPort) updateZ() bool {
+	fin := true
+	if v.interZ != nil {
+		z, finZ := v.interZ.Update(timing.DT)
+		v.Zoom = z
+		if finZ {
+			v.interZ = nil
+		} else {
+			fin = false
+		}
+	} else if v.velZ != 0. {
+		v.Zoom += v.velZ * timing.DT
+		fin = false
+	}
+	if v.velZ > 0 {
+		v.velZ -= v.CamAccel * timing.DT
+		if v.velZ < 0 {
+			v.velZ = 0.
+		}
+	} else if v.velZ < 0 {
+		v.velZ += v.CamAccel * timing.DT
+		if v.velZ > 0 {
+			v.velZ = 0.
+		}
+	}
+	if v.limZ != nil {
+		if v.Zoom > v.limZ.X {
+			v.Zoom = v.limZ.X
+			fin = true
+		} else if v.Zoom < v.limZ.Y {
+			v.Zoom = v.limZ.Y
+			fin = true
+		}
+	}
+	return fin
+}
+
+func (v *ViewPort) Draw(target pixel.Target) {
+	v.Canvas.DrawColorMask(target, v.Mat, v.Mask)
+}
+
 func (v *ViewPort) SetRect(r pixel.Rect) *ViewPort {
 	v.Rect = r
 	//v.Canvas = pixelgl.NewCanvas(r)
@@ -161,10 +266,48 @@ func (v *ViewPort) SnapTo(pos pixel.Vec) {
 
 func (v *ViewPort) MoveTo(pos pixel.Vec, dur float64, lock bool) {
 	if !v.lock {
-		v.interX = gween.New(v.CamPos.X, pos.X, dur, ease.InOutQuad)
-		v.interY = gween.New(v.CamPos.Y, pos.Y, dur, ease.InOutQuad)
+		if dur > 0. {
+			v.interX = gween.New(v.CamPos.X, pos.X, dur, ease.InOutQuad)
+			v.interY = gween.New(v.CamPos.Y, pos.Y, dur, ease.InOutQuad)
+		} else {
+			v.interX = nil
+			v.interY = nil
+			v.CamPos = pos
+		}
 		v.lock = lock
 	}
+}
+
+func (v *ViewPort) SetVel(vel pixel.Vec) {
+	v.velX = vel.X
+	v.velY = vel.Y
+}
+
+func (v *ViewPort) RemoveXLim() {
+	v.limX = nil
+}
+
+func (v *ViewPort) SetXLim(min, max float64) {
+	lim := pixel.V(max, min)
+	v.limX = &lim
+}
+
+func (v *ViewPort) RemoveYLim() {
+	v.limY = nil
+}
+
+func (v *ViewPort) SetYLim(min, max float64) {
+	lim := pixel.V(max, min)
+	v.limY = &lim
+}
+
+func (v *ViewPort) RemoveZLim() {
+	v.limY = nil
+}
+
+func (v *ViewPort) SetZLim(min, max float64) {
+	lim := pixel.V(max, min)
+	v.limZ = &lim
 }
 
 func (v *ViewPort) Follow(pos pixel.Vec, spd float64) {
@@ -242,12 +385,7 @@ func (v *ViewPort) PointInside(vec pixel.Vec) bool {
 }
 
 func (v *ViewPort) Projected(vec pixel.Vec) pixel.Vec {
-	//fmt.Printf("V: (%f,%f)\n", vec.X, vec.Y)
-	a := v.Mat.Unproject(vec).Add(v.PostCamPos)
-	//fmt.Printf("A: (%f,%f)\n", a.X, a.Y)
-	//b := v.Mat.Unproject(vec.Scaled(1 / v.Zoom))
-	//fmt.Printf("B: (%f,%f)\n", b.X, b.Y)
-	return a
+	return v.Mat.Unproject(vec).Add(pixel.V(-(v.Rect.W() * 0.5), -(v.Rect.H() * 0.5))).Add(v.PostCamPos)
 }
 
 func (v *ViewPort) Constrain(vec pixel.Vec) pixel.Vec {
@@ -278,4 +416,16 @@ func (v *ViewPort) ConstrainR(vec pixel.Vec, r pixel.Rect) pixel.Vec {
 		newPos.Y = v.CamPos.Y - v.Rect.H()*0.5 + r.H()*0.5
 	}
 	return newPos
+}
+
+func (v *ViewPort) GetLimX() (float64, float64) {
+	return v.limX.X, v.limX.Y
+}
+
+func (v *ViewPort) GetLimY() (float64, float64) {
+	return v.limY.X, v.limY.Y
+}
+
+func (v *ViewPort) GetLimZ() (float64, float64) {
+	return v.limZ.X, v.limZ.Y
 }

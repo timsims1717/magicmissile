@@ -56,8 +56,8 @@ func (s *gameState) Load() {
 
 func (s *gameState) Update(win *pixelgl.Window) {
 	debug.AddText("Game State")
+	debug.AddIntCoords("World", int(data.TheInput.World.X), int(data.TheInput.World.Y))
 	inPos := data.GameView.Projected(data.TheInput.World)
-	debug.AddText(fmt.Sprintf("World: (%d,%d)", int(data.TheInput.World.X), int(data.TheInput.World.Y)))
 	debug.AddText(fmt.Sprintf("GameView: (%d,%d)", int(inPos.X), int(inPos.Y)))
 
 	if options.Updated {
@@ -114,6 +114,7 @@ func (s *gameState) Update(win *pixelgl.Window) {
 	systems.MissileSystem()
 	systems.ExplosionSystem()
 	//systems.HealthSystem()
+	systems.InterpolationSystem()
 	systems.ParentSystem()
 	systems.ObjectSystem()
 	//systems.UpdateBackgrounds()
@@ -139,10 +140,10 @@ func (s *gameState) Draw(win *pixelgl.Window) {
 		bg.IMDraw.Draw(bg.View.Canvas)
 		bg.View.Canvas.Draw(data.GameView.Canvas, bg.View.Mat)
 	}
-	data.ExpView.Canvas.Draw(data.GameView.Canvas, data.ExpView.Mat)
+	data.ExpView.Draw(data.GameView.Canvas)
 	systems.DrawSystem(win, 10)
 	img.Batchers[data.ParticleKey].Draw(data.GameView.Canvas)
-	data.GameView.Canvas.Draw(win, data.GameView.Mat)
+	data.GameView.Draw(win)
 }
 
 func (s *gameState) SetAbstract(aState *state.AbstractState) {

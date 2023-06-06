@@ -21,14 +21,16 @@ func ObjectSystem() {
 
 func ParentSystem() {
 	for _, result := range myecs.Manager.Query(myecs.HasParent) {
-		tran, okT := result.Components[myecs.Object].(*object.Object)
+		obj, okO := result.Components[myecs.Object].(*object.Object)
 		parent, okP := result.Components[myecs.Parent].(*object.Object)
-		if okT && okP {
+		if okO && okP {
 			if parent.Kill {
 				myecs.Manager.DisposeEntity(result)
 			} else {
-				tran.Pos = parent.Pos.Add(parent.Offset)
-				tran.Hide = parent.Hide
+				obj.Pos = parent.Pos.Add(parent.Offset)
+				if parent.HideChildren {
+					obj.Hide = parent.Hide
+				}
 			}
 		}
 	}
@@ -43,6 +45,21 @@ func FunctionSystem() {
 					result.Entity.RemoveComponent(myecs.Update)
 				} else {
 					fnT.Timer.Reset()
+				}
+			}
+		} else if hcF, ok := fnA.(*data.HoverClick); ok {
+			if objC, okOC := result.Entity.GetComponentData(myecs.Object); okOC {
+				if obj, okO := objC.(*object.Object); okO {
+					if !obj.Hide {
+						pos := hcF.Input.World
+						if hcF.View != nil {
+							pos = hcF.View.Projected(pos)
+						}
+						hcF.Hover = obj.PointInside(pos)
+						if hcF.Func != nil {
+							hcF.Func(hcF)
+						}
+					}
 				}
 			}
 		} else if fnF, ok := fnA.(*data.FrameFunc); ok {

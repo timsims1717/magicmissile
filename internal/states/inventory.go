@@ -32,29 +32,39 @@ func (s *inventoryState) Load() {
 	data.InventoryView.CamPos = pixel.ZV
 	data.InventoryView.PortPos = viewport.MainCamera.PostCamPos
 	systems.CreateTowersNoBG()
-	systems.CreateInventoryScrolls()
+	systems.CreateTowerScrolls()
 }
 
 func (s *inventoryState) Update(win *pixelgl.Window) {
 	debug.AddText("Inventory State")
-	debug.AddIntCoords("Left Tower List View CamPos", int(data.LeftTowerScroll.ListView.CamPos.X), int(data.LeftTowerScroll.ListView.CamPos.Y))
+	debug.AddIntCoords("World", int(data.TheInput.World.X), int(data.TheInput.World.Y))
+	inPos := data.InventoryView.Projected(data.TheInput.World)
+	debug.AddIntCoords("Inventory View In", int(inPos.X), int(inPos.Y))
+	debug.AddIntCoords("Left Tower Pos", int(data.LeftTowerScroll.Scroll.Object.Pos.X), int(data.LeftTowerScroll.Scroll.Object.Pos.Y))
 
 	if options.Updated {
 		s.UpdateViews()
 	}
 
 	if data.TheInput.Get("debugCU").Pressed() {
-		data.LeftTowerScroll.ListView.CamPos.Y += timing.DT * 50.
+		data.InventoryView.CamPos.Y += timing.DT * 50.
 	} else if data.TheInput.Get("debugCD").Pressed() {
-		data.LeftTowerScroll.ListView.CamPos.Y -= timing.DT * 50.
+		data.InventoryView.CamPos.Y -= timing.DT * 50.
 	}
 	if data.TheInput.Get("debugCR").Pressed() {
-		data.LeftTowerScroll.ListView.CamPos.X += timing.DT * 50.
+		data.InventoryView.CamPos.X += timing.DT * 50.
 	} else if data.TheInput.Get("debugCL").Pressed() {
-		data.LeftTowerScroll.ListView.CamPos.X -= timing.DT * 50.
+		data.InventoryView.CamPos.X -= timing.DT * 50.
+	}
+	if data.TheInput.Get("showInventory").JustPressed() {
+		systems.ShowTowerScroll(data.LeftTowerScroll)
+		systems.ShowTowerScroll(data.MidTowerScroll)
+		systems.ShowTowerScroll(data.RightTowerScroll)
 	}
 
+	systems.FunctionSystem()
 	systems.ScrollSystem()
+	systems.InterpolationSystem()
 	systems.ParentSystem()
 	systems.ObjectSystem()
 	data.InventoryView.Update()
@@ -66,7 +76,7 @@ func (s *inventoryState) Update(win *pixelgl.Window) {
 func (s *inventoryState) Draw(win *pixelgl.Window) {
 	data.InventoryView.Canvas.Clear(colornames.Pink)
 	systems.DrawScrollSystem(win)
-	data.InventoryView.Canvas.Draw(win, data.InventoryView.Mat)
+	data.InventoryView.Draw(win)
 }
 
 func (s *inventoryState) SetAbstract(aState *state.AbstractState) {
