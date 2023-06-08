@@ -8,13 +8,14 @@ import (
 	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/reanimator"
 	"timsims1717/magicmissile/pkg/typeface"
+	"timsims1717/magicmissile/pkg/viewport"
 )
 
 func AnimationSystem() {
 	for _, result := range myecs.Manager.Query(myecs.HasAnimation) {
 		obj, okO := result.Components[myecs.Object].(*object.Object)
 		theAnim := result.Components[myecs.Animated]
-		if okO && !obj.Hide {
+		if okO && !obj.Hidden {
 			if theAnim == nil {
 				continue
 			} else if anims, okS := theAnim.([]*reanimator.Tree); okS {
@@ -32,13 +33,17 @@ func DrawSystem(win *pixelgl.Window, layer int) {
 	count := 0
 	for _, result := range myecs.Manager.Query(myecs.IsDrawable) {
 		obj, okO := result.Components[myecs.Object].(*object.Object)
-		if okO && obj.Layer == layer && !obj.Hide {
+		if okO && obj.Layer == layer && !obj.Hidden {
 			draw := result.Components[myecs.Drawable]
 			var target pixel.Target
 			target = win
 			if ok := result.Entity.HasComponent(myecs.DrawTarget); ok {
 				if tar, okT := result.Entity.GetComponentData(myecs.DrawTarget); okT {
-					target, okT = tar.(pixel.Target)
+					if vp, okV := tar.(*viewport.ViewPort); okV {
+						target = vp.Canvas
+					} else {
+						target = tar.(pixel.Target)
+					}
 				}
 			}
 			if draw == nil {

@@ -38,15 +38,15 @@ func (s *gameState) Load() {
 	data.GameView.SetRect(pixel.R(0, 0, data.BaseWidth, data.BaseHeight))
 	//data.GameView.CamPos = pixel.V(data.BaseWidth*0.5, data.BaseHeight*0.5)
 	data.GameView.CamPos = pixel.ZV
-	data.GameView.PortPos = viewport.MainCamera.PostCamPos
+	data.GameView.PortPos = viewport.MainCamera.CamPos
 	data.ExpView = viewport.New(nil)
 	data.ExpView.SetRect(pixel.R(0, 0, data.BaseWidth, data.BaseHeight))
 	data.ExpView.CamPos = pixel.ZV
-	data.ExpView.PortPos = viewport.MainCamera.PostCamPos
+	data.ExpView.PortPos = data.GameView.CamPos
 	data.ExpView1 = viewport.New(nil)
 	data.ExpView1.SetRect(pixel.R(0, 0, data.BaseWidth, data.BaseHeight))
 	data.ExpView1.CamPos = pixel.ZV
-	data.ExpView1.PortPos = viewport.MainCamera.PostCamPos
+	data.ExpView1.PortPos = data.GameView.CamPos
 	data.GameDraw = imdraw.New(nil)
 	systems.GenerateRandomBackground("ForestValley")
 	systems.UpdateBackgrounds()
@@ -58,7 +58,7 @@ func (s *gameState) Update(win *pixelgl.Window) {
 	debug.AddText("Game State")
 	debug.AddIntCoords("World", int(data.TheInput.World.X), int(data.TheInput.World.Y))
 	inPos := data.GameView.Projected(data.TheInput.World)
-	debug.AddText(fmt.Sprintf("GameView: (%d,%d)", int(inPos.X), int(inPos.Y)))
+	debug.AddIntCoords("Game View In", int(inPos.X), int(inPos.Y))
 
 	if options.Updated {
 		s.UpdateViews()
@@ -79,34 +79,28 @@ func (s *gameState) Update(win *pixelgl.Window) {
 	debug.AddText(fmt.Sprintf("Spell Tier: %d", data.TierTest+1))
 	debug.AddText(fmt.Sprintf("Spell Name: %s", data.SpellKeys[data.SpellTest]))
 	if data.TheInput.Get("debugCU").Pressed() {
-		data.CurrBackground.Backgrounds[0].View.PortPos.Y += timing.DT * 50.
+		data.GameView.PortPos.Y += timing.DT * 50.
 	} else if data.TheInput.Get("debugCD").Pressed() {
-		data.CurrBackground.Backgrounds[0].View.PortPos.Y -= timing.DT * 50.
+		data.GameView.PortPos.Y -= timing.DT * 50.
 	}
 	if data.TheInput.Get("debugCR").Pressed() {
-		data.CurrBackground.Backgrounds[0].View.PortPos.X += timing.DT * 50.
+		data.GameView.PortPos.X += timing.DT * 50.
 	} else if data.TheInput.Get("debugCL").Pressed() {
-		data.CurrBackground.Backgrounds[0].View.PortPos.X -= timing.DT * 50.
+		data.GameView.PortPos.X -= timing.DT * 50.
 	}
 	if data.TheInput.Get("fireLeft").JustPressed() {
 		tower := data.Towers[0]
 		target := inPos
-		target.X -= data.BaseWidth * 0.5
-		target.Y -= data.BaseHeight * 0.5
 		systems.FireNextFromTower(tower, target)
 	}
 	if data.TheInput.Get("fireMid").JustPressed() {
 		tower := data.Towers[1]
 		target := inPos
-		target.X -= data.BaseWidth * 0.5
-		target.Y -= data.BaseHeight * 0.5
 		systems.FireNextFromTower(tower, target)
 	}
 	if data.TheInput.Get("fireRight").JustPressed() {
 		tower := data.Towers[2]
 		target := inPos
-		target.X -= data.BaseWidth * 0.5
-		target.Y -= data.BaseHeight * 0.5
 		systems.FireNextFromTower(tower, target)
 	}
 
@@ -151,6 +145,7 @@ func (s *gameState) SetAbstract(aState *state.AbstractState) {
 }
 
 func (s *gameState) UpdateViews() {
-	data.GameView.SetRect(pixel.R(0, 0, viewport.MainCamera.Rect.W(), viewport.MainCamera.Rect.H()))
-	data.GameView.SetZoom(viewport.MainCamera.Rect.W() / data.BaseWidth)
+	ratio := viewport.MainCamera.Rect.W() / data.BaseWidth
+	data.GameView.PortSize = pixel.V(ratio, ratio)
+	data.GameView.PortPos = viewport.MainCamera.CamPos
 }

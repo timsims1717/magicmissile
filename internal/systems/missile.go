@@ -161,7 +161,7 @@ func MissileSystem() {
 				missile.Travel += util.Magnitude(norm) * missile.Speed * timing.DT
 			}
 			if data.GameView.PointInside(obj.Pos.Scaled(0.98)) {
-				if obj.Kill || (missile.Limit > 0 && missile.Travel > missile.Limit) || missile.Speed == 0. ||
+				if obj.Killed || (missile.Limit > 0 && missile.Travel > missile.Limit) || missile.Speed == 0. ||
 					l == (missile.Target.X <= obj.Pos.X) || b == (missile.Target.Y <= obj.Pos.Y) {
 					// missile reached target or was destroyed
 					for _, f := range missile.Payload {

@@ -36,6 +36,11 @@ func NewInterpolation(target InterpolationTarget) *Interpolation {
 	}
 }
 
+func (i *Interpolation) SetValue(v *float64) *Interpolation {
+	i.Value = v
+	return i
+}
+
 func (i *Interpolation) SetGween(begin, end, duration float64, easing ease.TweenFunc) *Interpolation {
 	i.Sequence = gween.NewSequence(gween.New(begin, end, duration, easing))
 	return i

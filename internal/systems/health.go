@@ -14,7 +14,7 @@ func HealthSystem() {
 					hp.Dead = true
 				}
 				if hp.Dead {
-					obj.Kill = true
+					obj.Killed = true
 				}
 			}
 		}

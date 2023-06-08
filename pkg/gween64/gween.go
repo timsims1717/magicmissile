@@ -17,6 +17,7 @@ type (
 		Overflow float64
 		easing   ease.TweenFunc
 		reverse  bool
+		End      float64
 	}
 )
 
@@ -33,6 +34,7 @@ func New(begin, end, duration float64, easing ease.TweenFunc) *Tween {
 		easing:   easing,
 		Overflow: 0,
 		reverse:  false,
+		End:      end,
 	}
 }
 

@@ -26,7 +26,7 @@ func CreateTowers() {
 				obj.Flip = rand.Intn(2) == 0
 				obj.Offset.Y += img.Batchers[data.ObjectKey].GetSprite(spr.Key).Frame().H()*0.5 - 10.
 				obj.Pos.Y += 6.
-				var slots []data.SpellSlot
+				var slots []*data.SpellSlot
 				for j := 0; j < data.SpellSlotNum; j++ {
 					spellKey := data.SpellKeys[rand.Intn(len(data.SpellKeys))]
 					baseTier := data.Missiles[spellKey][0]
@@ -38,7 +38,7 @@ func CreateTowers() {
 							break
 						}
 					}
-					slots = append(slots, data.SpellSlot{
+					slots = append(slots, &data.SpellSlot{
 						Tier:  slotTier,
 						Spell: spellKey,
 						Name:  baseTier.Name,
@@ -76,7 +76,7 @@ func CreateTowersNoBG() {
 			obj.Flip = rand.Intn(2) == 0
 			obj.Offset.Y += img.Batchers[data.ObjectKey].GetSprite(spr.Key).Frame().H()*0.5 - 10.
 			obj.Pos.Y += 6.
-			var slots []data.SpellSlot
+			var slots []*data.SpellSlot
 			for j := 0; j < data.SpellSlotNum; j++ {
 				spellKey := data.SpellKeys[rand.Intn(len(data.SpellKeys))]
 				baseTier := data.Missiles[spellKey][0]
@@ -88,7 +88,7 @@ func CreateTowersNoBG() {
 						break
 					}
 				}
-				slots = append(slots, data.SpellSlot{
+				slots = append(slots, &data.SpellSlot{
 					Tier:  slotTier,
 					Spell: spellKey,
 					Name:  baseTier.Name,

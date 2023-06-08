@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
@@ -35,7 +36,7 @@ func run() {
 
 	viewport.MainCamera = viewport.New(win.Canvas())
 	viewport.MainCamera.SetRect(pixel.R(0, 0, 1600, 900))
-	viewport.MainCamera.PortPos = pixel.V(0., 0.)
+	viewport.MainCamera.CamPos = pixel.V(data.BaseWidth*0.5, data.BaseHeight*0.5)
 
 	options.VSync = true
 	options.BilinearFilter = true
@@ -92,7 +93,7 @@ func run() {
 	state.Register("old-game", state.New(states.OldGameState))
 	state.PushState("inventory")
 
-	debug.Initialize(&viewport.MainCamera.PostCamPos, &viewport.MainCamera.PostCamPos)
+	debug.Initialize(&viewport.MainCamera.PostCamPos)
 	debug.Text = true
 
 	loading.LoadShaders()
@@ -115,8 +116,14 @@ func run() {
 		timing.Update()
 		debug.Clear()
 		options.WindowUpdate(win)
+		if options.Updated {
+			viewport.MainCamera.CamPos = pixel.V(viewport.MainCamera.Rect.W()*0.5, viewport.MainCamera.Rect.H()*0.5)
+		}
 
 		data.TheInput.Update(win, viewport.MainCamera.Mat)
+		if data.TheInput.Get("debugPause").JustPressed() {
+			fmt.Println("BREAKPOINT")
+		}
 		if data.TheInput.Get("fullscreen").JustPressed() {
 			options.FullScreen = !options.FullScreen
 		}

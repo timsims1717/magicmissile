@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"golang.org/x/image/colornames"
+	"image/color"
 	"strings"
 	"timsims1717/magicmissile/pkg/typeface"
 )
@@ -14,10 +14,8 @@ var (
 	lines     []string
 )
 
-func InitializeText(v *pixel.Vec) {
-	col := colornames.Aliceblue
-	col.A = 90
-	debugText = typeface.New(v, "basic", typeface.NewAlign(typeface.Left, typeface.Top), 1.0, 2.0, 0., 0.)
+func InitializeText() {
+	debugText = typeface.New("basic", typeface.NewAlign(typeface.Left, typeface.Top), 1.0, 2.0, 0., 0.)
 }
 
 func DrawText(win *pixelgl.Window) {
@@ -29,7 +27,7 @@ func DrawText(win *pixelgl.Window) {
 		sb.WriteString(line)
 	}
 	debugText.SetText(sb.String())
-	debugText.Obj.Pos = pixel.V(win.Bounds().W()*-0.5+2., win.Bounds().H()*0.5-2)
+	debugText.Obj.Pos = winV.Add(pixel.V(win.Bounds().W()*-0.5+2., win.Bounds().H()*0.5-2))
 	debugText.Obj.Update()
 	debugText.Draw(win)
 }
@@ -42,6 +40,10 @@ func AddIntCoords(label string, x, y int) {
 	lines = append(lines, fmt.Sprintf("%s: (%d,%d)", label, x, y))
 }
 
+func AddTruthText(label string, b bool) {
+	lines = append(lines, fmt.Sprintf("%s: %t", label, b))
+}
+
 func InsertText(s string, i int) {
 	if i < 0 || len(lines) <= i || len(lines) == 0 {
 		AddText(s)
@@ -50,4 +52,10 @@ func InsertText(s string, i int) {
 		tmp = append(tmp, lines[i:]...)
 		lines = tmp
 	}
+}
+
+func SetTextColor(col color.RGBA) {
+	fpsText.SetColor(col)
+	versionText.SetColor(col)
+	debugText.SetColor(col)
 }

@@ -129,7 +129,7 @@ type Tower struct {
 	Sprite   *img.Sprite
 	Entity   *ecs.Entity
 	Origin   pixel.Vec
-	Slots    []SpellSlot
+	Slots    []*SpellSlot
 	CurrSlot int
 	Exp      int
 	Level    int

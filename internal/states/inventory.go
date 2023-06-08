@@ -8,6 +8,7 @@ import (
 	"timsims1717/magicmissile/internal/data"
 	"timsims1717/magicmissile/internal/myecs"
 	"timsims1717/magicmissile/internal/systems"
+	"timsims1717/magicmissile/internal/systems/inventory"
 	"timsims1717/magicmissile/pkg/debug"
 	"timsims1717/magicmissile/pkg/options"
 	"timsims1717/magicmissile/pkg/state"
@@ -30,43 +31,87 @@ func (s *inventoryState) Load() {
 	data.InventoryView = viewport.New(nil)
 	data.InventoryView.SetRect(pixel.R(0, 0, data.BaseWidth, data.BaseHeight))
 	data.InventoryView.CamPos = pixel.ZV
-	data.InventoryView.PortPos = viewport.MainCamera.PostCamPos
+	data.InventoryView.PortPos = viewport.MainCamera.CamPos
+	data.InventoryView.Update()
 	systems.CreateTowersNoBG()
-	systems.CreateTowerScrolls()
+	inventory.CreateTowerScrolls()
+	inventory.CreateMovingSpellSlot()
+	//systems.CreateSpellInventory()
 }
 
 func (s *inventoryState) Update(win *pixelgl.Window) {
 	debug.AddText("Inventory State")
+	debug.AddIntCoords("Main Camera Pos", int(viewport.MainCamera.CamPos.X), int(viewport.MainCamera.CamPos.Y))
 	debug.AddIntCoords("World", int(data.TheInput.World.X), int(data.TheInput.World.Y))
 	inPos := data.InventoryView.Projected(data.TheInput.World)
 	debug.AddIntCoords("Inventory View In", int(inPos.X), int(inPos.Y))
-	debug.AddIntCoords("Left Tower Pos", int(data.LeftTowerScroll.Scroll.Object.Pos.X), int(data.LeftTowerScroll.Scroll.Object.Pos.Y))
+	debug.AddTruthText("Inventory Point Inside", data.InventoryView.PointInside(inPos))
 
 	if options.Updated {
 		s.UpdateViews()
 	}
 
 	if data.TheInput.Get("debugCU").Pressed() {
-		data.InventoryView.CamPos.Y += timing.DT * 50.
+		data.LeftTowerScroll.InvSlots[0].SlotObj.Pos.Y += timing.DT * 50.
 	} else if data.TheInput.Get("debugCD").Pressed() {
-		data.InventoryView.CamPos.Y -= timing.DT * 50.
+		data.LeftTowerScroll.InvSlots[0].SlotObj.Pos.Y -= timing.DT * 50.
 	}
 	if data.TheInput.Get("debugCR").Pressed() {
-		data.InventoryView.CamPos.X += timing.DT * 50.
+		data.LeftTowerScroll.InvSlots[0].SlotObj.Pos.X += timing.DT * 50.
 	} else if data.TheInput.Get("debugCL").Pressed() {
-		data.InventoryView.CamPos.X -= timing.DT * 50.
+		data.LeftTowerScroll.ListView.CamPos.X -= timing.DT * 50.
 	}
-	if data.TheInput.Get("showInventory").JustPressed() {
-		systems.ShowTowerScroll(data.LeftTowerScroll)
-		systems.ShowTowerScroll(data.MidTowerScroll)
-		systems.ShowTowerScroll(data.RightTowerScroll)
+	if data.InventoryTrans {
+		switch data.InventoryState {
+		case -1:
+			if data.LeftTowerScroll.Scroll.Closed &&
+				data.MidTowerScroll.Scroll.Closed &&
+				data.RightTowerScroll.Scroll.Closed {
+				data.InventoryTrans = false
+			}
+		case 0, 1, 2:
+			count := 0
+			if data.LeftTowerScroll.Scroll.Closed {
+				count++
+			}
+			if data.MidTowerScroll.Scroll.Closed {
+				count++
+			}
+			if data.RightTowerScroll.Scroll.Closed {
+				count++
+			}
+			if count >= 2 {
+				data.InventoryTrans = false
+			}
+		case 3:
+			if data.LeftTowerScroll.Scroll.Opened &&
+				data.MidTowerScroll.Scroll.Opened &&
+				data.RightTowerScroll.Scroll.Opened {
+				data.InventoryTrans = false
+			}
+		}
+	}
+	if data.TheInput.Get("showInventory").JustPressed() && !data.InventoryTrans {
+		if data.InventoryState == -1 {
+			inventory.ShowTowerScroll(data.LeftTowerScroll)
+			inventory.ShowTowerScroll(data.MidTowerScroll)
+			inventory.ShowTowerScroll(data.RightTowerScroll)
+			data.InventoryState = 3
+		} else {
+			inventory.HideTowerScroll(data.LeftTowerScroll)
+			inventory.HideTowerScroll(data.MidTowerScroll)
+			inventory.HideTowerScroll(data.RightTowerScroll)
+			data.InventoryState = -1
+		}
+		data.InventoryTrans = true
 	}
 
 	systems.FunctionSystem()
-	systems.ScrollSystem()
+	inventory.ScrollSystem()
 	systems.InterpolationSystem()
 	systems.ParentSystem()
 	systems.ObjectSystem()
+	inventory.UpdateListViews()
 	data.InventoryView.Update()
 	systems.TemporarySystem()
 	myecs.UpdateManager()
@@ -75,8 +120,9 @@ func (s *inventoryState) Update(win *pixelgl.Window) {
 
 func (s *inventoryState) Draw(win *pixelgl.Window) {
 	data.InventoryView.Canvas.Clear(colornames.Pink)
-	systems.DrawScrollSystem(win)
-	data.InventoryView.Draw(win)
+	inventory.DrawTowerScrollSystem(win)
+	inventory.DrawMovingSpellSlot(win)
+	data.InventoryView.Draw(viewport.MainCamera.Canvas)
 }
 
 func (s *inventoryState) SetAbstract(aState *state.AbstractState) {
@@ -84,6 +130,7 @@ func (s *inventoryState) SetAbstract(aState *state.AbstractState) {
 }
 
 func (s *inventoryState) UpdateViews() {
-	data.InventoryView.SetRect(pixel.R(0, 0, viewport.MainCamera.Rect.W(), viewport.MainCamera.Rect.H()))
-	data.InventoryView.SetZoom(viewport.MainCamera.Rect.W() / data.BaseWidth)
+	ratio := viewport.MainCamera.Rect.W() / data.BaseWidth
+	data.InventoryView.PortSize = pixel.V(ratio, ratio)
+	data.InventoryView.PortPos = viewport.MainCamera.CamPos
 }

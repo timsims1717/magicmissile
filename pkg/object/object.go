@@ -11,11 +11,10 @@ import (
 var objIndex = uint32(0)
 
 type Object struct {
-	ID   string
-	Hide bool
-	Load bool
-	Keep bool
-	Kill bool
+	ID     string
+	Hidden bool
+	Loaded bool
+	Killed bool
 
 	Pos  pixel.Vec
 	Mat  pixel.Matrix

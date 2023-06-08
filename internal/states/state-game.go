@@ -53,10 +53,10 @@ func (s *oldGameState) Load() {
 	game.Level = 0
 	game.BigOn = false
 	game.Timer = timing.New(0.)
-	game.TimeText = typeface.New(nil, "main", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 0.15, 0., 0.)
+	game.TimeText = typeface.New("main", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 0.15, 0., 0.)
 	game.TimeText.SetPos(pixel.V(0., game.Frame.Max.Y))
 	myecs.Manager.NewEntity().AddComponent(myecs.Object, game.TimeText.Obj)
-	game.OverText = typeface.New(nil, "main", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 0.25, 0., 0.)
+	game.OverText = typeface.New("main", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 0.25, 0., 0.)
 	game.OverText.SetPos(pixel.V(0., 220.))
 	game.OverText.SetText(game.StartMsg[rand.Intn(len(game.StartMsg))])
 	game.OverText.SetColor(color.RGBA{
@@ -67,7 +67,7 @@ func (s *oldGameState) Load() {
 	})
 	game.MsgTimer = timing.New(10.)
 	myecs.Manager.NewEntity().AddComponent(myecs.Object, game.OverText.Obj)
-	game.WizText = typeface.New(nil, "main", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 0.08, 0., 0.)
+	game.WizText = typeface.New("main", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 0.08, 0., 0.)
 	game.WizText.SetPos(pixel.V(0., game.CharYLvl-60.))
 	myecs.Manager.NewEntity().AddComponent(myecs.Object, game.WizText.Obj)
 }

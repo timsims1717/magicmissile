@@ -8,12 +8,14 @@ import (
 var (
 	Debug = false
 	Text  = false
+	winV  *pixel.Vec
 )
 
-func Initialize(txt, fps *pixel.Vec) {
+func Initialize(v *pixel.Vec) {
+	winV = v
 	InitializeLines()
-	InitializeText(txt)
-	InitializeFPS(fps)
+	InitializeText()
+	InitializeFPS()
 }
 
 func Draw(win *pixelgl.Window) {

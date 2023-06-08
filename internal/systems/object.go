@@ -10,7 +10,7 @@ import (
 func ObjectSystem() {
 	for _, result := range myecs.Manager.Query(myecs.IsObject) {
 		if obj, ok := result.Components[myecs.Object].(*object.Object); ok {
-			if obj.Kill {
+			if obj.Killed {
 				myecs.Manager.DisposeEntity(result)
 			} else {
 				obj.Update()
@@ -24,12 +24,12 @@ func ParentSystem() {
 		obj, okO := result.Components[myecs.Object].(*object.Object)
 		parent, okP := result.Components[myecs.Parent].(*object.Object)
 		if okO && okP {
-			if parent.Kill {
+			if parent.Killed {
 				myecs.Manager.DisposeEntity(result)
 			} else {
 				obj.Pos = parent.Pos.Add(parent.Offset)
 				if parent.HideChildren {
-					obj.Hide = parent.Hide
+					obj.Hidden = parent.Hidden
 				}
 			}
 		}
@@ -50,12 +50,14 @@ func FunctionSystem() {
 		} else if hcF, ok := fnA.(*data.HoverClick); ok {
 			if objC, okOC := result.Entity.GetComponentData(myecs.Object); okOC {
 				if obj, okO := objC.(*object.Object); okO {
-					if !obj.Hide {
+					if !obj.Hidden {
 						pos := hcF.Input.World
 						if hcF.View != nil {
 							pos = hcF.View.Projected(pos)
+							hcF.Hover = obj.PointInside(pos) && hcF.View.PointInside(pos)
+						} else {
+							hcF.Hover = obj.PointInside(pos)
 						}
-						hcF.Hover = obj.PointInside(pos)
 						if hcF.Func != nil {
 							hcF.Func(hcF)
 						}
@@ -79,14 +81,14 @@ func TemporarySystem() {
 		if okT {
 			if timer, ok := temp.(*timing.Timer); ok {
 				if timer.UpdateDone() {
-					obj.Hide = true
-					obj.Kill = true
+					obj.Hidden = true
+					obj.Killed = true
 					myecs.Manager.DisposeEntity(result.Entity)
 				}
 			} else if check, ok := temp.(myecs.ClearFlag); ok {
 				if check {
-					obj.Hide = true
-					obj.Kill = true
+					obj.Hidden = true
+					obj.Killed = true
 					myecs.Manager.DisposeEntity(result.Entity)
 				}
 			}
@@ -98,8 +100,8 @@ func ClearSystem() {
 	for _, result := range myecs.Manager.Query(myecs.IsObject) {
 		obj, ok := result.Components[myecs.Object].(*object.Object)
 		if ok {
-			obj.Hide = true
-			obj.Kill = true
+			obj.Hidden = true
+			obj.Killed = true
 		}
 		myecs.Manager.DisposeEntity(result.Entity)
 	}

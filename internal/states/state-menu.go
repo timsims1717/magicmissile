@@ -27,7 +27,7 @@ func (s *oldMenuState) Unload() {
 
 func (s *oldMenuState) Load() {
 	MainMenu.Open()
-	game.Title = typeface.New(nil, "title", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 1.0, 0., 0.)
+	game.Title = typeface.New("title", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 1.0, 0., 0.)
 	game.Title.SetColor(color.RGBA{
 		R: 223,
 		G: 62,

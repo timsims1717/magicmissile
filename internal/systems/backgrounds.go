@@ -31,7 +31,7 @@ func GenerateBackground() {
 		vp := viewport.New(nil)
 		vp.SetRect(pixel.R(0, 0, data.BaseWidth, data.BaseHeight))
 		vp.CamPos = pixel.ZV
-		vp.PortPos = viewport.MainCamera.PostCamPos
+		vp.PortPos = data.GameView.CamPos
 		vp.Canvas.SetUniform("uRed", float32(layer.Color.R)/255.)
 		vp.Canvas.SetUniform("uGreen", float32(layer.Color.G)/255.)
 		vp.Canvas.SetUniform("uBlue", float32(layer.Color.B)/255.)

@@ -6,7 +6,6 @@ import (
 	"timsims1717/magicmissile/internal/myecs"
 	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/object"
-	"timsims1717/magicmissile/pkg/timing"
 )
 
 func CreateScroll(orig pixel.Vec, baseLayer int, startSize pixel.Vec, fullSize pixel.Vec) *data.Scroll {
@@ -105,23 +104,7 @@ func CreateScroll(orig pixel.Vec, baseLayer int, startSize pixel.Vec, fullSize p
 }
 
 func UpdateScroll(scroll *data.Scroll) {
-	if !scroll.Freeze {
-		diff := 1500. * timing.DT
-		if diff > scroll.FullDim.Y*0.2 {
-			diff = scroll.FullDim.Y * 0.2
-		}
-		if scroll.CurrDim.X < scroll.FullDim.X {
-			scroll.CurrDim.X += diff
-			if scroll.CurrDim.X > scroll.FullDim.X {
-				scroll.CurrDim.X = scroll.FullDim.X
-			}
-		}
-		if scroll.CurrDim.Y < scroll.FullDim.Y {
-			scroll.CurrDim.Y += diff
-			if scroll.CurrDim.Y > scroll.FullDim.Y {
-				scroll.CurrDim.Y = scroll.FullDim.Y
-			}
-		}
+	if !scroll.Closed {
 		// Scroll Mid
 		scroll.MidMid.Sca = pixel.V(scroll.CurrDim.X/data.TileSize, scroll.CurrDim.Y/(data.TileSize*3))
 		scroll.MidLeft.Offset = pixel.V((scroll.MidLeft.Rect.W()+scroll.CurrDim.X)*-0.5, 0.)
@@ -140,4 +123,22 @@ func UpdateScroll(scroll *data.Scroll) {
 		scroll.BotRight.Offset = pixel.V((scroll.BotRight.Rect.W()+scroll.CurrDim.X)*0.5, (scroll.BotRight.Rect.H()+scroll.CurrDim.Y)*-0.5)
 	}
 	scroll.Opened = scroll.CurrDim == scroll.FullDim
+}
+
+func DisposeScroll(scroll *data.Scroll) {
+	for _, e := range scroll.Entities {
+		myecs.Manager.DisposeEntity(e)
+	}
+	scroll.Object = nil
+	scroll.Inters = []*object.Interpolation{}
+	scroll.Entity = nil
+	scroll.TopLeft = nil
+	scroll.TopMid = nil
+	scroll.TopRight = nil
+	scroll.MidLeft = nil
+	scroll.MidMid = nil
+	scroll.MidRight = nil
+	scroll.BotLeft = nil
+	scroll.BotMid = nil
+	scroll.BotRight = nil
 }

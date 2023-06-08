@@ -3,7 +3,6 @@ package menus
 import (
 	"github.com/faiface/pixel"
 	"timsims1717/magicmissile/pkg/typeface"
-	"timsims1717/magicmissile/pkg/viewport"
 )
 
 type Item struct {
@@ -35,7 +34,7 @@ func NewItem(key, raw string, right bool) *Item {
 	if right {
 		align = typeface.Right
 	}
-	tex := typeface.New(&viewport.MainCamera.PostCamPos, "main", typeface.NewAlign(typeface.Align(align), typeface.Bottom), 1.5, MenuSize, 0., 0.)
+	tex := typeface.New("main", typeface.NewAlign(typeface.Align(align), typeface.Bottom), 1.5, MenuSize, 0., 0.)
 	tex.SetColor(DefaultColor)
 	tex.SetText(raw)
 	return &Item{

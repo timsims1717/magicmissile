@@ -11,11 +11,11 @@ var TheInput = &pxginput.Input{
 		"fireMid":   pxginput.NewJoyless(pixelgl.KeyS),
 		"fireRight": pxginput.NewJoyless(pixelgl.KeyD),
 		"click":     pxginput.NewJoyless(pixelgl.MouseButtonLeft),
-		"switchR": {
+		"scrollUp": {
 			Keys:   []pixelgl.Button{pixelgl.KeyE, pixelgl.KeySpace},
 			Scroll: 1,
 		},
-		"switchL": {
+		"scrollDwn": {
 			Keys:   []pixelgl.Button{pixelgl.KeyQ},
 			Scroll: -1,
 		},
@@ -25,6 +25,7 @@ var TheInput = &pxginput.Input{
 		"fullscreen":       pxginput.NewJoyless(pixelgl.KeyF5),
 		"fuzzy":            pxginput.NewJoyless(pixelgl.KeyF6),
 		"debugText":        pxginput.NewJoyless(pixelgl.KeyF4),
+		"debugPause":       pxginput.NewJoyless(pixelgl.KeyF10),
 		"debugCU":          pxginput.NewJoyless(pixelgl.KeyKP8),
 		"debugCD":          pxginput.NewJoyless(pixelgl.KeyKP5),
 		"debugCR":          pxginput.NewJoyless(pixelgl.KeyKP6),

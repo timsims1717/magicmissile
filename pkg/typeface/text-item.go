@@ -24,7 +24,6 @@ type Text struct {
 	MaxHeight float64
 	MaxLines  int
 
-	Parent       *pixel.Vec
 	RelativeSize float64
 	SymbolSize   float64
 	Obj          *object.Object
@@ -34,7 +33,7 @@ type Text struct {
 	fullHeight float64
 }
 
-func New(parent *pixel.Vec, atlas string, align Alignment, lineHeight, relativeSize, maxWidth, maxHeight float64) *Text {
+func New(atlas string, align Alignment, lineHeight, relativeSize, maxWidth, maxHeight float64) *Text {
 	tex := text.New(pixel.ZV, Atlases[atlas])
 	tex.LineHeight *= lineHeight
 	obj := object.New()
@@ -53,7 +52,6 @@ func New(parent *pixel.Vec, atlas string, align Alignment, lineHeight, relativeS
 		MaxWidth:     maxWidth,
 		MaxHeight:    maxHeight,
 		MaxLines:     int(maxHeight / (tex.LineHeight * relativeSize)),
-		Parent:       parent,
 		RelativeSize: relativeSize,
 		SymbolSize:   1.,
 		Obj:          obj,

@@ -29,15 +29,16 @@ type ViewPort struct {
 	PostPortPos pixel.Vec
 	PostZoom    float64
 	PortSize    pixel.Vec
+	ParentView  *ViewPort
 
 	CamSpeed  float64
 	CamAccel  float64
 	ZoomSpeed float64
 	ZoomStep  float64
 
-	interX *gween.Tween
-	interY *gween.Tween
-	interZ *gween.Tween
+	interX *gween.Sequence
+	interY *gween.Sequence
+	interZ *gween.Sequence
 	shakeX *gween.Tween
 	shakeY *gween.Tween
 	shakeZ *gween.Tween
@@ -132,7 +133,7 @@ func (v *ViewPort) Update() {
 func (v *ViewPort) updateX() bool {
 	fin := true
 	if v.interX != nil {
-		x, finX := v.interX.Update(timing.DT)
+		x, _, finX := v.interX.Update(timing.DT)
 		v.CamPos.X = x
 		if finX {
 			v.interX = nil
@@ -169,7 +170,7 @@ func (v *ViewPort) updateX() bool {
 func (v *ViewPort) updateY() bool {
 	fin := true
 	if v.interY != nil {
-		y, finY := v.interY.Update(timing.DT)
+		y, _, finY := v.interY.Update(timing.DT)
 		v.CamPos.Y = y
 		if finY {
 			v.interY = nil
@@ -206,7 +207,7 @@ func (v *ViewPort) updateY() bool {
 func (v *ViewPort) updateZ() bool {
 	fin := true
 	if v.interZ != nil {
-		z, finZ := v.interZ.Update(timing.DT)
+		z, _, finZ := v.interZ.Update(timing.DT)
 		v.Zoom = z
 		if finZ {
 			v.interZ = nil
@@ -267,14 +268,33 @@ func (v *ViewPort) SnapTo(pos pixel.Vec) {
 func (v *ViewPort) MoveTo(pos pixel.Vec, dur float64, lock bool) {
 	if !v.lock {
 		if dur > 0. {
-			v.interX = gween.New(v.CamPos.X, pos.X, dur, ease.InOutQuad)
-			v.interY = gween.New(v.CamPos.Y, pos.Y, dur, ease.InOutQuad)
+			v.interX = gween.NewSequence(gween.New(v.CamPos.X, pos.X, dur, ease.InOutQuad))
+			v.interY = gween.NewSequence(gween.New(v.CamPos.Y, pos.Y, dur, ease.InOutQuad))
 		} else {
 			v.interX = nil
 			v.interY = nil
 			v.CamPos = pos
 		}
 		v.lock = lock
+	}
+}
+
+func (v *ViewPort) AddMove(pos pixel.Vec, dur float64) {
+	if v.interX == nil {
+		v.MoveTo(v.CamPos.Add(pos), dur, false)
+	} else {
+		if dur > 0. {
+			posX := v.CamPos.X
+			posY := v.CamPos.Y
+			if len(v.interX.Tweens) > 0 {
+				posX = v.interX.Tweens[len(v.interX.Tweens)-1].End
+			}
+			if len(v.interY.Tweens) > 0 {
+				posY = v.interY.Tweens[len(v.interY.Tweens)-1].End
+			}
+			v.interX.Add(gween.New(posX, posX+pos.X, dur, ease.InOutQuad))
+			v.interY.Add(gween.New(posY, posY+pos.Y, dur, ease.InOutQuad))
+		}
 	}
 }
 
@@ -349,7 +369,7 @@ func (v *ViewPort) SetZoom(zoom float64) {
 func (v *ViewPort) ZoomIn(zoom float64) {
 	if !v.lock {
 		v.TargetZoom *= math.Pow(v.ZoomStep, zoom)
-		v.interZ = gween.New(v.Zoom, v.TargetZoom, v.ZoomSpeed, ease.OutQuad)
+		v.interZ = gween.NewSequence(gween.New(v.Zoom, v.TargetZoom, v.ZoomSpeed, ease.OutQuad))
 	}
 }
 
@@ -381,11 +401,21 @@ func Sine(t, b, c, d float64) float64 {
 }
 
 func (v *ViewPort) PointInside(vec pixel.Vec) bool {
-	return v.Rect.Moved(pixel.V(-(v.Rect.W() * 0.5), -(v.Rect.H() * 0.5))).Contains(v.Mat.Unproject(vec))
+	return v.Canvas.Bounds().Contains(vec)
+	//return v.Rect.Moved(pixel.V(-(v.Rect.W() * 0.5), -(v.Rect.H() * 0.5))).Contains(v.Mat.Unproject(vec))
 }
 
 func (v *ViewPort) Projected(vec pixel.Vec) pixel.Vec {
-	return v.Mat.Unproject(vec).Add(pixel.V(-(v.Rect.W() * 0.5), -(v.Rect.H() * 0.5))).Add(v.PostCamPos)
+	//return v.Mat.Unproject(vec).Add(v.PostCamPos)
+	if v.ParentView != nil {
+		vec = v.ParentView.Projected(vec)
+	}
+	return v.Mat.Unproject(vec.Add(v.PostCamPos))
+}
+
+func (v *ViewPort) ProjectedInside(vec pixel.Vec) bool {
+	vec = v.Projected(vec)
+	return v.PointInside(vec)
 }
 
 func (v *ViewPort) Constrain(vec pixel.Vec) pixel.Vec {
