@@ -49,13 +49,18 @@ func Interpolate(obj *object.Object, inter *object.Interpolation) bool {
 	case object.InterpolateSY:
 		obj.Sca.Y = cur
 	case object.InterpolateR:
-		obj.Mask.R = uint8(cur)
+		obj.Mask.R = cur
 	case object.InterpolateG:
-		obj.Mask.G = uint8(cur)
+		obj.Mask.G = cur
 	case object.InterpolateB:
-		obj.Mask.B = uint8(cur)
+		obj.Mask.B = cur
 	case object.InterpolateA:
-		obj.Mask.A = uint8(cur)
+		obj.Mask.A = cur
+	case object.InterpolateCol:
+		obj.Mask.R = cur
+		obj.Mask.G = cur
+		obj.Mask.B = cur
+		obj.Mask.A = cur
 	case object.InterpolateCustom:
 		if inter.Value == nil {
 			panic(fmt.Sprintf("interpolate custom on a nil value for object %s", obj.ID))

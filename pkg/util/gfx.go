@@ -1,7 +1,9 @@
 package util
 
 import (
+	"github.com/faiface/pixel"
 	"github.com/pkg/errors"
+	"golang.org/x/image/colornames"
 	"image/color"
 )
 
@@ -41,3 +43,7 @@ func ParseHexColorFast(s string) (c color.RGBA, err error) {
 	}
 	return
 }
+
+var (
+	White = pixel.ToRGBA(colornames.White)
+)

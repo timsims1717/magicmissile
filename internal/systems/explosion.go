@@ -11,7 +11,7 @@ import (
 	"timsims1717/magicmissile/pkg/util"
 )
 
-func MakeExplosion(eFab *data.Explosion, pos pixel.Vec, col color.RGBA) {
+func MakeExplosion(eFab *data.Explosion, pos pixel.Vec, col pixel.RGBA) {
 	obj := object.New()
 	obj.Pos = pos
 	exp := &data.Explosion{

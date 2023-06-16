@@ -10,6 +10,7 @@ import (
 	"timsims1717/magicmissile/internal/systems"
 	"timsims1717/magicmissile/internal/systems/inventory"
 	"timsims1717/magicmissile/pkg/debug"
+	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/options"
 	"timsims1717/magicmissile/pkg/state"
 	"timsims1717/magicmissile/pkg/timing"
@@ -34,18 +35,21 @@ func (s *inventoryState) Load() {
 	data.InventoryView.PortPos = viewport.MainCamera.CamPos
 	data.InventoryView.Update()
 	systems.CreateTowersNoBG()
+	data.SquareFrame = img.Batchers[data.UIKey].GetSprite("scroll_square").Frame()
 	inventory.CreateTowerScrolls()
-	inventory.CreateMovingSpellSlot()
-	//systems.CreateSpellInventory()
+	inventory.CreateMainMovingSpellSlot()
+	inventory.CreateSpellInventory()
 }
 
 func (s *inventoryState) Update(win *pixelgl.Window) {
-	debug.AddText("Inventory State")
+	debug.AddTruthText(fmt.Sprintf("Inventory State (%d) - Transition", data.InventoryState), data.InventoryTrans)
 	debug.AddIntCoords("Main Camera Pos", int(viewport.MainCamera.CamPos.X), int(viewport.MainCamera.CamPos.Y))
 	debug.AddIntCoords("World", int(data.TheInput.World.X), int(data.TheInput.World.Y))
-	inPos := data.InventoryView.Projected(data.TheInput.World)
+	inPos := data.InventoryView.ProjectWorld(data.TheInput.World)
 	debug.AddIntCoords("Inventory View In", int(inPos.X), int(inPos.Y))
-	debug.AddTruthText("Inventory Point Inside", data.InventoryView.PointInside(inPos))
+	inside, edge := data.InventoryView.WorldInside(data.TheInput.World)
+	debug.AddTruthText("Inventory Point Inside", inside)
+	debug.AddIntCoords("Inventory Edge", int(edge.X), int(edge.Y))
 
 	if options.Updated {
 		s.UpdateViews()
@@ -112,6 +116,7 @@ func (s *inventoryState) Update(win *pixelgl.Window) {
 	systems.ParentSystem()
 	systems.ObjectSystem()
 	inventory.UpdateListViews()
+	inventory.UpdateSpellInventory(false)
 	data.InventoryView.Update()
 	systems.TemporarySystem()
 	myecs.UpdateManager()
@@ -121,7 +126,8 @@ func (s *inventoryState) Update(win *pixelgl.Window) {
 func (s *inventoryState) Draw(win *pixelgl.Window) {
 	data.InventoryView.Canvas.Clear(colornames.Pink)
 	inventory.DrawTowerScrollSystem(win)
-	inventory.DrawMovingSpellSlot(win)
+	inventory.DrawSpellInventory(win)
+	inventory.DrawMovingSpellSlots(win)
 	data.InventoryView.Draw(viewport.MainCamera.Canvas)
 }
 

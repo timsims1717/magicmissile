@@ -3,7 +3,6 @@ package data
 import (
 	"github.com/bytearena/ecs"
 	"github.com/faiface/pixel"
-	"image/color"
 	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/timing"
@@ -77,7 +76,7 @@ type Explosion struct {
 	MoveSpeed  float64       `json:"moveSpeed"`
 	CurrMove   pixel.Vec     `json:"-"`
 	DisRadius  float64       `json:"-"`
-	Color      color.RGBA    `json:"-"`
+	Color      pixel.RGBA    `json:"-"`
 	Timer      *timing.Timer `json:"-"`
 }
 

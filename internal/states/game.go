@@ -57,7 +57,7 @@ func (s *gameState) Load() {
 func (s *gameState) Update(win *pixelgl.Window) {
 	debug.AddText("Game State")
 	debug.AddIntCoords("World", int(data.TheInput.World.X), int(data.TheInput.World.Y))
-	inPos := data.GameView.Projected(data.TheInput.World)
+	inPos := data.GameView.ProjectWorld(data.TheInput.World)
 	debug.AddIntCoords("Game View In", int(inPos.X), int(inPos.Y))
 
 	if options.Updated {

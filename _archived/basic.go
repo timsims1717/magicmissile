@@ -15,9 +15,10 @@ import (
 	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/sfx"
 	"timsims1717/magicmissile/pkg/timing"
+	"timsims1717/magicmissile/pkg/util"
 )
 
-func BasicMissile(start, target pixel.Vec, speed float64, rgba color.RGBA) {
+func BasicMissile(start, target pixel.Vec, speed float64, rgba pixel.RGBA) {
 	obj := object.New()
 	obj.Pos = start
 	obj.Rot = target.Sub(start).Angle()
@@ -45,7 +46,7 @@ func BasicMissile(start, target pixel.Vec, speed float64, rgba color.RGBA) {
 		})
 }
 
-func MagicMissile(start, target pixel.Vec, speed float64, rgba color.RGBA) {
+func MagicMissile(start, target pixel.Vec, speed float64, rgba pixel.RGBA) {
 	for i := 0; i < 3; i++ {
 		pos := target
 		s := start
@@ -62,132 +63,132 @@ func MagicMissile(start, target pixel.Vec, speed float64, rgba color.RGBA) {
 	}
 }
 
-func ChaosBolt(start, target pixel.Vec, speed float64, count int) {
-	obj := object.New()
-	obj.Pos = start
-	obj.Rot = target.Sub(start).Angle()
-	r := false
-	g := false
-	b := false
-	c := rand.Intn(3)
-	var R1, G1, B1 uint8
-	if c == 0 {
-		r = true
-		B1 = 255
-	} else if c == 1 {
-		g = true
-		R1 = 255
-	} else {
-		b = true
-		G1 = 255
-	}
-	col := color.RGBA{
-		R: R1,
-		G: G1,
-		B: B1,
-		A: 255,
-	}
-	spr := &img.Sprite{
-		Key:   "missile",
-		Color: col,
-		Batch: "figures",
-	}
-	hitbox := pixel.R(-16., -3.5, 16, 3.5)
-	e := myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, obj).
-		AddComponent(myecs.Drawable, spr).
-		AddComponent(myecs.Hitbox, &hitbox).
-		AddComponent(myecs.Update, data.NewFrameFunc(func() bool {
-			add := int(timing.DT * 450.)
-			R, G, B := int(spr.Color.R), int(spr.Color.G), int(spr.Color.B)
-			if r {
-				if R+add > 255 {
-					R = 255
-					r = false
-					g = true
-				} else {
-					R += add
-				}
-				if G-add < 0 {
-					G = 0
-				} else {
-					G -= add
-				}
-				if B-add < 0 {
-					B = 0
-				} else {
-					B -= add
-				}
-			}
-			if g {
-				if G+add > 255 {
-					G = 255
-					g = false
-					b = true
-				} else {
-					G += add
-				}
-				if R-add < 0 {
-					R = 0
-				} else {
-					R -= add
-				}
-				if B-add < 0 {
-					B = 0
-				} else {
-					B -= add
-				}
-			}
-			if b {
-				if B+add > 255 {
-					B = 255
-					b = false
-					r = true
-				} else {
-					B += add
-				}
-				if R-add < 0 {
-					R = 0
-				} else {
-					R -= add
-				}
-				if G-add < 0 {
-					G = 0
-				} else {
-					G -= add
-				}
-			}
-			spr.Color.R = uint8(R)
-			spr.Color.G = uint8(G)
-			spr.Color.B = uint8(B)
-			return false
-		})).
-		AddComponent(myecs.Payload, &data.Missile{
-			Target: target,
-			Speed:  speed,
-			//Finish: func(pos pixel.Vec) {
-			//	if count < rand.Intn(6)+1 {
-			//		tar := pos
-			//		tar.X += rand.Float64()*150. - 75.
-			//		tar.Y += rand.Float64()*150. - 75.
-			//		if tar.Y < game.Frame.Min.Y {
-			//			tar.Y = game.Frame.Min.Y
-			//		}
-			//		ChaosBolt(pos, tar, speed, count+1)
-			//		BasicExplosion(obj.Pos, 20.+(2.*float64(count+1)), 2., spr.Color)
-			//	} else {
-			//		BasicExplosion(obj.Pos, 40., 2., spr.Color)
-			//	}
-			//},
-		})
-	if count == 0 {
-		hp := &data.Health{
-			HP:   1,
-			Team: data.NoTeam,
-		}
-		e.AddComponent(myecs.Health, hp)
-	}
-}
+//func ChaosBolt(start, target pixel.Vec, speed float64, count int) {
+//	obj := object.New()
+//	obj.Pos = start
+//	obj.Rot = target.Sub(start).Angle()
+//	r := false
+//	g := false
+//	b := false
+//	c := rand.Intn(3)
+//	var R1, G1, B1 uint8
+//	if c == 0 {
+//		r = true
+//		B1 = 255
+//	} else if c == 1 {
+//		g = true
+//		R1 = 255
+//	} else {
+//		b = true
+//		G1 = 255
+//	}
+//	col := color.RGBA{
+//		R: R1,
+//		G: G1,
+//		B: B1,
+//		A: 255,
+//	}
+//	spr := &img.Sprite{
+//		Key:   "missile",
+//		Color: pixel.ToRGBA(col),
+//		Batch: "figures",
+//	}
+//	hitbox := pixel.R(-16., -3.5, 16, 3.5)
+//	e := myecs.Manager.NewEntity().
+//		AddComponent(myecs.Object, obj).
+//		AddComponent(myecs.Drawable, spr).
+//		AddComponent(myecs.Hitbox, &hitbox).
+//		AddComponent(myecs.Update, data.NewFrameFunc(func() bool {
+//			add := int(timing.DT * 450.)
+//			R, G, B := int(spr.Color.R), int(spr.Color.G), int(spr.Color.B)
+//			if r {
+//				if R+add > 255 {
+//					R = 255
+//					r = false
+//					g = true
+//				} else {
+//					R += add
+//				}
+//				if G-add < 0 {
+//					G = 0
+//				} else {
+//					G -= add
+//				}
+//				if B-add < 0 {
+//					B = 0
+//				} else {
+//					B -= add
+//				}
+//			}
+//			if g {
+//				if G+add > 255 {
+//					G = 255
+//					g = false
+//					b = true
+//				} else {
+//					G += add
+//				}
+//				if R-add < 0 {
+//					R = 0
+//				} else {
+//					R -= add
+//				}
+//				if B-add < 0 {
+//					B = 0
+//				} else {
+//					B -= add
+//				}
+//			}
+//			if b {
+//				if B+add > 255 {
+//					B = 255
+//					b = false
+//					r = true
+//				} else {
+//					B += add
+//				}
+//				if R-add < 0 {
+//					R = 0
+//				} else {
+//					R -= add
+//				}
+//				if G-add < 0 {
+//					G = 0
+//				} else {
+//					G -= add
+//				}
+//			}
+//			spr.Color.R = uint8(R)
+//			spr.Color.G = uint8(G)
+//			spr.Color.B = uint8(B)
+//			return false
+//		})).
+//		AddComponent(myecs.Payload, &data.Missile{
+//			Target: target,
+//			Speed:  speed,
+//			//Finish: func(pos pixel.Vec) {
+//			//	if count < rand.Intn(6)+1 {
+//			//		tar := pos
+//			//		tar.X += rand.Float64()*150. - 75.
+//			//		tar.Y += rand.Float64()*150. - 75.
+//			//		if tar.Y < game.Frame.Min.Y {
+//			//			tar.Y = game.Frame.Min.Y
+//			//		}
+//			//		ChaosBolt(pos, tar, speed, count+1)
+//			//		BasicExplosion(obj.Pos, 20.+(2.*float64(count+1)), 2., spr.Color)
+//			//	} else {
+//			//		BasicExplosion(obj.Pos, 40., 2., spr.Color)
+//			//	}
+//			//},
+//		})
+//	if count == 0 {
+//		hp := &data.Health{
+//			HP:   1,
+//			Team: data.NoTeam,
+//		}
+//		e.AddComponent(myecs.Health, hp)
+//	}
+//}
 
 func BasicExplosion(pos pixel.Vec, radius, expansion float64, rgba color.RGBA) {
 	if expansion < 1.5 {
@@ -232,12 +233,12 @@ func BasicMeteor(spd float64, pos pixel.Vec) {
 	obj.Rot = math.Pi*rand.Float64()*2. - 1.
 	spr := &img.Sprite{
 		Key: fmt.Sprintf("meteor_sm_%d", rand.Intn(2)),
-		Color: color.RGBA{
+		Color: pixel.ToRGBA(color.RGBA{
 			R: 255,
 			G: 255,
 			B: 255,
 			A: 255,
-		},
+		}),
 		Batch: "stuff",
 	}
 	var target pixel.Vec
@@ -295,13 +296,8 @@ func BigMeteor(spd float64) {
 	obj.Pos.Y = 460.
 	obj.Rot = math.Pi*rand.Float64()*2. - 1.
 	spr := &img.Sprite{
-		Key: "meteor_lrg",
-		Color: color.RGBA{
-			R: 255,
-			G: 255,
-			B: 255,
-			A: 255,
-		},
+		Key:   "meteor_lrg",
+		Color: util.White,
 		Batch: "stuff",
 	}
 	var target pixel.Vec
@@ -372,12 +368,12 @@ func BigMeteor(spd float64) {
 
 func BasicZombie() {
 	game.ZCount++
-	col := color.RGBA{
+	col := pixel.ToRGBA(color.RGBA{
 		R: 91,
 		G: 149,
 		B: 56,
 		A: 255,
-	}
+	})
 	mob := &data.Mob{
 		Speed: 50.,
 		Char:  &data.Character{},

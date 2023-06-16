@@ -28,6 +28,7 @@ func ParentSystem() {
 				myecs.Manager.DisposeEntity(result)
 			} else {
 				obj.Pos = parent.Pos.Add(parent.Offset)
+				obj.Mask = parent.Mask
 				if parent.HideChildren {
 					obj.Hidden = parent.Hidden
 				}
@@ -53,7 +54,7 @@ func FunctionSystem() {
 					if !obj.Hidden {
 						pos := hcF.Input.World
 						if hcF.View != nil {
-							pos = hcF.View.Projected(pos)
+							pos = hcF.View.ProjectWorld(pos)
 							hcF.Hover = obj.PointInside(pos) && hcF.View.PointInside(pos)
 						} else {
 							hcF.Hover = obj.PointInside(pos)

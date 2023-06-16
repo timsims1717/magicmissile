@@ -33,6 +33,8 @@ var (
 	LeftScrollX       = -BaseWidth*0.33 + 25.
 	//MidScrollX        = 0.
 	//RightScrollX      = BaseWidth*0.33 - 25.
+	SquareFrame pixel.Rect
+	SlotWidth   float64
 
 	SpellInventoryPos   = pixel.V(BaseWidth*0.167, TowerScrollY)
 	SpellInventoryWidth = TowerScrollWidth * 2.
@@ -51,12 +53,13 @@ var (
 	SlotListViewY = -136.
 
 	SpellInventory  = &spellInventory{}
-	MovingSpellSlot *InvSpellSlot
+	MovingSpellSlot *movingSpellSlot
 	MSSEntities     []*ecs.Entity
 )
 
 type spellInventory struct {
 	Spells   map[string]int
+	Slots    []*InvSpellSlot
 	Scroll   *Scroll
 	Entities []*ecs.Entity
 
@@ -139,7 +142,31 @@ type InvSpellSlot struct {
 	NameRObj *object.Object
 	NameRSpr *img.Sprite
 	NameTxt  *typeface.Text
+	Entity   *ecs.Entity
 
 	Slot     *SpellSlot
-	PrevSlot *SpellSlot
+	MaskCode MaskCode
+	View     *viewport.ViewPort
+	SlotNum  int
 }
+
+type movingSpellSlot struct {
+	InvSpellSlot
+	PrevSlot      *InvSpellSlot
+	TierMoveIndex int
+	Moving        bool
+}
+
+func NewMovingSpellSlot() {
+	MovingSpellSlot = &movingSpellSlot{
+		TierMoveIndex: -1,
+	}
+}
+
+type MaskCode int
+
+const (
+	MaskWhite = iota
+	MaskRed
+	MaskYellow
+)

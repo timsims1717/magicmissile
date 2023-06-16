@@ -19,6 +19,7 @@ const (
 	InterpolateG
 	InterpolateB
 	InterpolateA
+	InterpolateCol
 	InterpolateCustom
 )
 

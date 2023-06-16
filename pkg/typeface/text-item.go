@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/text"
-	"image/color"
+	"golang.org/x/image/colornames"
 	"timsims1717/magicmissile/pkg/object"
 )
 
 type Text struct {
 	Raw     string
 	Text    *text.Text
-	Color   color.RGBA
+	Color   pixel.RGBA
 	Align   Alignment
 	Symbols []symbolHandle
 	NoShow  bool
@@ -39,14 +39,9 @@ func New(atlas string, align Alignment, lineHeight, relativeSize, maxWidth, maxH
 	obj := object.New()
 	obj.Sca = pixel.V(relativeSize, relativeSize)
 	return &Text{
-		Text:  tex,
-		Align: align,
-		Color: color.RGBA{
-			R: 255,
-			G: 255,
-			B: 255,
-			A: 255,
-		},
+		Text:         tex,
+		Align:        align,
+		Color:        pixel.ToRGBA(colornames.White),
 		Width:        maxWidth,
 		Height:       maxHeight,
 		MaxWidth:     maxWidth,
@@ -60,7 +55,7 @@ func New(atlas string, align Alignment, lineHeight, relativeSize, maxWidth, maxH
 
 func (item *Text) Draw(target pixel.Target) {
 	if !item.NoShow {
-		item.Text.Draw(target, item.Obj.Mat)
+		item.Text.DrawColorMask(target, item.Obj.Mat, item.Obj.Mask)
 	}
 }
 
@@ -74,7 +69,7 @@ func (item *Text) SetHeight(height float64) {
 	item.SetText(item.Raw)
 }
 
-func (item *Text) SetColor(col color.RGBA) {
+func (item *Text) SetColor(col pixel.RGBA) {
 	item.Color = col
 	item.updateText()
 }

@@ -15,13 +15,14 @@ import (
 	"timsims1717/magicmissile/pkg/object"
 	"timsims1717/magicmissile/pkg/sfx"
 	"timsims1717/magicmissile/pkg/timing"
+	"timsims1717/magicmissile/pkg/util"
 )
 
 func loadUI() {
 	game.Cursor = data.TheInput.World
 	spr := &img.Sprite{
 		Key:   "cursor",
-		Color: white,
+		Color: util.White,
 		Batch: "figures",
 	}
 	myecs.Manager.NewEntity().
@@ -32,7 +33,7 @@ func loadUI() {
 	selObj.Pos.Y = game.TownYLvl + 50.
 	selSpr := &img.Sprite{
 		Key:   "selected",
-		Color: white,
+		Color: util.White,
 		Batch: "figures",
 	}
 	myecs.Manager.NewEntity().
@@ -46,12 +47,12 @@ func loadUI() {
 }
 
 func loadWizard() {
-	wizCol := color.RGBA{
+	wizCol := pixel.ToRGBA(color.RGBA{
 		R: 121,
 		G: 58,
 		B: 128,
 		A: 255,
-	}
+	})
 	wPos := pixel.V(-90., game.CharYLvl)
 	wObj := object.New()
 	wObj.Pos = wPos
@@ -104,7 +105,7 @@ func loadWizard() {
 				case 0:
 					_archived.MagicMissile(pc.Char.Obj.Pos, game.Cursor, 500., wizCol)
 				case 1:
-					_archived.ChaosBolt(pc.Char.Obj.Pos, game.Cursor, 500., 0)
+					//_archived.ChaosBolt(pc.Char.Obj.Pos, game.Cursor, 500., 0)
 					//case 2:
 					//	payloads.Fireball(pc.Char.Obj.Pos, game.Cursor, 500.)
 				}
@@ -150,12 +151,12 @@ func loadWizard() {
 }
 
 func loadFighter() {
-	fightCol := color.RGBA{
+	fightCol := pixel.ToRGBA(color.RGBA{
 		R: 155,
 		G: 23,
 		B: 45,
 		A: 255,
-	}
+	})
 	fPos := pixel.V(0., game.CharYLvl)
 	fObj := object.New()
 	fObj.Pos = fPos
@@ -258,12 +259,12 @@ func loadTowns() {
 	game.Towns = []*data.Town{}
 	spr := &img.Sprite{
 		Key:   "house1",
-		Color: white,
+		Color: util.White,
 		Batch: "stuff",
 	}
 	sprD := &img.Sprite{
 		Key:   "house1dead",
-		Color: white,
+		Color: util.White,
 		Batch: "stuff",
 	}
 	for i := 0; i < 8; i++ {
@@ -350,12 +351,12 @@ func HPBar(parent *pixel.Vec, hp *data.Health, total int) {
 func loadScenery() {
 	grass := &img.Sprite{
 		Key:   "grass",
-		Color: white,
+		Color: util.White,
 		Batch: "sceneryfg",
 	}
 	path := &img.Sprite{
 		Key:   "path",
-		Color: white,
+		Color: util.White,
 		Batch: "sceneryfg",
 	}
 	layer1Y := -460.

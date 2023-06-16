@@ -17,24 +17,24 @@ const (
 )
 
 var (
-	DefaultColor = color.RGBA{
+	DefaultColor = pixel.ToRGBA(color.RGBA{
 		R: 109,
 		G: 117,
 		B: 141,
 		A: 255,
-	}
-	HoverColor = color.RGBA{
+	})
+	HoverColor = pixel.ToRGBA(color.RGBA{
 		R: 223,
 		G: 62,
 		B: 35,
 		A: 255,
-	}
-	DisabledColor = color.RGBA{
+	})
+	DisabledColor = pixel.ToRGBA(color.RGBA{
 		R: 109,
 		G: 117,
 		B: 141,
 		A: 255,
-	}
+	})
 	MenuSize  = 0.45
 	HoverSize = 0.5
 )

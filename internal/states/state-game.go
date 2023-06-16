@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"image/color"
 	"math/rand"
 	"timsims1717/magicmissile/_archived"
 	"timsims1717/magicmissile/internal/data"
@@ -18,13 +17,6 @@ import (
 	"timsims1717/magicmissile/pkg/typeface"
 	"timsims1717/magicmissile/pkg/viewport"
 )
-
-var white = color.RGBA{
-	R: 255,
-	G: 255,
-	B: 255,
-	A: 255,
-}
 
 var OldGameState = &oldGameState{}
 
@@ -59,12 +51,7 @@ func (s *oldGameState) Load() {
 	game.OverText = typeface.New("main", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 0.25, 0., 0.)
 	game.OverText.SetPos(pixel.V(0., 220.))
 	game.OverText.SetText(game.StartMsg[rand.Intn(len(game.StartMsg))])
-	game.OverText.SetColor(color.RGBA{
-		R: 255,
-		G: 255,
-		B: 255,
-		A: 0,
-	})
+	game.OverText.SetColor(pixel.Alpha(0.))
 	game.MsgTimer = timing.New(10.)
 	myecs.Manager.NewEntity().AddComponent(myecs.Object, game.OverText.Obj)
 	game.WizText = typeface.New("main", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 0.08, 0., 0.)

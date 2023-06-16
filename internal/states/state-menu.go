@@ -28,12 +28,12 @@ func (s *oldMenuState) Unload() {
 func (s *oldMenuState) Load() {
 	MainMenu.Open()
 	game.Title = typeface.New("title", typeface.NewAlign(typeface.Center, typeface.Center), 1.0, 1.0, 0., 0.)
-	game.Title.SetColor(color.RGBA{
+	game.Title.SetColor(pixel.ToRGBA(color.RGBA{
 		R: 223,
 		G: 62,
 		B: 35,
 		A: 255,
-	})
+	}))
 	game.Title.SetPos(pixel.V(0., 250.))
 	game.Title.SetText("MagicMissile")
 	myecs.Manager.NewEntity().AddComponent(myecs.Object, game.Title.Obj)

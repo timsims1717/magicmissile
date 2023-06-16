@@ -7,134 +7,177 @@ import (
 	"timsims1717/magicmissile/internal/data"
 	"timsims1717/magicmissile/internal/myecs"
 	"timsims1717/magicmissile/internal/systems"
+	"timsims1717/magicmissile/pkg/gween64/ease"
 	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/object"
-	"timsims1717/magicmissile/pkg/typeface"
 	"timsims1717/magicmissile/pkg/util"
 )
 
-func CreateMovingSpellSlot() {
+func CreateMainMovingSpellSlot() {
 	DisposeMovingSpellSlot()
-	data.MovingSpellSlot = &data.InvSpellSlot{}
-	data.MovingSpellSlot.NameMObj = object.New()
-	data.MovingSpellSlot.NameMObj.Layer = 120
-	data.MovingSpellSlot.NameMSpr = img.NewSprite("scroll_square_m", data.UIKey)
-	data.MovingSpellSlot.NameMObj.HideChildren = true
-	data.MovingSpellSlot.NameMObj.Hidden = true
-	AddMSSEntity(myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, data.MovingSpellSlot.NameMObj).
-		AddComponent(myecs.Drawable, data.MovingSpellSlot.NameMSpr).
-		AddComponent(myecs.Update, data.NewHoverClickFn(data.TheInput, data.InventoryView, func(hvc *data.HoverClick) {
-			data.MovingSpellSlot.NameMObj.Pos = data.InventoryView.Projected(hvc.Input.World)
-			if data.MovingSpellSlot.Slot != nil && data.MovingSpellSlot.Slot.Spell != "" {
+	invSpellSlot := CreateMovingSpellSlot(AddMSSEntity, 2)
+	data.MovingSpellSlot.InvSpellSlot = *invSpellSlot
+	data.MovingSpellSlot.Entity.AddComponent(myecs.Update, data.NewHoverClickFn(data.TheInput, data.InventoryView, func(hvc *data.HoverClick) {
+		if !data.MovingSpellSlot.Moving {
+			data.MovingSpellSlot.NameMObj.Pos = data.InventoryView.ProjectWorld(hvc.Input.World)
+		}
+		if data.MovingSpellSlot.Slot != nil && data.MovingSpellSlot.Slot.Spell != "" &&
+			hvc.Input.Get("click").JustReleased() || data.InventoryTrans {
+			if data.MovingSpellSlot.TierMoveIndex == -1 {
 				hoveredSlot := GetHoveredSlot()
-				if hvc.Input.Get("click").Pressed() && hoveredSlot != nil {
-
-				} else if hvc.Input.Get("click").JustReleased() {
-					if hoveredSlot != nil && hoveredSlot.Slot.Tier >= data.MovingSpellSlot.Slot.Tier {
-						// if the hovered slot is a legal place to put the spell
-						if data.MovingSpellSlot.PrevSlot != nil && hoveredSlot.Slot.Spell != "" &&
-							data.MovingSpellSlot.PrevSlot.Tier >= hoveredSlot.Slot.Tier {
-							// if we can switch the slots
-							data.MovingSpellSlot.PrevSlot.Spell = hoveredSlot.Slot.Spell
-							data.MovingSpellSlot.PrevSlot.Name = hoveredSlot.Slot.Name
-						} else {
-							// put the replaced spell slot into the spell storage
-						}
-						hoveredSlot.Slot.Spell = data.MovingSpellSlot.Slot.Spell
-						hoveredSlot.Slot.Name = data.MovingSpellSlot.Slot.Name
-					} else if data.MovingSpellSlot.PrevSlot != nil {
-						// if not, put it back where you got it from
-						data.MovingSpellSlot.PrevSlot.Spell = data.MovingSpellSlot.Slot.Spell
-						data.MovingSpellSlot.PrevSlot.Name = data.MovingSpellSlot.Slot.Name
+				if hoveredSlot != nil && (hoveredSlot.Slot.Tier == 0 ||
+					hoveredSlot.Slot.Tier >= data.MovingSpellSlot.Slot.Tier) {
+					// if the hovered slot is a legal place to put the spell
+					if data.MovingSpellSlot.PrevSlot != nil && hoveredSlot.Slot.Spell != "" &&
+						data.MovingSpellSlot.PrevSlot.Slot.Tier >= data.Missiles[hoveredSlot.Slot.Spell][0].Tier {
+						// if we can switch the slots
+						MoveNewSlotToSlot(hoveredSlot.View.ProjectedOut(hoveredSlot.NameMObj.Pos), hoveredSlot.Slot, data.MovingSpellSlot.PrevSlot, 0.25)
 					} else {
-						// if you don't know where it was, put it into the spell storage
+						// put the replaced spell slot into the spell storage
 					}
-					data.MovingSpellSlot.PrevSlot = nil
-					data.MovingSpellSlot.Slot = nil
-					data.MovingSpellSlot.NameMObj.Hidden = true
+					SetMovingSlotToList(hoveredSlot, 0.25)
+				} else if data.MovingSpellSlot.PrevSlot != nil {
+					// if not, put it back where you got it from
+					SetMovingSlotToList(data.MovingSpellSlot.PrevSlot, 0.25)
+				} else {
+					// if you don't know where it was, put it into the spell storage
+				}
+			} else {
+				hoveredSlot := GetEmptyTierSlot(data.MovingSpellSlot.TierMoveIndex)
+				if hoveredSlot != nil {
+					SetMovingSlotToList(hoveredSlot, 0.25)
+				} else if data.MovingSpellSlot.PrevSlot.Slot.Tier == 0 {
+					SetMovingSlotToList(data.MovingSpellSlot.PrevSlot, 0.25)
 				}
 			}
-		})))
-	data.MovingSpellSlot.NameLObj = object.New()
-	data.MovingSpellSlot.NameLObj.Layer = 120
-	data.MovingSpellSlot.NameLSpr = img.NewSprite("scroll_square_l", data.UIKey)
-	AddMSSEntity(myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, data.MovingSpellSlot.NameLObj).
-		AddComponent(myecs.Parent, data.MovingSpellSlot.NameMObj).
-		AddComponent(myecs.Drawable, data.MovingSpellSlot.NameLSpr))
-	data.MovingSpellSlot.NameRObj = object.New()
-	data.MovingSpellSlot.NameRObj.Layer = 120
-	data.MovingSpellSlot.NameRSpr = img.NewSprite("scroll_square_r", data.UIKey)
-	AddMSSEntity(myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, data.MovingSpellSlot.NameRObj).
-		AddComponent(myecs.Parent, data.MovingSpellSlot.NameMObj).
-		AddComponent(myecs.Drawable, data.MovingSpellSlot.NameRSpr))
-	data.MovingSpellSlot.NameTxt = typeface.New("main", typeface.NewAlign(typeface.Left, typeface.Center), 1., 0.15, 0., 0.)
-	data.MovingSpellSlot.NameTxt.Obj.Layer = 121
-	data.MovingSpellSlot.NameTxt.Obj.Offset.Y += 6.
-	data.MovingSpellSlot.NameTxt.SetColor(data.ScrollText)
-	AddMSSEntity(myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, data.MovingSpellSlot.NameTxt.Obj).
-		AddComponent(myecs.Parent, data.MovingSpellSlot.NameMObj).
-		AddComponent(myecs.Drawable, data.MovingSpellSlot.NameTxt).
-		AddComponent(myecs.DrawTarget, data.InventoryView))
-	data.MovingSpellSlot.TierObj = object.New()
-	data.MovingSpellSlot.TierObj.Layer = 120
-	data.MovingSpellSlot.TierSpr = img.NewSprite("scroll_square", data.UIKey)
-	AddMSSEntity(myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, data.MovingSpellSlot.TierObj).
-		AddComponent(myecs.Parent, data.MovingSpellSlot.NameMObj).
-		AddComponent(myecs.Drawable, data.MovingSpellSlot.TierSpr))
-	data.MovingSpellSlot.TierTxt = typeface.New("main", typeface.NewAlign(typeface.Center, typeface.Center), 1., 0.15, 0., 0.)
-	data.MovingSpellSlot.TierTxt.Obj.Layer = 121
-	data.MovingSpellSlot.TierTxt.Obj.Offset.Y += 6.
-	data.MovingSpellSlot.TierTxt.SetColor(data.ScrollText)
-	AddMSSEntity(myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, data.MovingSpellSlot.TierTxt.Obj).
-		AddComponent(myecs.Parent, data.MovingSpellSlot.NameMObj).
-		AddComponent(myecs.Drawable, data.MovingSpellSlot.TierTxt).
-		AddComponent(myecs.DrawTarget, data.InventoryView))
+		}
+	}))
 }
 
-func SetMovingSpell(slot *data.SpellSlot, nWidth float64, offset pixel.Vec, incTier bool) {
+func SetMovingSpell(moving *data.InvSpellSlot, nWidth float64, offset pixel.Vec) {
+	moving.NameMObj.Offset = offset
+	moving.NameMObj.Sca = pixel.V(nWidth/data.TileSize-2, 1.)
+	moving.NameMObj.SetRect(pixel.R(0., 0., nWidth, data.TileSize*3))
+	moving.NameMObj.Hidden = false
+	moving.NameMObj.Mask = util.White
+
+	moving.NameTxt.SetText(moving.Slot.Name)
+	moving.NameTxt.Obj.Offset.X = -(nWidth - data.TileSize*2.) * 0.5
+
+	moving.NameLObj.Offset.X = -(nWidth - data.TileSize) * 0.5
+	moving.NameRObj.Offset.X = (nWidth - data.TileSize) * 0.5
+
+	moving.TierObj.Offset.X = -nWidth*0.5 - data.TileSize*1.5
+	moving.TierTxt.Obj.Offset.X = -nWidth*0.5 - data.TileSize*1.5
+	moving.TierTxt.SetText(util.RomanNumeral(moving.Slot.Tier))
+}
+
+func SetMainMovingSlot(slot *data.InvSpellSlot, nWidth float64, offset pixel.Vec, incTier, inventory bool, index int) {
 	data.MovingSpellSlot.Slot = &data.SpellSlot{
-		Tier:  slot.Tier,
-		Spell: slot.Spell,
-		Name:  slot.Name,
+		Tier:  slot.Slot.Tier,
+		Spell: slot.Slot.Spell,
+		Name:  slot.Slot.Name,
 	}
+	data.MovingSpellSlot.TierMoveIndex = index
 	if !incTier {
-		data.MovingSpellSlot.Slot.Tier = data.Missiles[slot.Spell][0].Tier
+		data.MovingSpellSlot.Slot.Tier = data.Missiles[slot.Slot.Spell][0].Tier
 	}
 	data.MovingSpellSlot.PrevSlot = slot
 
-	data.MovingSpellSlot.NameMObj.Offset = offset
-	data.MovingSpellSlot.NameMObj.Sca = pixel.V(nWidth/data.TileSize-2, 1.)
-	data.MovingSpellSlot.NameMObj.SetRect(pixel.R(0., 0., nWidth, data.TileSize*3))
-	data.MovingSpellSlot.NameMObj.Hidden = false
+	SetMovingSpell(&data.MovingSpellSlot.InvSpellSlot, nWidth, offset)
+	data.MovingSpellSlot.NameMObj.Pos = data.InventoryView.ProjectWorld(data.TheInput.World)
 
-	data.MovingSpellSlot.NameTxt.SetText(data.MovingSpellSlot.Slot.Name)
-	data.MovingSpellSlot.NameTxt.Obj.Offset.X = -(nWidth - data.TileSize*2.) * 0.5
-
-	data.MovingSpellSlot.NameLObj.Offset.X = -(nWidth - data.TileSize) * 0.5
-	data.MovingSpellSlot.NameRObj.Offset.X = (nWidth - data.TileSize) * 0.5
-
-	data.MovingSpellSlot.TierObj.Offset.X = -nWidth*0.5 - data.TileSize*1.5
-	data.MovingSpellSlot.TierTxt.Obj.Offset.X = -nWidth*0.5 - data.TileSize*1.5
-	data.MovingSpellSlot.TierTxt.SetText(util.RomanNumeral(data.MovingSpellSlot.Slot.Tier))
-
-	if incTier {
-		slot.Tier = 0
+	if inventory {
+		data.SpellInventory.Spells[slot.Slot.Spell]--
+	} else {
+		if incTier {
+			slot.Slot.Tier = 0
+		}
+		slot.Slot.Spell = ""
+		slot.Slot.Name = ""
 	}
-	slot.Spell = ""
-	slot.Name = ""
 }
 
-func DrawMovingSpellSlot(win *pixelgl.Window) {
+func MoveNewSlotToSlot(orig pixel.Vec, prevSlot *data.SpellSlot, nextSlot *data.InvSpellSlot, dur float64) {
+	var entities []*ecs.Entity
+	invSpellSlot := CreateMovingSpellSlot(func(e *ecs.Entity) {
+		entities = append(entities, e)
+	}, 0)
+	invSpellSlot.NameMObj.Hidden = false
+	invSpellSlot.Slot = &data.SpellSlot{
+		Tier:  prevSlot.Tier,
+		Spell: prevSlot.Spell,
+		Name:  prevSlot.Name,
+	}
+	if nextSlot.Slot.Tier != 0 {
+		invSpellSlot.Slot.Tier = nextSlot.Slot.Tier
+	}
+	SetMovingSpell(invSpellSlot, data.SlotWidth, pixel.ZV)
+	invSpellSlot.NameMObj.Pos = orig
+	fPos := nextSlot.View.ProjectedOut(nextSlot.NameMObj.Pos)
+	invSpellSlot.Entity.AddComponent(myecs.Interpolation, []*object.Interpolation{
+		object.NewInterpolation(object.InterpolateX).
+			AddGween(orig.X, fPos.X, dur, ease.OutCubic).
+			SetOnComplete(func() {
+				if nextSlot.Slot.Tier == 0 {
+					nextSlot.Slot.Tier = invSpellSlot.Slot.Tier
+				}
+				nextSlot.Slot.Spell = invSpellSlot.Slot.Spell
+				nextSlot.Slot.Name = invSpellSlot.Slot.Name
+				for _, e := range entities {
+					myecs.Manager.DisposeEntity(e)
+				}
+			}),
+		object.NewInterpolation(object.InterpolateY).
+			AddGween(orig.Y, fPos.Y, dur, ease.OutCubic),
+	})
+}
+
+func SetMovingSlotToList(nextSlot *data.InvSpellSlot, dur float64) {
+	if nextSlot.Slot.Tier != 0 {
+		data.MovingSpellSlot.Slot.Tier = nextSlot.Slot.Tier
+		data.MovingSpellSlot.TierTxt.SetText(util.RomanNumeral(data.MovingSpellSlot.Slot.Tier))
+	}
+	data.MovingSpellSlot.Moving = true
+	fPos := nextSlot.View.ProjectedOut(nextSlot.View.Constrain(nextSlot.NameMObj.Pos))
+	interpolations := []*object.Interpolation{
+		object.NewInterpolation(object.InterpolateX).
+			AddGween(data.MovingSpellSlot.NameMObj.Pos.X, fPos.X, dur, ease.OutCubic).
+			SetOnComplete(func() {
+				if nextSlot.Slot.Tier == 0 {
+					nextSlot.Slot.Tier = data.MovingSpellSlot.Slot.Tier
+				}
+				nextSlot.Slot.Spell = data.MovingSpellSlot.Slot.Spell
+				nextSlot.Slot.Name = data.MovingSpellSlot.Slot.Name
+				data.MovingSpellSlot.PrevSlot = nil
+				data.MovingSpellSlot.Slot = nil
+				data.MovingSpellSlot.NameMObj.Hidden = true
+				data.MovingSpellSlot.Moving = false
+				data.MovingSpellSlot.NameMObj.Mask = util.White
+			}),
+		object.NewInterpolation(object.InterpolateY).
+			AddGween(data.MovingSpellSlot.NameMObj.Pos.Y, fPos.Y, dur, ease.OutCubic),
+		object.NewInterpolation(object.InterpolateOffX).
+			AddGween(data.MovingSpellSlot.NameMObj.Offset.X, 0., dur, ease.OutCubic),
+		object.NewInterpolation(object.InterpolateOffY).
+			AddGween(data.MovingSpellSlot.NameMObj.Offset.Y, 0., dur, ease.OutCubic),
+	}
+	if !nextSlot.View.PointInside(nextSlot.NameMObj.Pos) {
+		interpolations = append(interpolations, object.NewInterpolation(object.InterpolateCol).
+			AddGween(1., 0., dur*0.9, ease.Linear))
+	}
+	data.MovingSpellSlot.Entity.AddComponent(myecs.Interpolation, interpolations)
+}
+
+func DrawMovingSpellSlots(win *pixelgl.Window) {
 	img.Clear()
 	systems.DrawSystem(win, 120)
 	img.Batchers[data.UIKey].Draw(data.InventoryView.Canvas)
 	systems.DrawSystem(win, 121)
+	img.Clear()
+	systems.DrawSystem(win, 122)
+	img.Batchers[data.UIKey].Draw(data.InventoryView.Canvas)
+	systems.DrawSystem(win, 123)
 }
 
 func AddMSSEntity(e *ecs.Entity) {
@@ -145,5 +188,5 @@ func DisposeMovingSpellSlot() {
 	for _, e := range data.MSSEntities {
 		myecs.Manager.DisposeEntity(e)
 	}
-	data.MovingSpellSlot = nil
+	data.NewMovingSpellSlot()
 }

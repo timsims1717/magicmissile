@@ -2,10 +2,10 @@ package reanimator
 
 import (
 	"github.com/faiface/pixel"
-	"golang.org/x/image/colornames"
 	"image/color"
 	"time"
 	"timsims1717/magicmissile/pkg/img"
+	"timsims1717/magicmissile/pkg/util"
 )
 
 var (
@@ -124,7 +124,7 @@ func (t *Tree) Update() {
 type Result struct {
 	Spr   *pixel.Sprite
 	Off   pixel.Vec
-	Col   color.Color
+	Col   pixel.RGBA
 	Batch string
 }
 
@@ -209,7 +209,7 @@ type Anim struct {
 	Triggers map[int]func(*Anim, string, int)
 
 	Offset pixel.Vec
-	Color  color.Color
+	Color  pixel.RGBA
 	Batch  string
 }
 
@@ -222,7 +222,7 @@ const (
 	Done
 )
 
-func (a *Anim) WithColor(col color.Color) *Anim {
+func (a *Anim) WithColor(col pixel.RGBA) *Anim {
 	a.Color = col
 	return a
 }
@@ -243,7 +243,7 @@ func NewAnimFromSprite(key string, spr *pixel.Sprite, f Finish) *Anim {
 		S:      []*pixel.Sprite{spr},
 		Step:   0,
 		Finish: f,
-		Color:  colornames.White,
+		Color:  util.White,
 	}
 }
 
@@ -253,7 +253,7 @@ func NewAnimFromSprites(key string, spr []*pixel.Sprite, f Finish) *Anim {
 		S:      spr,
 		Step:   0,
 		Finish: f,
-		Color:  colornames.White,
+		Color:  util.White,
 	}
 }
 
@@ -273,7 +273,7 @@ func NewAnimFromSheet(key string, spriteSheet *img.SpriteSheet, rs []int, f Fini
 		S:      spr,
 		Step:   0,
 		Finish: f,
-		Color:  colornames.White,
+		Color:  util.White,
 	}
 }
 

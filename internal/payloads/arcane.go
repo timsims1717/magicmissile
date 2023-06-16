@@ -1,6 +1,7 @@
 package payloads
 
 import (
+	"github.com/faiface/pixel"
 	"golang.org/x/image/colornames"
 	"image/color"
 	"timsims1717/magicmissile/internal/data"
@@ -32,9 +33,9 @@ func RainbowSpray(mis *data.Missile, obj *object.Object) {
 		ExpandRate: 2,
 		Dissipate:  2.5,
 		DisRate:    50,
-		Color:      col,
+		Color:      pixel.ToRGBA(col),
 	}
-	systems.MakeExplosion(exp, obj.Pos, col)
+	systems.MakeExplosion(exp, obj.Pos, exp.Color)
 	if mis.Tier < 11 {
 		nMis := &data.Missile{
 			Limit:   float64(mis.Tier) * 4,

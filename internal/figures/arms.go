@@ -1,7 +1,7 @@
 package figures
 
 import (
-	"image/color"
+	"github.com/faiface/pixel"
 	"math"
 	"timsims1717/magicmissile/internal/data"
 	"timsims1717/magicmissile/pkg/img"
@@ -15,7 +15,7 @@ func ArmObj() *object.Object {
 	return armObj
 }
 
-func ArmSpr(key string, col color.RGBA) *img.Sprite {
+func ArmSpr(key string, col pixel.RGBA) *img.Sprite {
 	return &img.Sprite{
 		Key:   key,
 		Color: col,
@@ -23,14 +23,14 @@ func ArmSpr(key string, col color.RGBA) *img.Sprite {
 	}
 }
 
-func WandArm(col color.RGBA) *data.Arm {
+func WandArm(col pixel.RGBA) *data.Arm {
 	return &data.Arm{
 		Obj: ArmObj(),
 		Spr: ArmSpr("wand", col),
 	}
 }
 
-func AxeArm(col color.RGBA) *data.Arm {
+func AxeArm(col pixel.RGBA) *data.Arm {
 	return &data.Arm{
 		Obj:     ArmObj(),
 		Spr:     ArmSpr("axe", col),
@@ -40,7 +40,7 @@ func AxeArm(col color.RGBA) *data.Arm {
 	}
 }
 
-func ZombieArm(col color.RGBA) *data.Arm {
+func ZombieArm(col pixel.RGBA) *data.Arm {
 	return &data.Arm{
 		Obj:     ArmObj(),
 		Spr:     ArmSpr("zomb_arm", col),

@@ -1,11 +1,11 @@
 package figures
 
 import (
-	"image/color"
+	"github.com/faiface/pixel"
 	"timsims1717/magicmissile/pkg/img"
 )
 
-func WizardFigure(col color.RGBA) *img.Sprite {
+func WizardFigure(col pixel.RGBA) *img.Sprite {
 	return &img.Sprite{
 		Key:   "wizard",
 		Color: col,
@@ -13,7 +13,7 @@ func WizardFigure(col color.RGBA) *img.Sprite {
 	}
 }
 
-func FighterFigure(col color.RGBA) *img.Sprite {
+func FighterFigure(col pixel.RGBA) *img.Sprite {
 	return &img.Sprite{
 		Key:   "fighter",
 		Color: col,
@@ -21,7 +21,7 @@ func FighterFigure(col color.RGBA) *img.Sprite {
 	}
 }
 
-func ZombieFigure(col color.RGBA) *img.Sprite {
+func ZombieFigure(col pixel.RGBA) *img.Sprite {
 	return &img.Sprite{
 		Key:   "zombie",
 		Color: col,

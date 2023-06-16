@@ -13,7 +13,6 @@ import (
 	"timsims1717/magicmissile/pkg/gween64/ease"
 	"timsims1717/magicmissile/pkg/img"
 	"timsims1717/magicmissile/pkg/object"
-	"timsims1717/magicmissile/pkg/timing"
 	"timsims1717/magicmissile/pkg/typeface"
 	"timsims1717/magicmissile/pkg/util"
 	"timsims1717/magicmissile/pkg/viewport"
@@ -395,7 +394,6 @@ func CreateSaveButton(scroll *data.TowerScroll, tvFrame pixel.Rect, index int) {
 
 func CreateSpellList(scroll *data.TowerScroll, index int) {
 	rect := pixel.R(0, 0, (data.TowerScrollWidth-3)*data.TileSize, (data.ScrollHeight-10)*data.TileSize-math.Abs(scroll.TableHeadY))
-	frame := img.Batchers[data.UIKey].GetSprite("scroll_square").Frame()
 	scroll.ListViewObj = object.New()
 	scroll.ListViewObj.SetRect(rect)
 	scroll.ListViewObj.HideChildren = true
@@ -405,12 +403,22 @@ func CreateSpellList(scroll *data.TowerScroll, index int) {
 		AddComponent(myecs.Parent, scroll.Scroll.Object).
 		AddComponent(myecs.Update, data.NewHoverClickFn(data.TheInput, data.InventoryView, func(hvc *data.HoverClick) {
 			if hvc.Hover {
-				if hvc.Input.Get("scrollUp").Pressed() {
-					newPos := pixel.V(0., frame.H())
+				if hvc.Input.Get("scrollUp").Pressed() && !data.MovingSpellSlot.Moving {
+					newPos := pixel.V(0., data.SquareFrame.H())
 					scroll.ListView.AddMove(newPos, 0.05)
-				} else if hvc.Input.Get("scrollDwn").Pressed() {
-					newPos := pixel.V(0., -frame.H())
+				} else if hvc.Input.Get("scrollDwn").Pressed() && !data.MovingSpellSlot.Moving {
+					newPos := pixel.V(0., -data.SquareFrame.H())
 					scroll.ListView.AddMove(newPos, 0.05)
+				} else if data.MovingSpellSlot.Slot != nil && !data.MovingSpellSlot.Moving {
+					if inView, edge := scroll.ListView.WorldInside(data.TheInput.World); inView {
+						if edge.Y < 0 && edge.Y > -25. {
+							vel := pixel.V(0., 300.)
+							scroll.ListView.SetVel(vel)
+						} else if edge.Y > 0 && edge.Y < 25. {
+							vel := pixel.V(0., -300.)
+							scroll.ListView.SetVel(vel)
+						}
+					}
 				}
 			}
 		})))
@@ -499,225 +507,18 @@ func CreateSpellList(scroll *data.TowerScroll, index int) {
 	scroll.ListView.PortPos = scroll.Scroll.Object.Pos.Add(scroll.ListViewObj.Offset)
 	scroll.ListView.PortPos.X -= data.TileSize * 1.5
 
-	nWidth := scroll.ListView.Rect.W() - frame.W()*2.
+	data.SlotWidth = scroll.ListView.Rect.W() - data.SquareFrame.W()*2.
 	for i, slot := range scroll.Tower.Slots {
-		towerSlot := &data.InvSpellSlot{}
-		towerSlot.Slot = slot
+		towerSlot := CreateTowerSpellSlot(slot, index, i, scroll.AddEntity, scroll.ListView)
 
-		towerSlot.SlotObj = object.New()
-		towerSlot.SlotObj.Layer = 110 + index
-		towerSlot.SlotObj.Pos.Y -= frame.H() * float64(i)
-		towerSlot.SlotSpr = img.NewSprite("scroll_square", data.UIKey)
-		scroll.AddEntity(myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, towerSlot.SlotObj).
-			AddComponent(myecs.Drawable, towerSlot.SlotSpr))
-		towerSlot.SlotTxt = typeface.New("main", typeface.NewAlign(typeface.Center, typeface.Center), 1., 0.15, 0., 0.)
-		towerSlot.SlotTxt.Obj.Layer = 113 + index
-		towerSlot.SlotTxt.Obj.Offset.Y += 6.
-		towerSlot.SlotTxt.SetColor(data.ScrollText)
-		towerSlot.SlotTxt.SetText(fmt.Sprintf("%d", i+1))
-		scroll.AddEntity(myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, towerSlot.SlotTxt.Obj).
-			AddComponent(myecs.Parent, towerSlot.SlotObj).
-			AddComponent(myecs.Drawable, towerSlot.SlotTxt).
-			AddComponent(myecs.DrawTarget, scroll.ListView))
-		towerSlot.TierObj = object.New()
-		towerSlot.TierObj.Layer = 110 + index
-		towerSlot.TierObj.Pos.Y -= frame.H() * float64(i)
-		towerSlot.TierObj.Pos.X += frame.W()
-		towerSlot.TierSpr = img.NewSprite("scroll_square", data.UIKey)
-		scroll.AddEntity(myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, towerSlot.TierObj).
-			AddComponent(myecs.Drawable, towerSlot.TierSpr).
-			AddComponent(myecs.Update, data.NewHoverClickFn(data.TheInput, data.InventoryView, func(hvc *data.HoverClick) {
-				if data.InventoryState == index && !data.InventoryTrans &&
-					hvc.Hover && hvc.Input.Get("click").JustPressed() {
-					offset := towerSlot.NameMObj.PostPos.Sub(scroll.ListView.Projected(data.TheInput.World))
-					SetMovingSpell(towerSlot.Slot, nWidth, offset, true)
-				}
-			})))
-		towerSlot.TierTxt = typeface.New("main", typeface.NewAlign(typeface.Center, typeface.Center), 1., 0.15, 0., 0.)
-		towerSlot.TierTxt.Obj.Layer = 113 + index
-		towerSlot.TierTxt.Obj.Offset.Y += 6.
-		towerSlot.TierTxt.SetColor(data.ScrollText)
-		towerSlot.TierTxt.SetText(util.RomanNumeral(slot.Tier))
-		scroll.AddEntity(myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, towerSlot.TierTxt.Obj).
-			AddComponent(myecs.Parent, towerSlot.TierObj).
-			AddComponent(myecs.Drawable, towerSlot.TierTxt).
-			AddComponent(myecs.DrawTarget, scroll.ListView))
-		towerSlot.NameMObj = object.New()
-		towerSlot.NameMObj.Layer = 110 + index
-		towerSlot.NameMObj.Pos.Y -= frame.H() * float64(i)
-		towerSlot.NameMObj.Pos.X += frame.W()*1.5 + nWidth*0.5
-		towerSlot.NameMObj.Sca = pixel.V(nWidth/data.TileSize-2, 1.)
-		towerSlot.NameMObj.SetRect(pixel.R(0., 0., nWidth, frame.H()))
-		towerSlot.NameMSpr = img.NewSprite("scroll_square_m", data.UIKey)
-		scroll.AddEntity(myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, towerSlot.NameMObj).
-			AddComponent(myecs.Drawable, towerSlot.NameMSpr).
-			AddComponent(myecs.Update, data.NewHoverClickFn(data.TheInput, scroll.ListView, func(hvc *data.HoverClick) {
-				if hvc.Hover && hvc.Input.Get("click").JustPressed() {
-					offset := towerSlot.NameMObj.PostPos.Sub(scroll.ListView.Projected(data.TheInput.World))
-					SetMovingSpell(towerSlot.Slot, nWidth, offset, false)
-				}
-			})))
-		towerSlot.NameLObj = object.New()
-		towerSlot.NameLObj.Layer = 110 + index
-		towerSlot.NameLObj.Offset.X -= (nWidth - data.TileSize) * 0.5
-		towerSlot.NameLSpr = img.NewSprite("scroll_square_l", data.UIKey)
-		scroll.AddEntity(myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, towerSlot.NameLObj).
-			AddComponent(myecs.Parent, towerSlot.NameMObj).
-			AddComponent(myecs.Drawable, towerSlot.NameLSpr))
-		towerSlot.NameRObj = object.New()
-		towerSlot.NameRObj.Layer = 110 + index
-		towerSlot.NameRObj.Offset.X += (nWidth - data.TileSize) * 0.5
-		towerSlot.NameRSpr = img.NewSprite("scroll_square_r", data.UIKey)
-		scroll.AddEntity(myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, towerSlot.NameRObj).
-			AddComponent(myecs.Parent, towerSlot.NameMObj).
-			AddComponent(myecs.Drawable, towerSlot.NameRSpr))
-		towerSlot.NameTxt = typeface.New("main", typeface.NewAlign(typeface.Left, typeface.Center), 1., 0.15, 0., 0.)
-		towerSlot.NameTxt.Obj.Layer = 113 + index
-		towerSlot.NameTxt.Obj.Offset.X -= (nWidth - data.TileSize*2.) * 0.5
-		towerSlot.NameTxt.Obj.Offset.Y += 6.
-		towerSlot.NameTxt.SetColor(data.ScrollText)
-		towerSlot.NameTxt.SetText(slot.Name)
-		scroll.AddEntity(myecs.Manager.NewEntity().
-			AddComponent(myecs.Object, towerSlot.NameTxt.Obj).
-			AddComponent(myecs.Parent, towerSlot.NameMObj).
-			AddComponent(myecs.Drawable, towerSlot.NameTxt).
-			AddComponent(myecs.DrawTarget, scroll.ListView))
 		scroll.InvSlots = append(scroll.InvSlots, towerSlot)
 		if i == len(scroll.Tower.Slots)-1 {
 			// set listView YLim
-			scroll.ListView.SetYLim(math.Min(scroll.ListView.Rect.H()*-0.5+frame.H()*0.5, frame.H()*-(float64(i)+0.5)+scroll.ListView.Rect.H()*0.5), scroll.ListView.Rect.H()*-0.5+frame.H()*0.5)
+			scroll.ListView.SetYLim(math.Min(scroll.ListView.Rect.H()*-0.5+data.SquareFrame.H()*0.5, data.SquareFrame.H()*-(float64(i)+0.5)+scroll.ListView.Rect.H()*0.5), scroll.ListView.Rect.H()*-0.5+data.SquareFrame.H()*0.5)
 		}
 	}
 
-	arrowRect := img.Batchers[data.UIKey].GetSprite("scroll_arrow_up").Frame()
-	upArrowSpr := img.NewSprite("scroll_arrow_up", data.UIKey)
-	dwnArrowSpr := img.NewSprite("scroll_arrow_dwn", data.UIKey)
-	var upArrowTimer *timing.Timer
-	var dwnArrowTimer *timing.Timer
-	upArrowClick := false
-	dwnArrowClick := false
-	arrowUpObj := object.New()
-	arrowUpObj.Offset.Y = rect.H()*0.5 - 5.
-	arrowUpObj.Offset.X = rect.W()*0.5 - 13.
-	arrowUpObj.Layer = 102
-	arrowUpObj.SetRect(arrowRect)
-	upE := myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, arrowUpObj).
-		AddComponent(myecs.Parent, scroll.ListViewObj).
-		AddComponent(myecs.Drawable, upArrowSpr).
-		AddComponent(myecs.Update, data.NewHoverClickFn(data.TheInput, data.InventoryView, func(click *data.HoverClick) {
-			upArrowSpr.Key = "scroll_arrow_up"
-			if click.Hover {
-				if click.Input.Get("click").JustPressed() {
-					upArrowClick = true
-					if upArrowTimer == nil {
-						upArrowTimer = timing.New(0.35)
-					}
-					newPos := scroll.ListView.CamPos
-					newPos.Y += frame.H()
-					scroll.ListView.MoveTo(newPos, 0.15, false)
-				} else if click.Input.Get("click").Pressed() && upArrowClick {
-					if upArrowTimer.UpdateDone() {
-						vel := pixel.V(0., 300.)
-						scroll.ListView.SetVel(vel)
-					}
-				} else {
-					upArrowClick = false
-					upArrowTimer = nil
-				}
-				if upArrowClick {
-					upArrowSpr.Key = "scroll_arrow_up_pressed"
-				}
-			} else if !click.Input.Get("click").Pressed() {
-				upArrowClick = false
-			}
-		}))
-	scroll.AddEntity(upE)
-	arrowDwnObj := object.New()
-	arrowDwnObj.Offset.Y = rect.H()*-0.5 + 5.
-	arrowDwnObj.Offset.X = rect.W()*0.5 - 13.
-	arrowDwnObj.Layer = 102
-	arrowDwnObj.SetRect(arrowRect)
-	dwnE := myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, arrowDwnObj).
-		AddComponent(myecs.Parent, scroll.ListViewObj).
-		AddComponent(myecs.Drawable, dwnArrowSpr).
-		AddComponent(myecs.Update, data.NewHoverClickFn(data.TheInput, data.InventoryView, func(click *data.HoverClick) {
-			dwnArrowSpr.Key = "scroll_arrow_dwn"
-			if click.Hover {
-				if click.Input.Get("click").JustPressed() {
-					dwnArrowClick = true
-					if dwnArrowTimer == nil {
-						dwnArrowTimer = timing.New(0.35)
-					}
-					newPos := scroll.ListView.CamPos
-					newPos.Y -= frame.H()
-					scroll.ListView.MoveTo(newPos, 0.15, false)
-				} else if click.Input.Get("click").Pressed() && dwnArrowClick {
-					if dwnArrowTimer.UpdateDone() {
-						vel := pixel.V(0., -300.)
-						scroll.ListView.SetVel(vel)
-					}
-				} else {
-					dwnArrowClick = false
-					dwnArrowTimer = nil
-				}
-				if dwnArrowClick {
-					dwnArrowSpr.Key = "scroll_arrow_dwn_pressed"
-				}
-			} else if !click.Input.Get("click").Pressed() {
-				dwnArrowClick = false
-			}
-		}))
-	scroll.AddEntity(dwnE)
-
-	// scroll bar
-	barClick := false
-	barObj := object.New()
-	barObj.SetRect(img.Batchers[data.UIKey].GetSprite("scroll_bar").Frame())
-	barBot := rect.H()*-0.5 + (barObj.Rect.H()+arrowRect.H())*0.5 + 5.
-	barTop := rect.H()*0.5 - (barObj.Rect.H()+arrowRect.H())*0.5 - 5.
-	barObj.Offset.Y = barTop
-	barObj.Offset.X = rect.W()*0.5 - 13.
-	barObj.Layer = 102
-	barOffset := 0.
-	barE := myecs.Manager.NewEntity().
-		AddComponent(myecs.Object, barObj).
-		AddComponent(myecs.Parent, scroll.ListViewObj).
-		AddComponent(myecs.Drawable, img.NewSprite("scroll_bar", data.UIKey)).
-		AddComponent(myecs.Update, data.NewHoverClickFn(data.TheInput, data.InventoryView, func(click *data.HoverClick) {
-			if click.Hover {
-				if click.Input.Get("click").JustPressed() {
-					barClick = true
-					barOffset = barObj.PostPos.Y - click.View.Projected(click.Input.World).Y
-				}
-			}
-			if !click.Input.Get("click").Pressed() {
-				barClick = false
-			}
-			listCamTop, listCamBot := scroll.ListView.GetLimY()
-			if barClick {
-				inPos := click.View.Projected(click.Input.World)
-				barObj.Offset.Y -= barObj.PostPos.Y - inPos.Y - barOffset
-				if barObj.Offset.Y > barTop {
-					barObj.Offset.Y = barTop
-				} else if barObj.Offset.Y < barBot {
-					barObj.Offset.Y = barBot
-				}
-				barRatio := (barTop - barObj.Offset.Y) / (barTop - barBot)
-				scroll.ListView.CamPos.Y = -(barRatio * listCamTop) + (barRatio * listCamBot) + listCamTop
-			}
-			camRatio := (listCamTop - scroll.ListView.CamPos.Y) / (listCamTop - listCamBot)
-			barObj.Offset.Y = -(camRatio * barTop) + (camRatio * barBot) + barTop
-		}))
-	scroll.AddEntity(barE)
+	systems.CreateScrollBar(scroll.AddEntity, scroll.ListViewObj, data.InventoryView, scroll.ListView)
 }
 
 func MoveTowerScrollX(scroll *data.TowerScroll, posX float64) {
@@ -786,14 +587,15 @@ func UpdateTowerScroll(scroll *data.TowerScroll, index int) {
 }
 
 func UpdateListViews() {
-	UpdateListView(data.LeftTowerScroll)
-	UpdateListView(data.MidTowerScroll)
-	UpdateListView(data.RightTowerScroll)
+	UpdateListView(data.LeftTowerScroll, 0)
+	UpdateListView(data.MidTowerScroll, 1)
+	UpdateListView(data.RightTowerScroll, 2)
 }
 
-func UpdateListView(scroll *data.TowerScroll) {
+func UpdateListView(scroll *data.TowerScroll, index int) {
 	// update list
-	for _, slot := range scroll.InvSlots {
+	inPos := scroll.ListView.ProjectWorld(data.TheInput.World)
+	for i, slot := range scroll.InvSlots {
 		tier := slot.Slot.Tier
 		roman := util.RomanNumeral(tier)
 		if slot.TierTxt.Raw != roman {
@@ -815,6 +617,58 @@ func UpdateListView(scroll *data.TowerScroll) {
 				slot.NameMSpr.Key = "scroll_square_m"
 				slot.NameLSpr.Key = "scroll_square_l"
 				slot.NameRSpr.Key = "scroll_square_r"
+			}
+		}
+		// if the slot is being hovered over and data.MovingSpellSlot.Slot != nil
+		//  change the mask of the slot (red for too low of a tier, blue for the current selection)
+		maskCode := data.MaskWhite
+		if !data.InventoryTrans && !data.MovingSpellSlot.Moving &&
+			data.MovingSpellSlot.Slot != nil && data.MovingSpellSlot.TierMoveIndex == -1 {
+			if data.MovingSpellSlot.Slot.Tier > slot.Slot.Tier {
+				maskCode = data.MaskRed
+			} else if scroll.ListView.PointInside(inPos) && slot.NameMObj.PointInside(inPos) {
+				maskCode = data.MaskYellow
+			}
+		}
+		if data.MaskCode(maskCode) != slot.MaskCode {
+			switch maskCode {
+			case data.MaskWhite:
+				slot.SlotSpr.Color = util.White
+				slot.TierSpr.Color = util.White
+				slot.NameLSpr.Color = util.White
+				slot.NameMSpr.Color = util.White
+				slot.NameRSpr.Color = util.White
+			case data.MaskRed:
+				slot.TierSpr.Color = data.Red
+				slot.NameLSpr.Color = data.Gray
+				slot.NameMSpr.Color = data.Gray
+				slot.NameRSpr.Color = data.Gray
+			case data.MaskYellow:
+				slot.SlotSpr.Color = data.Green
+				slot.TierSpr.Color = data.Green
+				slot.NameLSpr.Color = data.Green
+				slot.NameMSpr.Color = data.Green
+				slot.NameRSpr.Color = data.Green
+			}
+			slot.MaskCode = data.MaskCode(maskCode)
+		}
+		if !data.InventoryTrans && !data.MovingSpellSlot.Moving &&
+			data.MovingSpellSlot.Slot != nil && data.MovingSpellSlot.TierMoveIndex == index {
+			inY := scroll.ListView.ProjectWorld(data.TheInput.World).Y
+			if inY < slot.NameMObj.Pos.Y && i != 0 {
+				prevSlot := scroll.InvSlots[i-1]
+				if prevSlot.Slot.Tier == 0 {
+					slot.Slot.Tier, prevSlot.Slot.Tier = prevSlot.Slot.Tier, slot.Slot.Tier
+					slot.Slot.Name, prevSlot.Slot.Name = prevSlot.Slot.Name, slot.Slot.Name
+					slot.Slot.Spell, prevSlot.Slot.Spell = prevSlot.Slot.Spell, slot.Slot.Spell
+				}
+			} else if inY > slot.NameMObj.Pos.Y && i != len(scroll.InvSlots)-1 {
+				nextSlot := scroll.InvSlots[i+1]
+				if nextSlot.Slot.Tier == 0 {
+					slot.Slot.Tier, nextSlot.Slot.Tier = nextSlot.Slot.Tier, slot.Slot.Tier
+					slot.Slot.Name, nextSlot.Slot.Name = nextSlot.Slot.Name, slot.Slot.Name
+					slot.Slot.Spell, nextSlot.Slot.Spell = nextSlot.Slot.Spell, slot.Slot.Spell
+				}
 			}
 		}
 	}
@@ -869,27 +723,53 @@ func DisposeTowerScroll(scroll *data.TowerScroll) {
 	scroll = nil
 }
 
+func GetEmptyTierSlot(index int) *data.InvSpellSlot {
+	var scroll *data.TowerScroll
+	switch index {
+	case 0:
+		scroll = data.LeftTowerScroll
+	case 1:
+		scroll = data.MidTowerScroll
+	case 2:
+		scroll = data.RightTowerScroll
+	default:
+		panic(fmt.Sprintf("GetEmptyTierSlot: bad tower index %d", index))
+	}
+	for _, slot := range scroll.InvSlots {
+		if slot.Slot.Tier == 0 {
+			return slot
+		}
+	}
+	return nil
+}
+
 func GetHoveredSlot() *data.InvSpellSlot {
-	inPos := data.LeftTowerScroll.ListView.Projected(data.TheInput.World)
+	inPos := data.LeftTowerScroll.ListView.ProjectWorld(data.TheInput.World)
 	if data.LeftTowerScroll.ListView.PointInside(inPos) {
 		for _, slot := range data.LeftTowerScroll.InvSlots {
-			if slot.NameMObj.PointInside(inPos) {
+			if slot.NameMObj.PointInside(inPos) ||
+				slot.TierObj.PointInside(inPos) ||
+				slot.SlotObj.PointInside(inPos) {
 				return slot
 			}
 		}
 	}
-	inPos = data.MidTowerScroll.ListView.Projected(data.TheInput.World)
+	inPos = data.MidTowerScroll.ListView.ProjectWorld(data.TheInput.World)
 	if data.MidTowerScroll.ListView.PointInside(inPos) {
 		for _, slot := range data.MidTowerScroll.InvSlots {
-			if slot.NameMObj.PointInside(inPos) {
+			if slot.NameMObj.PointInside(inPos) ||
+				slot.TierObj.PointInside(inPos) ||
+				slot.SlotObj.PointInside(inPos) {
 				return slot
 			}
 		}
 	}
-	inPos = data.RightTowerScroll.ListView.Projected(data.TheInput.World)
+	inPos = data.RightTowerScroll.ListView.ProjectWorld(data.TheInput.World)
 	if data.RightTowerScroll.ListView.PointInside(inPos) {
 		for _, slot := range data.RightTowerScroll.InvSlots {
-			if slot.NameMObj.PointInside(inPos) {
+			if slot.NameMObj.PointInside(inPos) ||
+				slot.TierObj.PointInside(inPos) ||
+				slot.SlotObj.PointInside(inPos) {
 				return slot
 			}
 		}

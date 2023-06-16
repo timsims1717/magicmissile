@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/pkg/errors"
-	"golang.org/x/image/colornames"
-	"image/color"
 	"os"
 	"path/filepath"
+	"timsims1717/magicmissile/pkg/util"
 )
 
 var (
@@ -59,14 +58,14 @@ type Sprite struct {
 	Key    string
 	Batch  string
 	Offset pixel.Vec
-	Color  color.RGBA
+	Color  pixel.RGBA
 }
 
 func NewSprite(key, batch string) *Sprite {
 	return &Sprite{
 		Key:   key,
 		Batch: batch,
-		Color: colornames.White,
+		Color: util.White,
 	}
 }
 
@@ -75,7 +74,7 @@ func NewOffsetSprite(key, batch string, offset pixel.Vec) *Sprite {
 		Key:    key,
 		Batch:  batch,
 		Offset: offset,
-		Color:  colornames.White,
+		Color:  util.White,
 	}
 }
 

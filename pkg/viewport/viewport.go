@@ -405,17 +405,37 @@ func (v *ViewPort) PointInside(vec pixel.Vec) bool {
 	//return v.Rect.Moved(pixel.V(-(v.Rect.W() * 0.5), -(v.Rect.H() * 0.5))).Contains(v.Mat.Unproject(vec))
 }
 
-func (v *ViewPort) Projected(vec pixel.Vec) pixel.Vec {
+func (v *ViewPort) ProjectWorld(vec pixel.Vec) pixel.Vec {
 	//return v.Mat.Unproject(vec).Add(v.PostCamPos)
 	if v.ParentView != nil {
-		vec = v.ParentView.Projected(vec)
+		vec = v.ParentView.ProjectWorld(vec)
 	}
 	return v.Mat.Unproject(vec.Add(v.PostCamPos))
 }
 
-func (v *ViewPort) ProjectedInside(vec pixel.Vec) bool {
-	vec = v.Projected(vec)
-	return v.PointInside(vec)
+func (v *ViewPort) Project(vec pixel.Vec) pixel.Vec {
+	return v.Mat.Unproject(vec.Add(v.PostCamPos))
+}
+
+func (v *ViewPort) WorldInside(vec pixel.Vec) (bool, pixel.Vec) {
+	vec = v.ProjectWorld(vec)
+	if v.PointInside(vec) {
+		x := vec.X - v.Canvas.Bounds().Max.X
+		if math.Abs(x) > v.Canvas.Bounds().W()*0.5 {
+			x = vec.X - v.Canvas.Bounds().Min.X
+		}
+		y := vec.Y - v.Canvas.Bounds().Max.Y
+		if math.Abs(y) > v.Canvas.Bounds().H()*0.5 {
+			y = vec.Y - v.Canvas.Bounds().Min.Y
+		}
+		return true, pixel.V(x, y)
+	}
+	return false, pixel.ZV
+}
+
+func (v *ViewPort) ProjectedOut(vec pixel.Vec) pixel.Vec {
+	vec = v.Mat.Project(vec.Add(pixel.V(-v.PostCamPos.X, -v.PostCamPos.Y)))
+	return vec
 }
 
 func (v *ViewPort) Constrain(vec pixel.Vec) pixel.Vec {
@@ -428,7 +448,7 @@ func (v *ViewPort) Constrain(vec pixel.Vec) pixel.Vec {
 	if v.CamPos.Y+v.Rect.H()*0.5 < vec.Y {
 		newPos.Y = v.CamPos.Y + v.Rect.H()*0.5
 	} else if v.CamPos.Y-v.Rect.H()*0.5 > vec.Y {
-		newPos.X = v.CamPos.Y - v.Rect.H()*0.5
+		newPos.Y = v.CamPos.Y - v.Rect.H()*0.5
 	}
 	return newPos
 }

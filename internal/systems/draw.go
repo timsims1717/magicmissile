@@ -69,18 +69,18 @@ func DrawSystem(win *pixelgl.Window, layer int) {
 
 func DrawThing(draw interface{}, obj *object.Object, target pixel.Target) {
 	if spr, ok0 := draw.(*pixel.Sprite); ok0 {
-		spr.Draw(target, obj.Mat)
+		spr.DrawColorMask(target, obj.Mat, obj.Mask)
 	} else if sprH, ok1 := draw.(*img.Sprite); ok1 {
 		if sprH.Batch != "" && sprH.Key != "" {
 			if batch, okB := img.Batchers[sprH.Batch]; okB {
-				batch.DrawSpriteColor(sprH.Key, obj.Mat.Moved(sprH.Offset), sprH.Color)
+				batch.DrawSpriteColor(sprH.Key, obj.Mat.Moved(sprH.Offset), sprH.Color.Mul(obj.Mask))
 			}
 		}
 	} else if anim, ok2 := draw.(*reanimator.Tree); ok2 {
 		res := anim.CurrentSprite()
 		if res != nil {
 			if _, okB := img.Batchers[res.Batch]; okB {
-				res.Spr.DrawColorMask(img.Batchers[res.Batch].Batch(), obj.Mat.Moved(res.Off), res.Col)
+				res.Spr.DrawColorMask(img.Batchers[res.Batch].Batch(), obj.Mat.Moved(res.Off), res.Col.Mul(obj.Mask))
 			}
 		}
 	} else if txt, ok3 := draw.(*typeface.Text); ok3 {

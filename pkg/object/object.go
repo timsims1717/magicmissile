@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"golang.org/x/image/colornames"
-	"image/color"
 	"timsims1717/magicmissile/pkg/util"
 )
 
@@ -28,7 +27,7 @@ type Object struct {
 	LastPos pixel.Vec
 	Offset  pixel.Vec
 
-	Mask  color.RGBA
+	Mask  pixel.RGBA
 	Layer int
 
 	ILock        bool
@@ -41,7 +40,7 @@ func New() *Object {
 			X: 1.,
 			Y: 1.,
 		},
-		Mask: colornames.White,
+		Mask: pixel.ToRGBA(colornames.White),
 	}
 }
 

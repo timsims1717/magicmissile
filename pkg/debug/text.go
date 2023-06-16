@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"image/color"
 	"strings"
 	"timsims1717/magicmissile/pkg/typeface"
 )
@@ -54,7 +53,7 @@ func InsertText(s string, i int) {
 	}
 }
 
-func SetTextColor(col color.RGBA) {
+func SetTextColor(col pixel.RGBA) {
 	fpsText.SetColor(col)
 	versionText.SetColor(col)
 	debugText.SetColor(col)

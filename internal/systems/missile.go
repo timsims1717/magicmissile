@@ -111,7 +111,7 @@ func MakeMissile(mFab *data.Missile, origin, target pixel.Vec) {
 		spr := &img.Sprite{
 			Key:   mFab.SprKey,
 			Batch: data.ParticleKey,
-			Color: col,
+			Color: pixel.ToRGBA(col),
 		}
 		obj := object.New()
 		obj.Pos = origin
