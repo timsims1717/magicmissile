@@ -744,33 +744,39 @@ func GetEmptyTierSlot(index int) *data.InvSpellSlot {
 }
 
 func GetHoveredSlot() *data.InvSpellSlot {
-	inPos := data.LeftTowerScroll.ListView.ProjectWorld(data.TheInput.World)
-	if data.LeftTowerScroll.ListView.PointInside(inPos) {
-		for _, slot := range data.LeftTowerScroll.InvSlots {
-			if slot.NameMObj.PointInside(inPos) ||
-				slot.TierObj.PointInside(inPos) ||
-				slot.SlotObj.PointInside(inPos) {
-				return slot
+	if data.InventoryState == 3 || data.InventoryState == 0 {
+		inPos := data.LeftTowerScroll.ListView.ProjectWorld(data.TheInput.World)
+		if data.LeftTowerScroll.ListView.PointInside(inPos) {
+			for _, slot := range data.LeftTowerScroll.InvSlots {
+				if slot.NameMObj.PointInside(inPos) ||
+					slot.TierObj.PointInside(inPos) ||
+					slot.SlotObj.PointInside(inPos) {
+					return slot
+				}
 			}
 		}
 	}
-	inPos = data.MidTowerScroll.ListView.ProjectWorld(data.TheInput.World)
-	if data.MidTowerScroll.ListView.PointInside(inPos) {
-		for _, slot := range data.MidTowerScroll.InvSlots {
-			if slot.NameMObj.PointInside(inPos) ||
-				slot.TierObj.PointInside(inPos) ||
-				slot.SlotObj.PointInside(inPos) {
-				return slot
+	if data.InventoryState == 3 || data.InventoryState == 1 {
+		inPos := data.MidTowerScroll.ListView.ProjectWorld(data.TheInput.World)
+		if data.MidTowerScroll.ListView.PointInside(inPos) {
+			for _, slot := range data.MidTowerScroll.InvSlots {
+				if slot.NameMObj.PointInside(inPos) ||
+					slot.TierObj.PointInside(inPos) ||
+					slot.SlotObj.PointInside(inPos) {
+					return slot
+				}
 			}
 		}
 	}
-	inPos = data.RightTowerScroll.ListView.ProjectWorld(data.TheInput.World)
-	if data.RightTowerScroll.ListView.PointInside(inPos) {
-		for _, slot := range data.RightTowerScroll.InvSlots {
-			if slot.NameMObj.PointInside(inPos) ||
-				slot.TierObj.PointInside(inPos) ||
-				slot.SlotObj.PointInside(inPos) {
-				return slot
+	if data.InventoryState == 3 || data.InventoryState == 2 {
+		inPos := data.RightTowerScroll.ListView.ProjectWorld(data.TheInput.World)
+		if data.RightTowerScroll.ListView.PointInside(inPos) {
+			for _, slot := range data.RightTowerScroll.InvSlots {
+				if slot.NameMObj.PointInside(inPos) ||
+					slot.TierObj.PointInside(inPos) ||
+					slot.SlotObj.PointInside(inPos) {
+					return slot
+				}
 			}
 		}
 	}

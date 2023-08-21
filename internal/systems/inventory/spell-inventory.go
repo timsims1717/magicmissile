@@ -149,9 +149,9 @@ spellLoop:
 				if slot.SlotNum != count {
 					slot.SlotTxt.SetText(strconv.Itoa(count))
 					slot.SlotNum = count
+					update = true
 					if count == 0 {
 						slot.NameMObj.Hidden = true
-						update = true
 					}
 				}
 				continue spellLoop

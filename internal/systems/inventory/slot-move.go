@@ -34,6 +34,7 @@ func CreateMainMovingSpellSlot() {
 						MoveNewSlotToSlot(hoveredSlot.View.ProjectedOut(hoveredSlot.NameMObj.Pos), hoveredSlot.Slot, data.MovingSpellSlot.PrevSlot, 0.25)
 					} else {
 						// put the replaced spell slot into the spell storage
+						MoveNewSlotToInventory(hoveredSlot.View.ProjectedOut(hoveredSlot.NameMObj.Pos), hoveredSlot.Slot, 0.25)
 					}
 					SetMovingSlotToList(hoveredSlot, 0.25)
 				} else if data.MovingSpellSlot.PrevSlot != nil {
@@ -41,13 +42,14 @@ func CreateMainMovingSpellSlot() {
 					SetMovingSlotToList(data.MovingSpellSlot.PrevSlot, 0.25)
 				} else {
 					// if you don't know where it was, put it into the spell storage
+					SetMovingSlotToInventory(0.25)
 				}
 			} else {
 				hoveredSlot := GetEmptyTierSlot(data.MovingSpellSlot.TierMoveIndex)
 				if hoveredSlot != nil {
 					SetMovingSlotToList(hoveredSlot, 0.25)
-				} else if data.MovingSpellSlot.PrevSlot.Slot.Tier == 0 {
-					SetMovingSlotToList(data.MovingSpellSlot.PrevSlot, 0.25)
+				} else {
+					SetMovingSlotToInventory(0.25)
 				}
 			}
 		}
@@ -82,7 +84,6 @@ func SetMainMovingSlot(slot *data.InvSpellSlot, nWidth float64, offset pixel.Vec
 	if !incTier {
 		data.MovingSpellSlot.Slot.Tier = data.Missiles[slot.Slot.Spell][0].Tier
 	}
-	data.MovingSpellSlot.PrevSlot = slot
 
 	SetMovingSpell(&data.MovingSpellSlot.InvSpellSlot, nWidth, offset)
 	data.MovingSpellSlot.NameMObj.Pos = data.InventoryView.ProjectWorld(data.TheInput.World)
@@ -90,6 +91,7 @@ func SetMainMovingSlot(slot *data.InvSpellSlot, nWidth float64, offset pixel.Vec
 	if inventory {
 		data.SpellInventory.Spells[slot.Slot.Spell]--
 	} else {
+		data.MovingSpellSlot.PrevSlot = slot
 		if incTier {
 			slot.Slot.Tier = 0
 		}
@@ -115,7 +117,7 @@ func MoveNewSlotToSlot(orig pixel.Vec, prevSlot *data.SpellSlot, nextSlot *data.
 	SetMovingSpell(invSpellSlot, data.SlotWidth, pixel.ZV)
 	invSpellSlot.NameMObj.Pos = orig
 	fPos := nextSlot.View.ProjectedOut(nextSlot.NameMObj.Pos)
-	invSpellSlot.Entity.AddComponent(myecs.Interpolation, []*object.Interpolation{
+	interpolations := []*object.Interpolation{
 		object.NewInterpolation(object.InterpolateX).
 			AddGween(orig.X, fPos.X, dur, ease.OutCubic).
 			SetOnComplete(func() {
@@ -130,7 +132,12 @@ func MoveNewSlotToSlot(orig pixel.Vec, prevSlot *data.SpellSlot, nextSlot *data.
 			}),
 		object.NewInterpolation(object.InterpolateY).
 			AddGween(orig.Y, fPos.Y, dur, ease.OutCubic),
-	})
+	}
+	if !nextSlot.View.PointInside(nextSlot.NameMObj.Pos) {
+		interpolations = append(interpolations, object.NewInterpolation(object.InterpolateCol).
+			AddGween(1., 0., dur*0.9, ease.Linear))
+	}
+	invSpellSlot.Entity.AddComponent(myecs.Interpolation, interpolations)
 }
 
 func SetMovingSlotToList(nextSlot *data.InvSpellSlot, dur float64) {
@@ -165,6 +172,70 @@ func SetMovingSlotToList(nextSlot *data.InvSpellSlot, dur float64) {
 	if !nextSlot.View.PointInside(nextSlot.NameMObj.Pos) {
 		interpolations = append(interpolations, object.NewInterpolation(object.InterpolateCol).
 			AddGween(1., 0., dur*0.9, ease.Linear))
+	}
+	data.MovingSpellSlot.Entity.AddComponent(myecs.Interpolation, interpolations)
+}
+
+func MoveNewSlotToInventory(orig pixel.Vec, prevSlot *data.SpellSlot, dur float64) {
+	var entities []*ecs.Entity
+	invSpellSlot := CreateMovingSpellSlot(func(e *ecs.Entity) {
+		entities = append(entities, e)
+	}, 0)
+	invSpellSlot.NameMObj.Hidden = false
+	invSpellSlot.Slot = &data.SpellSlot{
+		Tier:  prevSlot.Tier,
+		Spell: prevSlot.Spell,
+		Name:  prevSlot.Name,
+	}
+	SetMovingSpell(invSpellSlot, data.SlotWidth, pixel.ZV)
+	invSpellSlot.NameMObj.Pos = orig
+	fPos := data.SpellInventory.ListViewObj.Pos
+	for _, slot := range data.SpellInventory.Slots {
+		if slot.Slot.Spell == invSpellSlot.Slot.Spell && slot.SlotNum != 0 {
+			fPos = slot.View.ProjectedOut(slot.View.Constrain(slot.NameMObj.Pos))
+			break
+		}
+	}
+	invSpellSlot.Entity.AddComponent(myecs.Interpolation, []*object.Interpolation{
+		object.NewInterpolation(object.InterpolateX).
+			AddGween(orig.X, fPos.X, dur, ease.OutCubic).
+			SetOnComplete(func() {
+				data.SpellInventory.Spells[data.MovingSpellSlot.Slot.Spell]++
+				for _, e := range entities {
+					myecs.Manager.DisposeEntity(e)
+				}
+			}),
+		object.NewInterpolation(object.InterpolateY).
+			AddGween(orig.Y, fPos.Y, dur, ease.OutCubic),
+	})
+}
+
+func SetMovingSlotToInventory(dur float64) {
+	data.MovingSpellSlot.Moving = true
+	fPos := data.SpellInventory.ListViewObj.Pos
+	for _, slot := range data.SpellInventory.Slots {
+		if slot.Slot.Spell == data.MovingSpellSlot.Slot.Spell && slot.SlotNum != 0 {
+			fPos = slot.View.ProjectedOut(slot.View.Constrain(slot.NameMObj.Pos))
+			break
+		}
+	}
+	interpolations := []*object.Interpolation{
+		object.NewInterpolation(object.InterpolateX).
+			AddGween(data.MovingSpellSlot.NameMObj.Pos.X, fPos.X, dur, ease.OutCubic).
+			SetOnComplete(func() {
+				data.SpellInventory.Spells[data.MovingSpellSlot.Slot.Spell]++
+				data.MovingSpellSlot.PrevSlot = nil
+				data.MovingSpellSlot.Slot = nil
+				data.MovingSpellSlot.NameMObj.Hidden = true
+				data.MovingSpellSlot.Moving = false
+				data.MovingSpellSlot.NameMObj.Mask = util.White
+			}),
+		object.NewInterpolation(object.InterpolateY).
+			AddGween(data.MovingSpellSlot.NameMObj.Pos.Y, fPos.Y, dur, ease.OutCubic),
+		object.NewInterpolation(object.InterpolateOffX).
+			AddGween(data.MovingSpellSlot.NameMObj.Offset.X, 0., dur, ease.OutCubic),
+		object.NewInterpolation(object.InterpolateOffY).
+			AddGween(data.MovingSpellSlot.NameMObj.Offset.Y, 0., dur, ease.OutCubic),
 	}
 	data.MovingSpellSlot.Entity.AddComponent(myecs.Interpolation, interpolations)
 }

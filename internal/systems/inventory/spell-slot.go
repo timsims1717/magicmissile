@@ -185,7 +185,8 @@ func CreateInventorySpellSlot(slot *data.SpellSlot, count int, entityFn func(*ec
 		AddComponent(myecs.Drawable, invSlot.NameMSpr).
 		AddComponent(myecs.Update, data.NewHoverClickFn(data.TheInput, vp, func(hvc *data.HoverClick) {
 			if hvc.Hover && hvc.Input.Get("click").JustPressed() && invSlot.Slot.Spell != "" &&
-				data.MovingSpellSlot.Slot == nil && !data.MovingSpellSlot.Moving {
+				data.MovingSpellSlot.Slot == nil && !data.MovingSpellSlot.Moving &&
+				data.SpellInventory.Spells[invSlot.Slot.Spell] != 0 {
 				offset := invSlot.NameMObj.PostPos.Sub(hvc.View.ProjectWorld(data.TheInput.World))
 				SetMainMovingSlot(invSlot, data.SlotWidth, offset, false, true, -1)
 			}
@@ -230,12 +231,13 @@ func CreateInventorySpellSlot(slot *data.SpellSlot, count int, entityFn func(*ec
 		AddComponent(myecs.Drawable, invSlot.SlotSpr))
 	invSlot.SlotTxt = typeface.New("main", typeface.NewAlign(typeface.Center, typeface.Center), 1., 0.15, 0., 0.)
 	invSlot.SlotTxt.Obj.Layer = 117
+	invSlot.SlotTxt.Obj.Offset.X -= data.SquareFrame.W()*1.5 + data.SlotWidth*0.5
 	invSlot.SlotTxt.Obj.Offset.Y += 6.
 	invSlot.SlotTxt.SetColor(data.ScrollText)
 	invSlot.SlotTxt.SetText(strconv.Itoa(count))
 	entityFn(myecs.Manager.NewEntity().
 		AddComponent(myecs.Object, invSlot.SlotTxt.Obj).
-		AddComponent(myecs.Parent, invSlot.SlotObj).
+		AddComponent(myecs.Parent, invSlot.NameMObj).
 		AddComponent(myecs.Drawable, invSlot.SlotTxt).
 		AddComponent(myecs.DrawTarget, vp))
 	invSlot.TierObj = object.New()
@@ -249,12 +251,13 @@ func CreateInventorySpellSlot(slot *data.SpellSlot, count int, entityFn func(*ec
 		AddComponent(myecs.Drawable, invSlot.TierSpr))
 	invSlot.TierTxt = typeface.New("main", typeface.NewAlign(typeface.Center, typeface.Center), 1., 0.15, 0., 0.)
 	invSlot.TierTxt.Obj.Layer = 117
+	invSlot.TierTxt.Obj.Offset.X -= data.SquareFrame.W()*0.5 + data.SlotWidth*0.5
 	invSlot.TierTxt.Obj.Offset.Y += 6.
 	invSlot.TierTxt.SetColor(data.ScrollText)
 	invSlot.TierTxt.SetText(util.RomanNumeral(slot.Tier))
 	entityFn(myecs.Manager.NewEntity().
 		AddComponent(myecs.Object, invSlot.TierTxt.Obj).
-		AddComponent(myecs.Parent, invSlot.TierObj).
+		AddComponent(myecs.Parent, invSlot.NameMObj).
 		AddComponent(myecs.Drawable, invSlot.TierTxt).
 		AddComponent(myecs.DrawTarget, vp))
 	return invSlot
